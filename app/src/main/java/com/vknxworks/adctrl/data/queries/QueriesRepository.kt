@@ -78,7 +78,8 @@ class QueriesRepository(private val sessions: Sessions, scope: CoroutineScope) {
             val page = fetch(olderThan = null)
             if (active.server.id != sessions.active.value?.server?.id) return@withLock
             _state.value = _state.value.copy(
-                items = page.data,
+                // Rows are keyed; a repeated identical entry would otherwise crash the list.
+                items = page.data.distinctBy { it.key },
                 oldest = if (page.data.size < PAGE) "" else page.oldest,
                 loading = false,
                 error = null,
@@ -104,7 +105,7 @@ class QueriesRepository(private val sessions: Sessions, scope: CoroutineScope) {
             val known = shown.mapTo(HashSet()) { it.key }
             val fresh = page.data.takeWhile { it.key !in known }
             _state.value = _state.value.copy(
-                items = if (fresh.size >= PAGE) page.data else fresh + shown,
+                items = (if (fresh.size >= PAGE) page.data else fresh + shown).distinctBy { it.key },
                 // A whole new page means there's a gap: start the list over from it.
                 oldest = if (fresh.size >= PAGE) page.oldest else _state.value.oldest,
                 error = null,
@@ -129,7 +130,7 @@ class QueriesRepository(private val sessions: Sessions, scope: CoroutineScope) {
                 if (active.server.id != sessions.active.value?.server?.id) return@withLock
                 val known = _state.value.items.mapTo(HashSet()) { it.key }
                 _state.value = _state.value.copy(
-                    items = _state.value.items + page.data.filter { it.key !in known },
+                    items = (_state.value.items + page.data.filter { it.key !in known }).distinctBy { it.key },
                     oldest = if (page.data.size < PAGE) "" else page.oldest,
                     loadingMore = false,
                 )

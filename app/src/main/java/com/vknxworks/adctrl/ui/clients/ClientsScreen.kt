@@ -139,7 +139,8 @@ fun ClientsScreen() {
                 blocked = c.clients.isBlocked(listOf(rc.ip), state.access),
             )
         }
-        p + r
+        // Rows are keyed; never let two share a key.
+        (p + r).distinctBy { it.key }
     }
     val shown = rows.filter { row ->
         (search.isBlank() || row.name.contains(search, true) || row.ids.any { it.contains(search, true) } || row.tags.any { it.contains(search, true) }) &&
@@ -149,7 +150,7 @@ fun ClientsScreen() {
                 ClientFilter.RUNTIME -> !row.persistent
                 ClientFilter.BLOCKED -> row.blocked
             }
-    }.sortedWith(compareByDescending<ClientItem> { it.queries ?: -1 }.thenBy { it.name.lowercase() })
+    }.sortedWith(compareByDescending<ClientItem> { it.queries ?: -1L }.thenBy { it.name.lowercase() })
     val range = stringResource(rangeLabel(overview.range))
 
     Box(Modifier.fillMaxSize()) {

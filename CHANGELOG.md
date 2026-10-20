@@ -4,6 +4,14 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.7.1 (2026-10-21)
+
+### Fixed
+
+- **AdCtrl crashed when opening the Clients tab** as soon as some clients had queries in the chosen range and others didn't. Sorting the list mixed two kinds of number; it now sorts busiest first as intended
+- A client sent by the server in an unexpected shape can no longer crash the Clients tab: it's still listed by its name and addresses, and other problems reading the clients show as an error with Retry instead
+- The query log and the clients list can no longer crash if the server sends the same entry twice
+
 ## v0.7.0 (2026-10-21)
 
 The Clients tab: every device on your network, what it's been doing, and its own settings. All four tabs are now complete.
