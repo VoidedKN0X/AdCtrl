@@ -26,3 +26,7 @@ The first build of AdCtrl: the app's shell, ready for the features that follow. 
 
 - **Google-free and telemetry-free from the start**: no Google Play services, Firebase, ML Kit, analytics or crash reporting. Every build now checks the app's libraries and fails if anything from Google Play services, Firebase, ML Kit, Play Core or Tink appears
 - Added **PRIVACY.md** explaining what AdCtrl sends where (only to your own servers)
+
+### Fixed
+
+- The first build of 0.1.0 didn't compile because the bundled Manrope variable font's weights need an extra compiler setting; it's added, so 0.1.0 now builds and is published
