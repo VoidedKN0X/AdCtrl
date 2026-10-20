@@ -4,6 +4,24 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.7.0 (2026-10-21)
+
+The Clients tab: every device on your network, what it's been doing, and its own settings. All four tabs are now complete.
+
+### New
+
+- **Clients list**: the clients you added and the devices AdGuard Home found by itself (from DHCP, ARP, reverse DNS, the hosts file or whois), busiest first, with their addresses, tags and number of queries in the range chosen on the Overview. Search by name, address or tag, and filter by All, Added, Found or Blocked. A device whose address belongs to a client you added is shown under that client
+- **Client page**: name, addresses, tags, whois details, and whether it's blocked (with the access-list rule that blocks it)
+- **Activity**: its queries in the Overview's range, how many of its newest 500 queries were blocked, its most queried and most blocked domains recently, and **Recent queries** to open its queries in the query log
+- **Settings** for clients you added: use the network-wide settings or its own filtering, safe browsing, parental control and safe search; the network-wide blocked services or its own (pick from the full list); its own upstream DNS servers; and keeping it out of the query log or statistics. Only the setting you change is sent: everything else about the client, including settings AdCtrl doesn't show, stays as it was
+- **Add a client** with a name, addresses (IP, CIDR range, MAC address or ClientID) and tags, from the **+** on the Clients tab or with **Add as a client** on a device AdGuard Home found. **Change name, addresses and tags** or **Remove** a client later
+- **Block this client** stops AdGuard Home answering all of a device's DNS queries, through the access list, after a confirmation that names exactly what's added. **Unblock** lets it back. If your access list only allows listed clients, AdCtrl takes the device off the allowed list instead, and says so. MAC addresses can't be blocked this way, and the button explains why
+- **Overview top clients** now open the client's page
+
+### Privacy
+
+- A client's recent queries are only read while its page is open, and never stored on the phone
+
 ## v0.6.0 (2026-10-21)
 
 The Filters tab: lists, custom rules, blocked services, DNS rewrites and safe browsing, parental control and safe search, each in its own section at the top of the tab.
