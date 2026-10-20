@@ -366,4 +366,150 @@
     <string name="check_result_service">Blocked service: %1$s</string>
     <string name="check_result_cname">Rewritten to %1$s</string>
     <string name="check_result_ips">Answers: %1$s</string>
+    <!-- Filters -->
+    <string name="ok">OK</string>
+    <string name="filters_lists">Lists</string>
+    <string name="filters_rules">Custom rules</string>
+    <string name="filters_services">Services</string>
+    <string name="filters_rewrites">Rewrites</string>
+    <string name="filters_protection">Protection</string>
+    <string name="filters_error_title">Couldn\'t load this</string>
+
+    <!-- Filters: lists -->
+    <string name="filtering_enabled">Filtering</string>
+    <string name="filtering_enabled_subtitle">Use blocklists, allowlists and custom rules</string>
+    <string name="filtering_on">Filtering is on</string>
+    <string name="filtering_off">Filtering is off</string>
+    <string name="filtering_off_title">Turn off filtering?</string>
+    <string name="filtering_off_body">AdGuard Home stops using every blocklist, allowlist and custom rule until you turn it back on. Blocked services, safe browsing and parental control keep working.</string>
+    <string name="filtering_off_confirm">Turn off</string>
+    <string name="filtering_interval">Update lists</string>
+    <string name="interval_never">Never</string>
+    <string name="interval_hour">Every hour</string>
+    <string name="interval_day">Every day</string>
+    <string name="interval_3days">Every 3 days</string>
+    <string name="interval_week">Every week</string>
+    <string name="lists_refresh">Update lists now</string>
+    <string name="lists_refresh_subtitle">Download every blocklist and allowlist again</string>
+    <string name="blocklists">Blocklists</string>
+    <string name="allowlists">Allowlists</string>
+    <string name="add_blocklist">Add blocklist</string>
+    <string name="add_allowlist">Add allowlist</string>
+    <string name="blocklists_empty">No blocklists yet.</string>
+    <string name="allowlists_empty">No allowlists. Allowlists unblock everything they list.</string>
+    <string name="list_updated">updated %1$s</string>
+    <string name="list_never_updated">never downloaded</string>
+    <string name="lists_note">Tap a list to rename it, change its address or remove it. The switch turns it on or off.</string>
+    <string name="list_edit_title">Change list</string>
+    <string name="list_name">Name</string>
+    <string name="list_url">Address</string>
+    <string name="list_url_invalid">Use an http:// or https:// address, or a file path on the server.</string>
+    <string name="list_duplicate">This list is already added.</string>
+    <string name="list_enabled">On</string>
+    <string name="list_add">Add list</string>
+    <string name="list_remove">Remove list</string>
+    <string name="list_remove_title">Remove %1$s?</string>
+    <string name="list_remove_body">Its rules stop blocking anything. You can add it again later.</string>
+    <string name="list_remove_body_allow">Its rules stop allowing anything, so what it unblocked may be blocked again.</string>
+    <string name="known_lists_title">Or pick a well-known list</string>
+    <string name="known_lists_body">These come with AdCtrl, from AdGuard Home\'s own vetted list. Tap one to fill in its name and address.</string>
+    <string name="known_general">General</string>
+    <string name="known_security">Security</string>
+    <string name="known_other">Other</string>
+    <string name="known_added">Already added</string>
+
+    <!-- Filters: custom rules -->
+    <string name="rules_unsaved">not saved</string>
+    <string name="rules_search">Search rules</string>
+    <string name="rules_matches">%1$d of %2$d</string>
+    <string name="rules_prev">Previous</string>
+    <string name="rules_next">Next</string>
+    <string name="rules_hints">Possible mistakes</string>
+    <string name="rules_discard">Discard changes</string>
+    <string name="rules_save">Save</string>
+    <string name="rules_saved">Custom rules saved</string>
+    <string name="rules_empty">No custom rules. Type one rule per line, like ||example.com^</string>
+    <string name="rules_hint_line">Line %1$d: %2$s</string>
+    <string name="rules_hint_show">Show</string>
+    <string name="rules_hint_fix">Use %1$s</string>
+    <string name="rules_save_title">Save custom rules?</string>
+    <string name="rules_save_summary">%1$d added, %2$d removed:</string>
+    <string name="rules_save_hints">There are %1$d possible mistakes. You can save anyway.</string>
+    <string name="rules_leave_title">Discard your changes?</string>
+    <string name="rules_leave_body">Your edits to the custom rules aren\'t saved yet.</string>
+    <string name="rules_keep_editing">Keep editing</string>
+    <string name="hint_scheme">DNS filtering only sees host names, not addresses with http:// or https://.</string>
+    <string name="hint_path">DNS filtering can\'t block a path, only a whole host name.</string>
+    <string name="hint_wildcard">To cover a domain and its subdomains, use ||example.com^ instead of *.example.com.</string>
+    <string name="hint_separator">Without ^ at the end this also matches longer names, like example.com.other.net.</string>
+    <string name="hint_cosmetic">This is a browser element-hiding rule; AdGuard Home ignores it.</string>
+    <string name="hint_empty">This rule doesn\'t name anything to match.</string>
+    <string name="hint_duplicate">Same as line %1$s.</string>
+    <string name="hint_spaces">Adblock-style rules can\'t contain spaces.</string>
+
+    <!-- Filters: blocked services -->
+    <string name="services_schedule">Pause schedule</string>
+    <string name="services_schedule_none">Blocked services are blocked all the time</string>
+    <string name="services_search">Search services</string>
+    <string name="services_all">All (%1$d)</string>
+    <string name="services_blocked">Blocked (%1$d)</string>
+    <string name="services_none">No services match.</string>
+    <string name="services_group_other">Other</string>
+    <string name="schedule_body">Blocked services aren\'t blocked during these hours, for example to allow games in the evening. Times are in the server\'s time zone (%1$s).</string>
+    <string name="schedule_from">Paused from</string>
+    <string name="schedule_until">Paused until</string>
+    <string name="schedule_midnight_note">00:00 means midnight at the end of the day.</string>
+    <string name="schedule_clear">Remove all pauses</string>
+    <string name="schedule_invalid">A pause has to end after it starts.</string>
+    <string name="schedule_saved">Pause schedule saved</string>
+
+    <!-- Filters: rewrites -->
+    <string name="rewrites_enabled">DNS rewrites</string>
+    <string name="rewrites_enabled_subtitle">Answer these domains with your own addresses</string>
+    <string name="rewrites_on">DNS rewrites are on</string>
+    <string name="rewrites_off">DNS rewrites are off</string>
+    <string name="rewrites_search">Search rewrites</string>
+    <string name="rewrites_empty">No DNS rewrites yet. Use them to give devices and services on your network a name.</string>
+    <string name="rewrites_none_match">No rewrites match.</string>
+    <string name="rewrite_add">Add rewrite</string>
+    <string name="rewrite_edit">Change rewrite</string>
+    <string name="rewrite_domain">Domain</string>
+    <string name="rewrite_domain_hint">*.example.com also covers every subdomain</string>
+    <string name="rewrite_answer">Answer</string>
+    <string name="rewrite_answer_hint">An IP address, a domain (CNAME), or A / AAAA to keep the real answer for that type</string>
+    <string name="rewrite_duplicate">This rewrite already exists.</string>
+    <string name="rewrite_delete">Delete rewrite</string>
+    <string name="rewrite_delete_title">Delete the rewrite for %1$s?</string>
+    <string name="rewrite_delete_body">%1$s will no longer be answered with %2$s.</string>
+    <string name="rewrite_added">Rewrite for %1$s added</string>
+    <string name="rewrite_deleted">Rewrite for %1$s deleted</string>
+    <string name="rewrite_keep_a">keep the real IPv4 answer</string>
+    <string name="rewrite_keep_aaaa">keep the real IPv6 answer</string>
+
+    <!-- Filters: protection -->
+    <string name="safe_browsing">Safe browsing</string>
+    <string name="safe_browsing_subtitle">Block known malware and phishing sites</string>
+    <string name="parental">Parental control</string>
+    <string name="parental_subtitle">Block adult websites</string>
+    <string name="safe_search">Safe search</string>
+    <string name="safe_search_subtitle">Force safe search on search engines and YouTube</string>
+    <string name="safe_search_engines">Safe search for</string>
+    <string name="protection_footer">These apply to every device that uses the network-wide settings. Safe browsing and parental control check a hashed prefix of each domain with AdGuard\'s servers.</string>
+
+    <plurals name="interval_hours">
+        <item quantity="one">Every hour</item>
+        <item quantity="other">Every %1$d hours</item>
+    </plurals>
+    <plurals name="list_rules">
+        <item quantity="one">%1$s rule</item>
+        <item quantity="other">%1$s rules</item>
+    </plurals>
+    <plurals name="lists_updated">
+        <item quantity="one">%1$d list updated</item>
+        <item quantity="other">%1$d lists updated</item>
+    </plurals>
+    <plurals name="rules_count">
+        <item quantity="one">%1$d rule</item>
+        <item quantity="other">%1$d rules</item>
+    </plurals>
 </resources>

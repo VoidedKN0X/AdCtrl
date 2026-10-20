@@ -57,6 +57,7 @@ import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.ui.components.LocalBottomClearance
 import com.vknxworks.adctrl.ui.components.LocalHazeState
 import com.vknxworks.adctrl.ui.components.TabPlaceholder
+import com.vknxworks.adctrl.ui.filters.FiltersScreen
 import com.vknxworks.adctrl.ui.overview.OverviewScreen
 import com.vknxworks.adctrl.ui.queries.CheckHostScreen
 import com.vknxworks.adctrl.ui.queries.QueriesScreen
@@ -207,7 +208,7 @@ private fun AppNavHost(navController: NavHostController) {
             when (top.route) {
                 OverviewRoute -> composable<OverviewRoute> { OverviewScreen() }
                 QueriesRoute -> composable<QueriesRoute> { QueriesScreen() }
-                FiltersRoute -> composable<FiltersRoute> { TabPlaceholder(top.label, top.hint, top.selectedIcon) }
+                FiltersRoute -> composable<FiltersRoute> { FiltersScreen() }
                 ClientsRoute -> composable<ClientsRoute> { TabPlaceholder(top.label, top.hint, top.selectedIcon) }
             }
         }
