@@ -74,27 +74,31 @@ class AghClient(
     val http: OkHttpClient = httpFor(base, baseUrl, server.certPin)
     private val auth = Credentials.basic(server.username, secrets.password, Charsets.UTF_8)
 
-    fun url(path: String, query: Map<String, String> = emptyMap()): HttpUrl {
+    fun url(path: String, query: List<Pair<String, String>> = emptyList()): HttpUrl {
         val b = baseUrl.newBuilder().addPathSegment("control")
         path.trim('/').split('/').filter { it.isNotEmpty() }.forEach { b.addPathSegment(it) }
         query.forEach { (k, v) -> b.addQueryParameter(k, v) }
         return b.build()
     }
 
-    suspend fun get(path: String, query: Map<String, String> = emptyMap()): JsonElement = call("GET", path, query, null)
+    suspend fun get(path: String, query: Map<String, String> = emptyMap()): JsonElement = call("GET", path, query.toList(), null)
 
     suspend fun <T> get(path: String, strategy: DeserializationStrategy<T>, query: Map<String, String> = emptyMap()): T =
         decode(strategy, get(path, query))
 
-    suspend fun post(path: String, body: JsonElement? = null): JsonElement = call("POST", path, emptyMap(), body)
+    /** GET with parameters that may repeat (the query log's "reason"). */
+    suspend fun <T> getMulti(path: String, strategy: DeserializationStrategy<T>, query: List<Pair<String, String>>): T =
+        decode(strategy, call("GET", path, query, null))
+
+    suspend fun post(path: String, body: JsonElement? = null): JsonElement = call("POST", path, emptyList(), body)
 
     /**
      * A POST that only reads (AdGuard Home's version check is a POST). Allowed in read-only mode and
      * not behind the app lock, because it changes nothing.
      */
-    suspend fun postRead(path: String, body: JsonElement? = null): JsonElement = call("POST", path, emptyMap(), body, write = false)
+    suspend fun postRead(path: String, body: JsonElement? = null): JsonElement = call("POST", path, emptyList(), body, write = false)
 
-    suspend fun put(path: String, body: JsonElement? = null): JsonElement = call("PUT", path, emptyMap(), body)
+    suspend fun put(path: String, body: JsonElement? = null): JsonElement = call("PUT", path, emptyList(), body)
 
     /** GET /control/status: also proves the address is AdGuard Home and the sign-in works. */
     suspend fun status(): ServerStatus {
@@ -118,7 +122,7 @@ class AghClient(
     private suspend fun call(
         method: String,
         path: String,
-        query: Map<String, String>,
+        query: List<Pair<String, String>>,
         body: JsonElement?,
         write: Boolean = method != "GET",
     ): JsonElement {

@@ -4,6 +4,25 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.5.0 (2026-10-21)
+
+The Queries tab: your live query log, with one-tap block and unblock.
+
+### New
+
+- **Live query log**, newest first. New queries appear at the top every few seconds while the tab is open (pause and resume live updates with the button at the top), and older ones load as you scroll down, all the way back to what AdGuard Home keeps. Pull down to refresh
+- Each query shows the domain, the time, what happened to it (blocked, blocked service, malware or phishing, adult website, safe search, allowed by rule, rewritten, processed, from cache) and which list blocked or allowed it, plus the query type, the client (by name when AdGuard Home knows it), the response time and the upstream DNS server
+- **Search** domains or clients, and **filter** by All, Blocked, Allowed, Processed, Rewritten, Malware and phishing, or Adult websites
+- **Query details**: tap a query for its answer records (and the upstream's original answer when it was changed), the rule that matched and the list it came from, the response code, time taken, upstream, cache and DNSSEC, and the client's name, IP address, ClientID, protocol and whois
+- **Block or Unblock in one tap** from a query's details. Choose only this host, this host and its subdomains, or the whole domain, and optionally only for this client. AdCtrl shows the exact rule (like `||example.com^` or `@@||example.com^$important`) before adding it to your custom rules. Unblocking wins over every blocklist, blocked service, safe browsing and parental control. With more than one server, add the rule **on all servers** at once
+- **This client's queries**: from a query's details, show only that client's queries; the search then narrows its domains. Tap the client chip to go back to everyone
+- **Check host**: type a domain (optionally a client and query type) to see whether AdGuard Home would block it, and by which rule and list, with Block or Unblock right there. Open it from the button at the top of Queries or from a query's details
+- **Overview top lists are tappable**: a top queried domain opens Queries searching for it, a top blocked domain opens the blocked queries for it, and a top client opens that client's queries
+
+### Privacy
+
+- The query log is only held in memory while you use AdCtrl: it's never written to the phone's storage, and it's cleared when you switch servers
+
 ## v0.4.1 (2026-10-21)
 
 ### Fixed

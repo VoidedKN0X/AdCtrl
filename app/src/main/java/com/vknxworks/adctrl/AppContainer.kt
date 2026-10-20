@@ -2,6 +2,8 @@ package com.vknxworks.adctrl
 
 import android.content.Context
 import com.vknxworks.adctrl.data.overview.OverviewRepository
+import com.vknxworks.adctrl.data.queries.QueriesRepository
+import com.vknxworks.adctrl.data.rules.UserRules
 import com.vknxworks.adctrl.data.server.HostAllowlist
 import com.vknxworks.adctrl.data.server.ServerStore
 import com.vknxworks.adctrl.data.server.Sessions
@@ -47,6 +49,8 @@ class AppContainer(val context: Context) {
 
     val sessions = Sessions(serverStore, http, appScope)
     val overview = OverviewRepository(context, sessions, appScope)
+    val queries = QueriesRepository(sessions, appScope)
+    val userRules = UserRules(sessions)
 }
 
 val Context.container: AppContainer

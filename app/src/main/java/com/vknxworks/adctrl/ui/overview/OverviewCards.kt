@@ -1,6 +1,7 @@
 package com.vknxworks.adctrl.ui.overview
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -207,7 +208,14 @@ fun QueriesChart(stats: Stats, now: Long) {
 
 /** A top list: name, number and a bar relative to the first entry. */
 @Composable
-fun TopListCard(title: String, entries: List<TopEntry>, empty: String, format: (TopEntry) -> String, label: (TopEntry) -> String = { it.key }) {
+fun TopListCard(
+    title: String,
+    entries: List<TopEntry>,
+    empty: String,
+    format: (TopEntry) -> String,
+    label: (TopEntry) -> String = { it.key },
+    onClick: ((TopEntry) -> Unit)? = null,
+) {
     OverviewCard(title) {
         Column(Modifier.padding(vertical = 6.dp)) {
             if (entries.isEmpty()) {
@@ -215,7 +223,11 @@ fun TopListCard(title: String, entries: List<TopEntry>, empty: String, format: (
             }
             val max = entries.maxOfOrNull { it.value }?.takeIf { it > 0 } ?: 1.0
             entries.forEach { e ->
-                Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 7.dp)) {
+                Column(
+                    Modifier.fillMaxWidth()
+                        .then(if (onClick != null) Modifier.clickable { onClick(e) } else Modifier)
+                        .padding(horizontal = 16.dp, vertical = 7.dp),
+                ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(label(e), style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                         Spacer(Modifier.width(12.dp))

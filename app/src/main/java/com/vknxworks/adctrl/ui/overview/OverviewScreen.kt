@@ -32,7 +32,11 @@ import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.container
 import com.vknxworks.adctrl.data.api.AghError
 import com.vknxworks.adctrl.data.api.AghVersion
+import com.vknxworks.adctrl.data.api.QueryFilter
 import com.vknxworks.adctrl.data.api.TopEntry
+import com.vknxworks.adctrl.data.queries.QuerySearch
+import com.vknxworks.adctrl.ui.nav.LocalNavigator
+import com.vknxworks.adctrl.ui.nav.QueriesRoute
 import com.vknxworks.adctrl.data.overview.Attention
 import com.vknxworks.adctrl.data.overview.PauseDuration
 import com.vknxworks.adctrl.data.overview.StatsRange
@@ -56,6 +60,7 @@ private enum class Pending { CLEAR_CACHE, UPDATE }
 fun OverviewScreen() {
     val context = LocalContext.current
     val c = context.container
+    val nav = LocalNavigator.current
     val scope = rememberCoroutineScope()
     val state by c.overview.state.collectAsStateWithLifecycle()
     val active by c.sessions.active.collectAsStateWithLifecycle()
@@ -98,6 +103,12 @@ fun OverviewScreen() {
         else -> ProtectionState.Off
     }
     val attention = remember(snap, state.pausedUntil, now / 1000) { snap?.let { Attention.compute(it, state.pausedUntil, now) }.orEmpty() }
+
+    /** Opens the Queries tab filtered by a domain or client from a top list. */
+    fun openQueries(search: QuerySearch) {
+        c.appScope.launch { c.queries.setSearch(search) }
+        nav.tab(QueriesRoute)
+    }
 
     fun report(e: Throwable) {
         scope.launch { snackbar.showSnackbar(errorMessage(context, e, server?.host.orEmpty())) }
@@ -198,6 +209,7 @@ fun OverviewScreen() {
                                 TopEntry.parse(stats.topQueriedDomains).take(TOP_COUNT),
                                 stringResource(R.string.top_empty),
                                 format = { formatCount(it.value.toLong()) },
+                                onClick = { e -> openQueries(QuerySearch(text = e.key)) },
                             )
                         }
                         item(key = "top-blocked") {
@@ -206,6 +218,7 @@ fun OverviewScreen() {
                                 TopEntry.parse(stats.topBlockedDomains).take(TOP_COUNT),
                                 stringResource(R.string.top_empty),
                                 format = { formatCount(it.value.toLong()) },
+                                onClick = { e -> openQueries(QuerySearch(text = e.key, filter = QueryFilter.BLOCKED)) },
                             )
                         }
                         item(key = "top-clients") {
@@ -214,6 +227,7 @@ fun OverviewScreen() {
                                 TopEntry.parse(stats.topClients).take(TOP_COUNT),
                                 stringResource(R.string.top_empty),
                                 format = { formatCount(it.value.toLong()) },
+                                onClick = { e -> openQueries(QuerySearch(client = e.key)) },
                             )
                         }
                         item(key = "top-upstreams") { UpstreamsCard(stats) }
