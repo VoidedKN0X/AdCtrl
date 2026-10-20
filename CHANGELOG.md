@@ -4,6 +4,21 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.4.0 (2026-10-21)
+
+### New
+
+- **Quick Settings tile.** Add the **AdGuard** tile from your phone's Quick Settings edit screen. It's lit while protection is on and dimmed while it's paused or off, with the state underneath: "On · tap to pause 5 minutes", "Paused · 4:32 left" (counting down while the panel is open), or "Off"
+- **Tap the tile** to pause protection for your default duration, or to turn it back on when it's paused or off. **Long-press** it to open AdCtrl
+- **Settings › Quick Settings tile**: choose how long a tap pauses for (30 seconds up to 8 hours, or until you turn it back on; 5 minutes by default), and whether the tile pauses **all servers** that aren't read-only or only the active one
+- **5 minutes** is now also in the pause menu on the Overview
+- With more than one server, the tile is named after the active server
+
+### Security
+
+- **No pausing from the lock screen**: tapping the tile on a locked phone asks you to unlock it first
+- On a read-only server the tile only shows the state; tapping it opens AdCtrl instead of changing anything
+
 ## v0.3.0 (2026-10-20)
 
 The Overview is here: protection, statistics and server info for your AdGuard Home.

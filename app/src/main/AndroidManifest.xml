@@ -27,7 +27,28 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Long-pressing the Quick Settings tile opens AdCtrl. -->
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
+
+        <!-- Quick Settings tile: protection on, paused or off; tap to pause or resume. Exported because
+             only System UI can bind to it (BIND_QUICK_SETTINGS_TILE). -->
+        <service
+            android:name=".ui.widgets.ProtectionTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_shield"
+            android:label="@string/tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="true" />
+        </service>
 
         <!-- Don't let androidx.emoji2 look up a downloadable emoji font at start-up: emoji are drawn with the
              phone's own emoji font, and nothing is fetched. -->
