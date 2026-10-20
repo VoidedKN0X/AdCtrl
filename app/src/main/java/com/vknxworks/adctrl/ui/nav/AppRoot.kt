@@ -56,7 +56,8 @@ import androidx.navigation.compose.rememberNavController
 import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.ui.components.LocalBottomClearance
 import com.vknxworks.adctrl.ui.components.LocalHazeState
-import com.vknxworks.adctrl.ui.components.TabPlaceholder
+import com.vknxworks.adctrl.ui.clients.ClientScreen
+import com.vknxworks.adctrl.ui.clients.ClientsScreen
 import com.vknxworks.adctrl.ui.filters.FiltersScreen
 import com.vknxworks.adctrl.ui.overview.OverviewScreen
 import com.vknxworks.adctrl.ui.queries.CheckHostScreen
@@ -209,8 +210,12 @@ private fun AppNavHost(navController: NavHostController) {
                 OverviewRoute -> composable<OverviewRoute> { OverviewScreen() }
                 QueriesRoute -> composable<QueriesRoute> { QueriesScreen() }
                 FiltersRoute -> composable<FiltersRoute> { FiltersScreen() }
-                ClientsRoute -> composable<ClientsRoute> { TabPlaceholder(top.label, top.hint, top.selectedIcon) }
+                ClientsRoute -> composable<ClientsRoute> { ClientsScreen() }
             }
+        }
+        composable<ClientRoute> {
+            val r = it.toRoute<ClientRoute>()
+            ClientScreen(r.key, r.persistent)
         }
         composable<CheckHostRoute> {
             val r = it.toRoute<CheckHostRoute>()

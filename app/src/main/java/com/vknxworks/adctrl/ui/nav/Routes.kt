@@ -8,6 +8,9 @@ import kotlinx.serialization.Serializable
 @Serializable data object FiltersRoute
 @Serializable data object ClientsRoute
 
+/** A client: [key] is a persistent client's name, or a runtime client's IP address. */
+@Serializable data class ClientRoute(val key: String, val persistent: Boolean)
+
 /** Check host, optionally filled in with a domain and client. */
 @Serializable data class CheckHostRoute(val host: String = "", val client: String = "")
 

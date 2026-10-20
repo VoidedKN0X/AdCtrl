@@ -36,6 +36,7 @@ import com.vknxworks.adctrl.data.api.QueryFilter
 import com.vknxworks.adctrl.data.api.TopEntry
 import com.vknxworks.adctrl.data.queries.QuerySearch
 import com.vknxworks.adctrl.ui.nav.LocalNavigator
+import com.vknxworks.adctrl.ui.nav.ClientRoute
 import com.vknxworks.adctrl.ui.nav.QueriesRoute
 import com.vknxworks.adctrl.data.overview.Attention
 import com.vknxworks.adctrl.data.overview.PauseDuration
@@ -227,7 +228,7 @@ fun OverviewScreen() {
                                 TopEntry.parse(stats.topClients).take(TOP_COUNT),
                                 stringResource(R.string.top_empty),
                                 format = { formatCount(it.value.toLong()) },
-                                onClick = { e -> openQueries(QuerySearch(client = e.key)) },
+                                onClick = { e -> nav.navigate(ClientRoute(key = e.key, persistent = false)) },
                             )
                         }
                         item(key = "top-upstreams") { UpstreamsCard(stats) }
