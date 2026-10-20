@@ -18,7 +18,7 @@ What AdCtrl is being built to do:
 - **Queries**: the live query log with search and filters, the matched rule and list for every answer, and **one-tap block or unblock** of any domain, for one subdomain, the whole domain or one client
 - **Filters**: blocklists and allowlists, a custom rules editor with syntax highlighting, blocked services, DNS rewrites, and safe browsing, parental control and safe search
 - **Clients**: every device with its statistics and settings, and blocking a device entirely
-- **Quick Settings tile**, widget and app shortcuts to pause protection without opening the app
+- **Quick Settings tile** to pause protection or turn it back on with one tap (long-press opens AdCtrl), plus a widget and app shortcuts
 - **Several servers**, such as a primary and a secondary, with "apply to all servers" for rule changes and pausing
 - **Safe by design**: a read-only mode, confirmation before changes, certificate pinning, screenshot protection, an optional app lock, and passwords encrypted with the Android Keystore
 

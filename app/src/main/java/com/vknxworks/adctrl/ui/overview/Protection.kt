@@ -180,6 +180,7 @@ fun PauseSheet(
 fun pauseLabel(d: PauseDuration): Int = when (d) {
     PauseDuration.S30 -> R.string.pause_30s
     PauseDuration.M1 -> R.string.pause_1m
+    PauseDuration.M5 -> R.string.pause_5m
     PauseDuration.M10 -> R.string.pause_10m
     PauseDuration.H1 -> R.string.pause_1h
     PauseDuration.H8 -> R.string.pause_8h

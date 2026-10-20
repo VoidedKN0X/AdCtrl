@@ -43,6 +43,7 @@ enum class StatsRange(val ms: Long) {
 enum class PauseDuration(val ms: Long?) {
     S30(30_000),
     M1(60_000),
+    M5(300_000),
     M10(600_000),
     H1(3_600_000),
     H8(8 * 3_600_000),

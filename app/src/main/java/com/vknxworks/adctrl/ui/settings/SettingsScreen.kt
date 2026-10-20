@@ -19,14 +19,18 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.container
+import com.vknxworks.adctrl.data.overview.PauseDuration
 import com.vknxworks.adctrl.data.settings.ThemeChoice
+import com.vknxworks.adctrl.ui.overview.pauseLabel
+import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Timer
 import com.vknxworks.adctrl.ui.components.Group
 import com.vknxworks.adctrl.ui.components.GroupChoice
 import com.vknxworks.adctrl.ui.components.GroupSwitch
 import com.vknxworks.adctrl.ui.components.ScreenTopBar
 import kotlinx.coroutines.launch
 
-/** App settings: appearance and privacy. Notifications, app lock and widgets join as they're built. */
+/** App settings: appearance, the Quick Settings tile and privacy. Notifications, app lock and widgets join as they're built. */
 @Composable
 fun SettingsScreen() {
     val c = LocalContext.current.container
@@ -49,6 +53,20 @@ fun SettingsScreen() {
                     checked = settings.dynamicColor,
                     icon = Icons.Filled.Palette,
                 ) { on -> c.appScope.launch { c.settings.update { it.copy(dynamicColor = on) } } }
+            }
+            Group(stringResource(R.string.tile_settings_group), footer = stringResource(R.string.tile_settings_footer)) {
+                GroupChoice(
+                    stringResource(R.string.tile_pause_setting),
+                    PauseDuration.entries.map { it to stringResource(pauseLabel(it)) },
+                    settings.tilePause,
+                    icon = Icons.Filled.Timer,
+                ) { d -> c.appScope.launch { c.settings.update { it.copy(tilePause = d) } } }
+                GroupSwitch(
+                    stringResource(R.string.tile_all_setting),
+                    stringResource(R.string.tile_all_setting_subtitle),
+                    checked = settings.tileAllServers,
+                    icon = Icons.Filled.Dns,
+                ) { on -> c.appScope.launch { c.settings.update { it.copy(tileAllServers = on) } } }
             }
             Group(stringResource(R.string.group_privacy), footer = stringResource(R.string.hide_content_footer)) {
                 GroupSwitch(
