@@ -32,7 +32,13 @@ val AghJson = Json {
     encodeDefaults = true
 }
 
-private val JSON_TYPE = "application/json; charset=utf-8".toMediaType()
+/**
+ * AdGuard Home accepts a change with a body only when Content-Type is exactly "application/json"
+ * (internal/home/control.go, ensureContentType); anything else, even with "; charset=utf-8", gets
+ * 415. A body built from bytes keeps this header as is (OkHttp adds a charset to String bodies), and
+ * a change without a body must have no Content-Type at all.
+ */
+private val JSON_TYPE = "application/json".toMediaType()
 
 /**
  * OkHttp client for one server: normal certificate checks, or only the pinned certificate when the
@@ -123,7 +129,7 @@ class AghClient(
             val requestBody = when {
                 method == "GET" -> null
                 body == null -> ByteArray(0).toRequestBody(null)
-                else -> AghJson.encodeToString(JsonElement.serializer(), body).toRequestBody(JSON_TYPE)
+                else -> AghJson.encodeToString(JsonElement.serializer(), body).toByteArray(Charsets.UTF_8).toRequestBody(JSON_TYPE)
             }
             val request = Request.Builder()
                 .url(url(path, query))
