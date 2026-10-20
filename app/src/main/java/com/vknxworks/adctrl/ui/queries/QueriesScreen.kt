@@ -253,25 +253,20 @@ fun QueriesScreen() {
     }
     ruleTarget?.let { target ->
         val item = target.item
+        val ruleClient = item.client.ifBlank { item.clientId }.ifBlank { null }
         RuleDialog(
             block = target.block,
             host = item.asciiDomain,
-            client = item.client.ifBlank { item.clientId }.ifBlank { null },
+            client = ruleClient,
             clientLabel = item.clientLabel,
             writableServers = servers.count { !it.readOnly },
+            loadOpposing = { c.userRules.opposing(target.block, item.asciiDomain, ruleClient) },
             onDismiss = { ruleTarget = null },
             onSave = { rule, all ->
                 ruleTarget = null
                 scope.launch {
-                    val result = c.userRules.add(rule, all)
-                    val msg = when {
-                        result.failed.isNotEmpty() && result.added.isEmpty() && result.alreadyThere.isEmpty() ->
-                            errorMessage(context, result.failed.first().second, result.failed.first().first.host)
-                        result.failed.isNotEmpty() -> context.getString(R.string.rule_failed_some, result.failed.joinToString(", ") { it.first.name })
-                        result.added.isEmpty() -> context.getString(R.string.rule_already)
-                        else -> context.getString(if (target.block) R.string.rule_blocked else R.string.rule_unblocked, item.domain)
-                    }
-                    snackbar.showSnackbar(msg)
+                    val result = c.userRules.apply(target.block, item.asciiDomain, ruleClient, rule, all)
+                    snackbar.showSnackbar(ruleResultMessage(context, result, target.block, item.domain))
                 }
             },
         )

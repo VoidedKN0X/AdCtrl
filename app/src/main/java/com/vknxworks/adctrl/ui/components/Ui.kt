@@ -24,7 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -102,7 +102,7 @@ fun TabTitle(
 
 /**
  * The profile picture; tapping it opens account and settings (there is no "You" tab).
- * Shows the first letter of the active server's name.
+ * Shows the first letter of the active server's name, or AdCtrl's shield when it doesn't start with a letter.
  */
 @Composable
 fun ProfileButton() {
@@ -116,7 +116,7 @@ fun ProfileButton() {
             contentAlignment = Alignment.Center,
         ) {
             if (initial.isNullOrBlank()) {
-                Icon(Icons.Filled.AccountCircle, label, tint = MaterialTheme.colorScheme.primary)
+                Icon(Icons.Filled.Shield, label, Modifier.size(20.dp), tint = MaterialTheme.colorScheme.primary)
             } else {
                 Text(initial.take(1).uppercase(), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             }

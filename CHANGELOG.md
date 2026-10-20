@@ -4,6 +4,17 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.5.1 (2026-10-21)
+
+### Changed
+
+- **Block and Unblock keep your custom rules tidy.** Unblocking a domain that your own custom rule blocks now removes that line instead of adding an allow rule on top, and blocking a domain your own allow rule lets through removes that allow rule. The dialog shows exactly which line will be removed before you confirm
+- A new rule is only added when it's still needed: when unblocking, if a blocklist, blocked service, safe browsing or parental control also blocks the domain once your rule is gone (then the allow rule is added, with the scope and client you chose); when blocking, if nothing blocks the domain once your allow rule is gone
+- Every copy of a removed line goes, and nothing else in your custom rules changes. With **On all servers**, each server is checked and tidied on its own
+- If the domain is already the way you asked, nothing is changed and AdCtrl says so
+- **Check host** now offers **Block** for domains allowed by a rule too, so you can undo an unblock from there
+- **Profile picture**: shows the first letter of the server's name only when the name starts with a letter. Names like `192.168.1.2` now show AdCtrl's shield instead of "1". Name a server (for example "Primary") under **Account › Servers › Change address or sign-in** to see its letter
+
 ## v0.5.0 (2026-10-21)
 
 The Queries tab: your live query log, with one-tap block and unblock.

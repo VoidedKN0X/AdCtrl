@@ -159,24 +159,20 @@ fun CheckHostScreen(initialHost: String, initialClient: String) {
     }
 
     rule?.let { block ->
+        val ruleClient = client.ifBlank { null }
         RuleDialog(
             block = block,
             host = checked,
-            client = client.ifBlank { null },
+            client = ruleClient,
             clientLabel = null,
             writableServers = servers.count { !it.readOnly },
+            loadOpposing = { c.userRules.opposing(block, checked, ruleClient) },
             onDismiss = { rule = null },
             onSave = { text, all ->
                 rule = null
                 scope.launch {
-                    val res = c.userRules.add(text, all)
-                    snackbar.showSnackbar(
-                        when {
-                            res.failed.isNotEmpty() -> context.getString(R.string.rule_failed_some, res.failed.joinToString(", ") { it.first.name })
-                            res.added.isEmpty() -> context.getString(R.string.rule_already)
-                            else -> context.getString(if (block) R.string.rule_blocked else R.string.rule_unblocked, checked)
-                        },
-                    )
+                    val res = c.userRules.apply(block, checked, ruleClient, text, all)
+                    snackbar.showSnackbar(ruleResultMessage(context, res, block, checked))
                     check()
                 }
             },
@@ -228,7 +224,7 @@ private fun CheckResultCard(host: String, r: CheckHostResult, names: Map<Long, S
                     FilledTonalButton(onClick = { onRule(false) }) {
                         Icon(Icons.Filled.Verified, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_unblock))
                     }
-                } else if (kind != QueryKind.ALLOWED) {
+                } else {
                     FilledTonalButton(onClick = { onRule(true) }) {
                         Icon(Icons.Filled.Block, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_block))
                     }
