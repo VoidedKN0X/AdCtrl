@@ -1,6 +1,7 @@
 package com.vknxworks.adctrl
 
 import android.content.Context
+import com.vknxworks.adctrl.data.overview.OverviewRepository
 import com.vknxworks.adctrl.data.server.HostAllowlist
 import com.vknxworks.adctrl.data.server.ServerStore
 import com.vknxworks.adctrl.data.server.Sessions
@@ -45,6 +46,7 @@ class AppContainer(val context: Context) {
         .build()
 
     val sessions = Sessions(serverStore, http, appScope)
+    val overview = OverviewRepository(context, sessions, appScope)
 }
 
 val Context.container: AppContainer

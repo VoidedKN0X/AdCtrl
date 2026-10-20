@@ -4,6 +4,32 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.3.0 (2026-10-20)
+
+The Overview is here: protection, statistics and server info for your AdGuard Home.
+
+### New
+
+- **Protection switch** at the top of the Overview, showing whether AdGuard Home is blocking for your network. Switching it off opens the **pause menu** (nothing changes until you pick a duration): 30 seconds, 1 minute, 10 minutes, 1 hour, 8 hours, or until you turn it back on
+- **Live countdown** while protection is paused, with **Resume now** and **Change pause**. When the pause runs out, the Overview checks the server and shows protection back on
+- **All servers**: with more than one server, the pause menu can pause (or resume) every server that isn't read-only at once, for a primary and secondary pair. If one server can't be changed, AdCtrl tells you which
+- **Statistics** for the last 24 hours, 7 days, 30 days or 90 days. Only ranges your server keeps statistics for are offered: total DNS queries, queries blocked by filters (with the percentage), malware and phishing blocked, adult websites blocked, safe search enforced, and the average processing time
+- **Queries over time**: a graph of queries and blocked queries per hour or per day. Touch and drag across it to see the numbers at any point
+- **Top lists**: top queried domains, top blocked domains, top clients and top upstream DNS servers, with each upstream's number of answers and average response time
+- **Needs attention** list: protection off or paused, filtering switched off, filter lists that aren't updating (no rules, never downloaded, or not updated for over twice the update interval), a new AdGuard Home version, and statistics switched off
+- **Server info**: AdGuard Home version, DNS addresses and port, upstream DNS servers, DNS cache and DHCP server on or off, and whether an update is available
+- **Clear DNS cache** and **Update to …** (when AdGuard Home can update itself), each after a confirmation, plus **Check for updates**
+- **Works offline**: when the server can't be reached, the Overview keeps showing the last known state, marked with when it was from and why it couldn't refresh, with **Retry**
+- Pull down to refresh. The Overview refreshes every 30 seconds while you look at it, less often while the server is unreachable, and not at all in the background
+
+### Changed
+
+- **Read-only mode** now hides the protection switch, pause menu, clear cache and update actions; the state is still shown
+
+### Privacy
+
+- To show the last known Overview when the server is unreachable, AdCtrl keeps the latest statistics (including top domains and clients) in its private storage on the phone. It's never backed up or sent anywhere, and is deleted when you remove the server
+
 ## v0.2.0 (2026-10-20)
 
 AdCtrl now connects to your AdGuard Home. The tabs are still placeholders; the Overview with the protection switch comes next.

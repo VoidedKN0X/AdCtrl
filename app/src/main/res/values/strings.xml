@@ -136,4 +136,106 @@
     <string name="error_generic">Something went wrong.</string>
     <string name="error_read_only">This server is in read-only mode, so nothing was changed. Turn read-only mode off to make changes.</string>
     <string name="error_cancelled">Cancelled: the change wasn\'t confirmed with your fingerprint or screen lock.</string>
+    <!-- Overview: protection -->
+    <string name="protection_paused">Protection is paused</string>
+    <string name="protection_unknown">Protection</string>
+    <string name="protection_on_body">%1$s is blocking ads and trackers for your network</string>
+    <string name="protection_paused_body">Back on by itself in %1$s</string>
+    <string name="protection_off_body">Off until someone turns it back on. Nothing is blocked.</string>
+    <string name="protection_unknown_body">Waiting for the server…</string>
+    <string name="resume_now">Resume now</string>
+    <string name="pause_change">Change pause</string>
+    <string name="pause_title">Pause protection</string>
+    <string name="pause_body">Nothing is blocked while protection is paused. It comes back on by itself when the time is up.</string>
+    <string name="pause_30s">30 seconds</string>
+    <string name="pause_1m">1 minute</string>
+    <string name="pause_10m">10 minutes</string>
+    <string name="pause_1h">1 hour</string>
+    <string name="pause_8h">8 hours</string>
+    <string name="pause_until_on">Until I turn it back on</string>
+    <string name="apply_all_servers">All servers</string>
+    <string name="apply_all_servers_body">Also on your other servers that aren\'t read-only (%1$d in total)</string>
+    <string name="paused_all">Protection paused on all servers</string>
+    <string name="resumed_all">Protection back on, on all servers</string>
+    <string name="protection_failed_some">Couldn\'t change protection on: %1$s</string>
+
+    <!-- Overview: attention -->
+    <string name="attention_title">Needs attention</string>
+    <string name="sev_critical">Critical</string>
+    <string name="sev_warning">Warning</string>
+    <string name="sev_info">Info</string>
+    <string name="att_protection_off">Protection is off</string>
+    <string name="att_protection_off_detail">It stays off until someone turns it back on.</string>
+    <string name="att_paused">Protection is paused for %1$s more</string>
+    <string name="att_filtering_off">Filtering is off</string>
+    <string name="att_filtering_off_detail">Blocklists and custom rules are switched off in AdGuard Home\'s settings.</string>
+    <string name="att_lists_failing_detail">%1$s. They have no rules or haven\'t updated for longer than expected, which usually means their downloads fail.</string>
+    <string name="att_update">AdGuard Home %1$s is available</string>
+    <string name="att_update_detail">Install it from Server info below.</string>
+    <string name="att_update_manual">This installation can\'t update itself (for example Docker): update it the way you installed it.</string>
+    <string name="att_stats_off">Statistics are off</string>
+    <string name="att_stats_off_detail">Turn them on in AdGuard Home\'s settings to see numbers and graphs here.</string>
+
+    <!-- Overview: statistics -->
+    <string name="stale_banner">Showing the state from %1$s. %2$s</string>
+    <string name="range_24h">24 hours</string>
+    <string name="range_7d">7 days</string>
+    <string name="range_30d">30 days</string>
+    <string name="range_90d">90 days</string>
+    <string name="stat_queries">DNS queries</string>
+    <string name="stat_blocked">Blocked by filters</string>
+    <string name="stat_percent">%1$d%%</string>
+    <string name="stat_safebrowsing">Malware and phishing</string>
+    <string name="stat_parental">Adult websites</string>
+    <string name="stat_safesearch">Safe search enforced</string>
+    <string name="stat_avg_time">Average processing time</string>
+    <string name="chart_title">Queries over time</string>
+    <string name="chart_queries">Queries</string>
+    <string name="chart_blocked">Blocked</string>
+    <string name="top_queried">Top queried domains</string>
+    <string name="top_blocked">Top blocked domains</string>
+    <string name="top_clients">Top clients</string>
+    <string name="top_upstreams">Top upstreams</string>
+    <string name="top_empty">Nothing yet in this period.</string>
+
+    <!-- Overview: server info -->
+    <string name="server_info_title">Server info</string>
+    <string name="up_to_date">Up to date</string>
+    <string name="update_available">AdGuard Home %1$s is available</string>
+    <string name="update_check_disabled">Update checks are turned off on this server</string>
+    <string name="info_dns">DNS server</string>
+    <string name="info_upstreams">Upstream DNS servers</string>
+    <string name="info_none">None</string>
+    <string name="info_more">and %1$d more</string>
+    <string name="info_cache">DNS cache</string>
+    <string name="info_dhcp">DHCP server</string>
+    <string name="state_on">On</string>
+    <string name="state_off">Off</string>
+    <string name="clear_cache">Clear DNS cache</string>
+    <string name="clear_cache_subtitle">Forget cached answers, so new lookups go to the upstream servers</string>
+    <string name="clear_cache_confirm_title">Clear the DNS cache?</string>
+    <string name="clear_cache_confirm_body">%1$s forgets every cached DNS answer. Lookups may be slightly slower for a moment while the cache fills again.</string>
+    <string name="clear_cache_confirm">Clear cache</string>
+    <string name="cache_cleared">DNS cache cleared</string>
+    <string name="check_update">Check for updates</string>
+    <string name="check_update_subtitle">Ask the server to look for a new AdGuard Home version now</string>
+    <string name="update_now">Update to %1$s</string>
+    <string name="update_now_subtitle">AdGuard Home downloads the new version and restarts</string>
+    <string name="update_confirm_title">Update to %1$s?</string>
+    <string name="update_confirm_body">%1$s downloads the new version and restarts. DNS stops answering for a few seconds while it restarts, and AdCtrl reconnects afterwards.</string>
+    <string name="update_confirm">Update</string>
+    <string name="update_started">Update started. AdGuard Home restarts in a moment.</string>
+
+    <plurals name="att_lists_failing">
+        <item quantity="one">%1$d filter list isn\'t updating</item>
+        <item quantity="other">%1$d filter lists aren\'t updating</item>
+    </plurals>
+    <plurals name="range_last_days">
+        <item quantity="one">Last day</item>
+        <item quantity="other">Last %1$d days</item>
+    </plurals>
+    <plurals name="range_last_hours">
+        <item quantity="one">Last hour</item>
+        <item quantity="other">Last %1$d hours</item>
+    </plurals>
 </resources>

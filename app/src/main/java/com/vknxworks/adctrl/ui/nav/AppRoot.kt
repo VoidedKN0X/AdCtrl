@@ -57,6 +57,7 @@ import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.ui.components.LocalBottomClearance
 import com.vknxworks.adctrl.ui.components.LocalHazeState
 import com.vknxworks.adctrl.ui.components.TabPlaceholder
+import com.vknxworks.adctrl.ui.overview.OverviewScreen
 import com.vknxworks.adctrl.ui.settings.ServersScreen
 import com.vknxworks.adctrl.ui.settings.SettingsScreen
 import com.vknxworks.adctrl.ui.setup.SetupScreen
@@ -202,7 +203,7 @@ private fun AppNavHost(navController: NavHostController) {
         // Each tab is a placeholder until its part of the app is built.
         topDestinations.forEach { top ->
             when (top.route) {
-                OverviewRoute -> composable<OverviewRoute> { TabPlaceholder(top.label, top.hint, top.selectedIcon) }
+                OverviewRoute -> composable<OverviewRoute> { OverviewScreen() }
                 QueriesRoute -> composable<QueriesRoute> { TabPlaceholder(top.label, top.hint, top.selectedIcon) }
                 FiltersRoute -> composable<FiltersRoute> { TabPlaceholder(top.label, top.hint, top.selectedIcon) }
                 ClientsRoute -> composable<ClientsRoute> { TabPlaceholder(top.label, top.hint, top.selectedIcon) }

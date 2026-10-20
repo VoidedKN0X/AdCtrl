@@ -82,6 +82,12 @@ class AghClient(
 
     suspend fun post(path: String, body: JsonElement? = null): JsonElement = call("POST", path, emptyMap(), body)
 
+    /**
+     * A POST that only reads (AdGuard Home's version check is a POST). Allowed in read-only mode and
+     * not behind the app lock, because it changes nothing.
+     */
+    suspend fun postRead(path: String, body: JsonElement? = null): JsonElement = call("POST", path, emptyMap(), body, write = false)
+
     suspend fun put(path: String, body: JsonElement? = null): JsonElement = call("PUT", path, emptyMap(), body)
 
     /** GET /control/status: also proves the address is AdGuard Home and the sign-in works. */
@@ -103,10 +109,16 @@ class AghClient(
         throw AghError.NotAdGuard()
     }
 
-    private suspend fun call(method: String, path: String, query: Map<String, String>, body: JsonElement?): JsonElement {
+    private suspend fun call(
+        method: String,
+        path: String,
+        query: Map<String, String>,
+        body: JsonElement?,
+        write: Boolean = method != "GET",
+    ): JsonElement {
         // Read-only mode is enforced here, for every request that could change something, not only by hiding buttons.
-        if (method != "GET" && isReadOnly()) throw AghError.ReadOnly()
-        if (method != "GET" && !WriteGuard.check()) throw AghError.Cancelled()
+        if (write && isReadOnly()) throw AghError.ReadOnly()
+        if (write && !WriteGuard.check()) throw AghError.Cancelled()
         return withContext(Dispatchers.IO) {
             val requestBody = when {
                 method == "GET" -> null
