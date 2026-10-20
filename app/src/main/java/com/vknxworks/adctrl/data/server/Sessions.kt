@@ -97,6 +97,20 @@ class Sessions(
         }
     }
 
+    /** A screen fetched the active server's status itself: share it, so the connection card stays current. */
+    fun reportStatus(serverId: String, status: ServerStatus) {
+        if (active.value?.server?.id != serverId) return
+        val version = AghVersion.parse(status.version)
+        _connection.value = Connection(status, version, loading = false, error = if (version.supported) null else AghError.TooOld(status.version))
+    }
+
+    /** A screen's request to the active server failed in a way that affects the whole connection. */
+    fun reportError(serverId: String, e: AghError) {
+        if (active.value?.server?.id != serverId) return
+        if (e is AghError.ReadOnly || e is AghError.Cancelled || e is AghError.Server || e is AghError.Forbidden) return
+        _connection.value = _connection.value.copy(loading = false, error = e)
+    }
+
     fun add(server: Server, secrets: ServerSecrets): Server {
         val saved = if (server.id.isBlank()) server.copy(id = UUID.randomUUID().toString()) else server
         store.saveSecrets(saved.id, secrets)
