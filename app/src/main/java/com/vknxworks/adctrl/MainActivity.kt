@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.data.settings.ThemeChoice
+import com.vknxworks.adctrl.ui.components.ScreenPrivacy
 import com.vknxworks.adctrl.ui.nav.AppRoot
 import com.vknxworks.adctrl.ui.theme.AdCtrlTheme
 
@@ -29,14 +30,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             val settings by c.settings.settings.collectAsStateWithLifecycle()
             // FLAG_SECURE follows "Hide content in screenshots & recents" (on by default, and on
-            // before the setting has been read).
-            LaunchedEffect(settings.hideContent) {
-                if (settings.hideContent) {
+            // before the setting has been read), and is always on while server setup is open.
+            val secure = settings.hideContent || ScreenPrivacy.forced > 0
+            LaunchedEffect(secure) {
+                if (secure) {
                     window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
                 } else {
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                 }
-                setRecentsScreenshotEnabled(!settings.hideContent)
+                setRecentsScreenshotEnabled(!secure)
             }
             val dark = when (settings.theme) {
                 ThemeChoice.SYSTEM -> isSystemInDarkTheme()

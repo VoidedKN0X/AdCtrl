@@ -16,9 +16,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.vknxworks.adctrl.R
+import com.vknxworks.adctrl.container
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.ui.theme.Gutter
 
-/** A main tab that isn't built yet: its title and what it will show. */
+/** A main tab that isn't built yet: its title, what it will show, and any connection problem. */
 @Composable
 fun TabPlaceholder(@StringRes title: Int, @StringRes hint: Int, icon: ImageVector) {
     Column(Modifier.fillMaxSize().statusBarsPadding()) {
@@ -29,10 +33,12 @@ fun TabPlaceholder(@StringRes title: Int, @StringRes hint: Int, icon: ImageVecto
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter),
         )
+        ConnectionBanner()
+        val active by LocalContext.current.container.sessions.active.collectAsStateWithLifecycle()
         EmptyState(
             icon = icon,
             title = stringResource(R.string.tab_coming_title),
-            body = stringResource(R.string.tab_coming_body),
+            body = stringResource(R.string.tab_coming_body, active?.server?.name.orEmpty()),
             modifier = Modifier.weight(1f).padding(bottom = LocalBottomClearance.current),
         )
         Spacer(Modifier.height(8.dp))
