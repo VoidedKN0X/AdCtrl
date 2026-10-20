@@ -4,6 +4,25 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.6.0 (2026-10-21)
+
+The Filters tab: lists, custom rules, blocked services, DNS rewrites and safe browsing, parental control and safe search, each in its own section at the top of the tab.
+
+### New
+
+- **Lists**: every blocklist and allowlist with its name, address, number of rules and when it last updated. A warning icon marks lists that never downloaded or have no rules. Switch each one on or off, tap one to rename it, change its address or remove it (after a confirmation), and **Update lists now** downloads them all again and says how many changed
+- **Add a list** from your own address, or pick one of 45 well-known lists that come with AdCtrl (general, security, and trackers for OPPO & Realme, Samsung, Xiaomi, Smart TVs, consoles and more), taken from AdGuard Home's own vetted list. Nothing is downloaded to show them, and lists you already have are marked
+- **Filtering on or off** for all lists and custom rules (turning it off asks first), and how often lists update: never, every hour, 12 hours, day, 3 days or week
+- **Custom rules editor** with line numbers and colours for comments, block rules, allow rules (`@@`), hosts-file lines, anchors (`||`, `^`) and modifiers (`$…`). Long lines scroll sideways so line numbers always match
+- **Search** the rules, with the number of matches and previous/next
+- **Possible mistakes** are flagged with the line number: addresses with `http://`, paths, `*.example.com`, a missing `^`, browser element-hiding rules, spaces, empty rules and duplicates, with a one-tap fix where there's an obvious one
+- **Save with a look first**: before saving, AdCtrl shows exactly which lines are added and removed. Unsaved edits are kept while you switch tabs, **Discard changes** puts the saved rules back, and going back with unsaved edits asks first
+- **Blocked services**: every service AdGuard Home can block, grouped by kind, with search and a **Blocked** view. One tap blocks or unblocks a service; changes made elsewhere in the meantime are kept
+- **Pause schedule** for blocked services: per day, the hours when they aren't blocked (for example games in the evening), in the server's time zone
+- **DNS rewrites**: list, search, add, change and delete rewrites (domain → IP address, a domain, or keep the real A / AAAA answer), with wildcard domains like `*.example.com`. Each rewrite and all rewrites at once can be switched off without deleting them
+- **Protection**: safe browsing, parental control and safe search for the whole network, and which search engines safe search applies to
+- In **read-only mode** every section shows its settings without any way to change them
+
 ## v0.5.1 (2026-10-21)
 
 ### Changed

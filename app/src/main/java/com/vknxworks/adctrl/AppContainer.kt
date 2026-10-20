@@ -1,6 +1,7 @@
 package com.vknxworks.adctrl
 
 import android.content.Context
+import com.vknxworks.adctrl.data.filters.FiltersRepository
 import com.vknxworks.adctrl.data.overview.OverviewRepository
 import com.vknxworks.adctrl.data.queries.QueriesRepository
 import com.vknxworks.adctrl.data.rules.UserRules
@@ -51,6 +52,7 @@ class AppContainer(val context: Context) {
     val overview = OverviewRepository(context, sessions, appScope)
     val queries = QueriesRepository(sessions, appScope)
     val userRules = UserRules(sessions)
+    val filters = FiltersRepository(sessions, appScope)
 }
 
 val Context.container: AppContainer

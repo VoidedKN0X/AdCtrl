@@ -8,7 +8,7 @@ AdCtrl is an Android app for [AdGuard Home](https://github.com/AdguardTeam/AdGua
 
 Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
-> **Early development.** AdCtrl is being built one part at a time. It connects to your AdGuard Home; the Overview, query log, filters and clients follow. See [CHANGELOG.md](CHANGELOG.md) for what's in each version.
+> **Early development.** AdCtrl is being built one part at a time. The Overview, Quick Settings tile, query log and Filters are done; clients, widgets and notifications follow. See [CHANGELOG.md](CHANGELOG.md) for what's in each version.
 
 ## Features
 
@@ -16,7 +16,7 @@ What AdCtrl is being built to do:
 
 - **Overview**: a big protection switch with pause for 30 seconds up to 8 hours (with a countdown), statistics for the last day to 90 days, a queries vs. blocked graph, top domains, clients and upstreams, and an attention list for paused protection, failing filter lists and updates
 - **Queries**: the live query log with search and filters, the matched rule and list for every answer, and **one-tap block or unblock** of any domain, for one subdomain, the whole domain or one client
-- **Filters**: blocklists and allowlists, a custom rules editor with syntax highlighting, blocked services, DNS rewrites, and safe browsing, parental control and safe search
+- **Filters**: blocklists and allowlists (with 45 well-known lists to pick from), a custom rules editor with highlighting, search, mistake hints and a look at the changes before saving, blocked services with a pause schedule, DNS rewrites, and safe browsing, parental control and safe search
 - **Clients**: every device with its statistics and settings, and blocking a device entirely
 - **Quick Settings tile** to pause protection or turn it back on with one tap (long-press opens AdCtrl), plus a widget and app shortcuts
 - **Several servers**, such as a primary and a secondary, with "apply to all servers" for rule changes and pausing
