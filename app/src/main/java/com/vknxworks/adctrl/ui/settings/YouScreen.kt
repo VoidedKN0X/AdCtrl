@@ -36,6 +36,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.vknxworks.adctrl.BuildConfig
 import com.vknxworks.adctrl.R
+import com.vknxworks.adctrl.container
+import com.vknxworks.adctrl.ui.components.GroupSwitch
+import com.vknxworks.adctrl.ui.nav.ServersRoute
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.ui.components.Group
 import com.vknxworks.adctrl.ui.components.GroupRow
 import com.vknxworks.adctrl.ui.components.ScreenTopBar
@@ -50,12 +57,16 @@ private const val LICENCE_URL = "https://www.gnu.org/licenses/gpl-3.0.html"
 
 /**
  * Account and settings, opened from the profile picture on any tab. Shows which server you're
- * connected to (once server setup exists), settings, and the About / support section.
+ * connected to, the server list and read-only mode, settings, and the About / support section.
  */
 @Composable
 fun YouScreen() {
     val context = LocalContext.current
+    val c = context.container
     val nav = LocalNavigator.current
+    val active by c.sessions.active.collectAsStateWithLifecycle()
+    val connection by c.sessions.connection.collectAsStateWithLifecycle()
+    val server = active?.server
     fun open(url: String) {
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -74,16 +85,45 @@ fun YouScreen() {
                     Modifier.size(96.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Filled.Dns, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
+                    if (server == null) {
+                        Icon(Icons.Filled.Dns, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
+                    } else {
+                        Text(server.initial.uppercase(), style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.primary)
+                    }
                 }
                 Spacer(Modifier.height(14.dp))
-                Text(stringResource(R.string.you_not_connected), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
+                Text(server?.name ?: stringResource(R.string.you_not_connected), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
                 Text(
-                    stringResource(R.string.you_not_connected_body),
+                    if (server == null) {
+                        stringResource(R.string.you_not_connected_body)
+                    } else {
+                        listOfNotNull(
+                            (connection.status?.version ?: server.version).takeIf { it.isNotBlank() }?.let { stringResource(R.string.agh_version, it) },
+                            stringResource(R.string.signed_in_as, server.username),
+                        ).joinToString("\n")
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
+            }
+
+            if (server != null) {
+                Group {
+                    GroupRow(
+                        stringResource(R.string.servers_title),
+                        stringResource(R.string.servers_subtitle),
+                        icon = Icons.Filled.SwapHoriz,
+                        showChevron = true,
+                        onClick = { nav.navigate(ServersRoute) },
+                    )
+                    GroupSwitch(
+                        stringResource(R.string.read_only_mode),
+                        stringResource(R.string.read_only_mode_subtitle),
+                        checked = server.readOnly,
+                        icon = Icons.Filled.Visibility,
+                    ) { c.sessions.setReadOnly(server.id, it) }
+                }
             }
 
             Group {

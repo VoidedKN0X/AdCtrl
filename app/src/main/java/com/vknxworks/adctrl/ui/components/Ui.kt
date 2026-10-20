@@ -52,6 +52,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.vknxworks.adctrl.R
+import com.vknxworks.adctrl.container
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.ui.nav.LocalNavigator
 import com.vknxworks.adctrl.ui.nav.YouRoute
 import com.vknxworks.adctrl.ui.theme.Gutter
@@ -99,11 +102,13 @@ fun TabTitle(
 
 /**
  * The profile picture; tapping it opens account and settings (there is no "You" tab).
- * Shows the first letter of the connected server's name once server setup exists.
+ * Shows the first letter of the active server's name.
  */
 @Composable
-fun ProfileButton(initial: String? = null) {
+fun ProfileButton() {
     val nav = LocalNavigator.current
+    val active by LocalContext.current.container.sessions.active.collectAsStateWithLifecycle()
+    val initial = active?.server?.initial
     val label = stringResource(R.string.account_and_settings)
     IconButton(onClick = { nav.navigate(YouRoute) }) {
         Box(

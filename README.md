@@ -8,7 +8,7 @@ AdCtrl is an Android app for [AdGuard Home](https://github.com/AdguardTeam/AdGua
 
 Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
-> **Early development.** AdCtrl is being built one part at a time. The current version is the app's shell; connecting to AdGuard Home comes next. See [CHANGELOG.md](CHANGELOG.md) for what's in each version.
+> **Early development.** AdCtrl is being built one part at a time. It connects to your AdGuard Home; the Overview, query log, filters and clients follow. See [CHANGELOG.md](CHANGELOG.md) for what's in each version.
 
 ## Features
 
@@ -29,7 +29,7 @@ Coming soon.
 ## Requirements
 
 - Android 13 or newer, on a 64-bit ARM phone (nearly every phone from the last several years)
-- AdGuard Home
+- AdGuard Home v0.107.37 or newer
 - **Google-free and de-Googled:** no Google Play services, Firebase or other Google services, and the app never contacts Google. It works the same on de-Googled phones (GrapheneOS, CalyxOS, /e/OS, LineageOS without Google apps).
 
 ## Install
@@ -44,9 +44,18 @@ Coming soon.
 
 If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X/AdCtrl` in Obtainium by hand.
 
+## Getting started
+
+1. Open AdCtrl and enter the address you open AdGuard Home's web interface on, like `https://adguard.example.com` or `192.168.1.2:3000`. Without `http://`, AdCtrl uses HTTPS. AdCtrl only ever connects to this exact address; there's no second or fallback address.
+2. Enter the username and password you sign in to AdGuard Home with.
+3. If AdGuard Home uses a self-signed certificate, compare the fingerprint AdCtrl shows with your certificate's (on the server: `openssl x509 -in cert.pem -noout -fingerprint -sha256`), then tap **Trust**.
+4. Check the version and protection state AdCtrl shows, choose whether to use **read-only mode**, and tap **Continue**.
+
+Add a second server, such as a secondary AdGuard Home, under **Account › Servers**.
+
 ## Recommended AdGuard Home setup
 
-- **Use HTTPS.** AdGuard Home signs you in with a username and password on every request (HTTP Basic auth), so reach it over HTTPS: turn on encryption in AdGuard Home under **Settings › Encryption settings**, or put it behind a reverse proxy such as Nginx Proxy Manager. AdCtrl only allows plain HTTP for addresses on your own network, and only when you switch it on for that server.
+- **Use HTTPS.** AdGuard Home signs you in with a username and password on every request (HTTP Basic auth), so reach it over HTTPS: turn on encryption in AdGuard Home under **Settings › Encryption settings**, or put it behind a reverse proxy such as Nginx Proxy Manager. AdCtrl only allows plain HTTP for addresses on your own network (private IPs and `.lan`, `.local`, `.home.arpa`, `.internal` or single-word names that point to a private IP), and only when you switch it on for that server.
 - **Use a dedicated, strong password.** Give the AdGuard Home admin account a long, random password that you don't use anywhere else.
 - **Self-signed certificate?** AdCtrl shows its SHA-256 fingerprint the first time it connects. Compare it with your certificate and tap **Trust**; AdCtrl then accepts only that exact certificate for that server.
 

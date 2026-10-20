@@ -4,6 +4,28 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.2.0 (2026-10-20)
+
+AdCtrl now connects to your AdGuard Home. The tabs are still placeholders; the Overview with the protection switch comes next.
+
+### New
+
+- **Add your AdGuard Home server.** On first start, AdCtrl asks for the address you open AdGuard Home's web interface on, plus your AdGuard Home username and password. Without `http://`, the address uses HTTPS; a port you type is kept. AdCtrl checks that the address really is AdGuard Home, that the sign-in works and which version it runs, then shows the version, the protection state and the DNS addresses before you tap **Continue**
+- **Only the address you enter.** AdCtrl only ever connects to the exact address saved for each server. There's no second address and no automatic switching to another one
+- **AdGuard Home v0.107.37 or newer.** Older versions are refused with a message saying which version is needed; after updating AdGuard Home, tap **Retry**
+- **Several servers**, such as a primary and a secondary: **Account › Servers** lists them, with switching, changing the address or sign-in, read-only mode and removing a server. The profile picture shows the active server's first letter
+- **Read-only mode** per server, during setup and under **Account**. In read-only mode AdCtrl refuses to send any change to that server, whatever the screen
+- **Connection problems** show as a card on every tab, with the one action that fixes it: **Retry**, **Sign in again** for a wrong password, **Check again** for a changed certificate, or **Change address or sign-in**
+- Clear messages for an unreachable server, a wrong username or password (including AdGuard Home's temporary block after several wrong passwords), an untrusted or changed certificate, an address that isn't AdGuard Home, a redirect, and a version that's too old
+
+### Security
+
+- **Your servers only.** Every request is checked before it's sent: anything other than your saved servers (or the address you're setting up) is blocked. Redirects are never followed, so your password can't be passed on to another host
+- **Self-signed certificates** are shown by their SHA-256 fingerprint the first time you connect. Once you tap **Trust**, AdCtrl accepts only that exact certificate, and only for that server; if it ever changes, AdCtrl stops and asks again. There's never a "trust all" option
+- **Plain HTTP only on your own network.** `http://` addresses are only accepted for private IPs (like 192.168.x.x) and local names (`.lan`, `.local`, `.home.arpa`, `.internal` or a single word), and only after you switch on **Allow plain HTTP for this server** and confirm a warning. A local name must also point to a private address, or AdCtrl won't connect
+- **Passwords are encrypted** with a key in the Android Keystore that never leaves the phone. A saved password is only reused for the same address and username: changing either needs it typed again
+- Server setup is always hidden from screenshots and the recent apps view, because the password is typed there
+
 ## v0.1.0 (2026-10-20)
 
 The first build of AdCtrl: the app's shell, ready for the features that follow. It doesn't connect to an AdGuard Home server yet; adding a server comes in the next version.
