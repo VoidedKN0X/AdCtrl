@@ -28,6 +28,8 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
@@ -99,8 +101,7 @@ class ClientsRepository(private val sessions: Sessions, scope: CoroutineScope) {
             if (sessions.active.value?.server?.id != id) return
             _state.update {
                 it.copy(
-                    persistent = clients.clients.map { raw -> PersistentClient(AghJson.decodeFromJsonElement(ClientFields.serializer(), raw), raw) }
-                        .sortedBy { c -> c.name.lowercase() },
+                    persistent = clients.clients.mapNotNull { raw -> readClient(raw) }.sortedBy { c -> c.name.lowercase() },
                     runtime = clients.autoClients.sortedBy { c -> c.name.ifBlank { c.ip }.lowercase() },
                     supportedTags = clients.supportedTags,
                     access = access,
@@ -112,7 +113,25 @@ class ClientsRepository(private val sessions: Sessions, scope: CoroutineScope) {
         } catch (e: AghError) {
             sessions.reportError(id, e)
             _state.update { it.copy(loading = false, error = e) }
+        } catch (e: kotlinx.serialization.SerializationException) {
+            _state.update { it.copy(loading = false, error = AghError.NotAdGuard()) }
+        } catch (e: IllegalArgumentException) {
+            _state.update { it.copy(loading = false, error = AghError.NotAdGuard()) }
         }
+    }
+
+    /**
+     * Reads one persistent client. A client sent in a shape AdCtrl doesn't expect is still shown by
+     * its name and addresses (and never crashes the app); one without a name is skipped.
+     */
+    private fun readClient(raw: JsonObject): PersistentClient? {
+        val fields = runCatching { AghJson.decodeFromJsonElement(ClientFields.serializer(), raw) }.getOrElse {
+            ClientFields(
+                name = (raw["name"] as? JsonPrimitive)?.contentOrNull.orEmpty(),
+                ids = (raw["ids"] as? JsonArray)?.mapNotNull { (it as? JsonPrimitive)?.contentOrNull }.orEmpty(),
+            )
+        }
+        return if (fields.name.isBlank()) null else PersistentClient(fields, raw)
     }
 
     /** What AdGuard Home knows about these IDs: whether they're blocked and why, and whois. */
