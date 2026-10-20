@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -85,10 +86,11 @@ fun YouScreen() {
                     Modifier.size(96.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (server == null) {
-                        Icon(Icons.Filled.Dns, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
-                    } else {
-                        Text(server.initial.uppercase(), style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.primary)
+                    val initial = server?.initial
+                    when {
+                        server == null -> Icon(Icons.Filled.Dns, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
+                        initial == null -> Icon(Icons.Filled.Shield, null, Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary)
+                        else -> Text(initial, style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.primary)
                     }
                 }
                 Spacer(Modifier.height(14.dp))

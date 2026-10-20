@@ -332,13 +332,23 @@
     <string name="rule_only_client">Only for %1$s</string>
     <string name="rule_all_servers">On all servers (%1$d)</string>
     <string name="rule_preview">This rule is added to your custom rules:</string>
+    <string name="rule_preview_fallback">Added only if it\'s still needed:</string>
+    <string name="rule_removes_block">Your custom rules block this. AdCtrl removes this line:</string>
+    <string name="rule_removes_allow">Your custom rules allow this. AdCtrl removes this line:</string>
+    <string name="rule_fallback_unblock">If a blocklist, blocked service, safe browsing or parental control still blocks it afterwards, AdCtrl adds the allow rule below instead. Choose how much it covers:</string>
+    <string name="rule_fallback_block">If nothing blocks it once that line is gone, AdCtrl adds the block rule below. Choose how much it covers:</string>
+    <string name="rule_result_removed_block">%1$s is unblocked: removed your rule that blocked it</string>
+    <string name="rule_result_removed_allow">%1$s is blocked again: removed your rule that allowed it</string>
+    <string name="rule_result_both_unblock">%1$s is unblocked: removed your rule, and added an allow rule because a blocklist also blocks it</string>
+    <string name="rule_result_both_block">%1$s is blocked: removed your allow rule, and added a block rule because nothing else blocks it</string>
+    <string name="rule_result_already_blocked">%1$s is already blocked</string>
+    <string name="rule_result_already_unblocked">%1$s already isn\'t blocked</string>
     <string name="rule_block_note">Devices may keep using an answer they already have until it expires.</string>
     <string name="rule_unblock_note">$important makes this allow rule win over every blocklist, blocked service, safe browsing and parental control. Devices may keep the old answer until it expires.</string>
     <string name="rule_block_save">Block</string>
     <string name="rule_unblock_save">Unblock</string>
     <string name="rule_blocked">%1$s is blocked</string>
     <string name="rule_unblocked">%1$s is unblocked</string>
-    <string name="rule_already">That rule is already in your custom rules</string>
     <string name="rule_failed_some">Couldn\'t add the rule on: %1$s</string>
 
     <!-- Check host -->

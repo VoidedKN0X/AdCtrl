@@ -35,8 +35,11 @@ data class Server(
 
     val isHttp: Boolean get() = parsedUrl?.isHttps == false
 
-    /** First letter shown in the profile picture. */
-    val initial: String get() = name.ifBlank { host }.take(1)
+    /**
+     * The letter shown in the profile picture: the first letter of the name, or null when the name
+     * doesn't start with one (like an IP address), and the shield is shown instead.
+     */
+    val initial: String? get() = name.trim().firstOrNull()?.takeIf { it.isLetter() }?.uppercase()
 
     /** The address as shown to the user: no https://, but http:// stays visible as a warning. */
     val displayUrl: String get() = url.removePrefix("https://")
