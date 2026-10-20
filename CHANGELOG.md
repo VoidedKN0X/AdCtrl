@@ -4,6 +4,13 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.4.1 (2026-10-21)
+
+### Fixed
+
+- **Pausing and resuming protection failed with error 415** ("only content-type application/json is allowed"), from the Overview and from the Quick Settings tile. AdGuard Home only accepts changes whose content type is exactly `application/json`, and AdCtrl added `; charset=utf-8` to it. Every change AdCtrl sends now uses exactly `application/json`
+- **"Update available" never showed**, for the same reason: the update check failed quietly. It now works, on the Overview, in Server info and with **Check for updates**
+
 ## v0.4.0 (2026-10-21)
 
 ### New
