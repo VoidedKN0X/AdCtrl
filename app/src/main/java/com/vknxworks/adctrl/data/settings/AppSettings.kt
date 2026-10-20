@@ -36,6 +36,8 @@ data class AppSettings(
     val tilePause: PauseDuration = PauseDuration.M5,
     /** The tile pauses and resumes every server that isn't read-only, not only the active one. */
     val tileAllServers: Boolean = false,
+    /** The Queries tab adds new queries by itself while it's on screen. */
+    val queriesLive: Boolean = true,
 )
 
 class SettingsRepository(private val context: Context, scope: CoroutineScope) {
@@ -45,6 +47,7 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         val hideContent = booleanPreferencesKey("hide_content")
         val tilePause = stringPreferencesKey("tile_pause")
         val tileAll = booleanPreferencesKey("tile_all_servers")
+        val queriesLive = booleanPreferencesKey("queries_live")
     }
 
     val settings: StateFlow<AppSettings> = context.appDataStore.data
@@ -60,6 +63,7 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         hideContent = this[K.hideContent] ?: true,
         tilePause = enumOr(this[K.tilePause], PauseDuration.M5),
         tileAllServers = this[K.tileAll] ?: false,
+        queriesLive = this[K.queriesLive] ?: true,
     )
 
     suspend fun update(transform: (AppSettings) -> AppSettings) {
@@ -70,6 +74,7 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             p[K.hideContent] = s.hideContent
             p[K.tilePause] = s.tilePause.name
             p[K.tileAll] = s.tileAllServers
+            p[K.queriesLive] = s.queriesLive
         }
     }
 

@@ -58,6 +58,8 @@ import com.vknxworks.adctrl.ui.components.LocalBottomClearance
 import com.vknxworks.adctrl.ui.components.LocalHazeState
 import com.vknxworks.adctrl.ui.components.TabPlaceholder
 import com.vknxworks.adctrl.ui.overview.OverviewScreen
+import com.vknxworks.adctrl.ui.queries.CheckHostScreen
+import com.vknxworks.adctrl.ui.queries.QueriesScreen
 import com.vknxworks.adctrl.ui.settings.ServersScreen
 import com.vknxworks.adctrl.ui.settings.SettingsScreen
 import com.vknxworks.adctrl.ui.setup.SetupScreen
@@ -204,10 +206,14 @@ private fun AppNavHost(navController: NavHostController) {
         topDestinations.forEach { top ->
             when (top.route) {
                 OverviewRoute -> composable<OverviewRoute> { OverviewScreen() }
-                QueriesRoute -> composable<QueriesRoute> { TabPlaceholder(top.label, top.hint, top.selectedIcon) }
+                QueriesRoute -> composable<QueriesRoute> { QueriesScreen() }
                 FiltersRoute -> composable<FiltersRoute> { TabPlaceholder(top.label, top.hint, top.selectedIcon) }
                 ClientsRoute -> composable<ClientsRoute> { TabPlaceholder(top.label, top.hint, top.selectedIcon) }
             }
+        }
+        composable<CheckHostRoute> {
+            val r = it.toRoute<CheckHostRoute>()
+            CheckHostScreen(r.host, r.client)
         }
         composable<YouRoute> { YouScreen() }
         composable<SettingsRoute> { SettingsScreen() }
