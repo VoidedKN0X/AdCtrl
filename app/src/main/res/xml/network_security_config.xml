@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- HTTPS only for now. Plain HTTP will only ever be allowed for private LAN addresses, per server,
+     behind an explicit switch, and is enforced in code when server setup arrives. System and
+     user-installed CAs are trusted so servers behind a private CA or Nginx Proxy Manager work; a
+     self-signed certificate is never trusted here, only pinned per server by its SHA-256 fingerprint. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

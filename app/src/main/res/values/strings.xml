@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AdCtrl</string>
+    <string name="vendor">VKNXWorks</string>
+
+    <!-- Tabs -->
+    <string name="tab_overview">Overview</string>
+    <string name="tab_queries">Queries</string>
+    <string name="tab_filters">Filters</string>
+    <string name="tab_clients">Clients</string>
+    <string name="tab_overview_hint">Protection on or paused, statistics and graphs for your AdGuard Home server.</string>
+    <string name="tab_queries_hint">The live query log, with one-tap block and unblock.</string>
+    <string name="tab_filters_hint">Blocklists, allowlists, custom rules, blocked services and DNS rewrites.</string>
+    <string name="tab_clients_hint">Every device on your network, with its statistics and settings.</string>
+    <string name="tab_coming_title">Coming in the next updates</string>
+    <string name="tab_coming_body">AdCtrl is built one part at a time. Adding your AdGuard Home server comes next.</string>
+
+    <!-- Common -->
+    <string name="back">Back</string>
+    <string name="selected">Selected</string>
+    <string name="account_and_settings">Account and settings</string>
+
+    <!-- Account (opened from the profile picture) -->
+    <string name="you_title">Account</string>
+    <string name="you_not_connected">Not connected</string>
+    <string name="you_not_connected_body">Adding your AdGuard Home server arrives in the next update.</string>
+    <string name="settings">Settings</string>
+    <string name="settings_subtitle">Appearance and privacy</string>
+    <string name="group_about">About</string>
+    <string name="support_title">Support AdCtrl</string>
+    <string name="support_subtitle">AdCtrl is free and open source. Sponsor development on GitHub</string>
+    <string name="bugs_title">Report a bug</string>
+    <string name="bugs_subtitle">Found a problem or have an idea? Open an issue on GitHub</string>
+    <string name="source_title">Source code</string>
+    <string name="source_subtitle">github.com/VoidedKN0X/AdCtrl</string>
+    <string name="licence_title">Licence</string>
+    <string name="licence_subtitle">GNU General Public License v3.0</string>
+    <string name="about_footer">%1$s %2$s · %3$s</string>
+
+    <!-- Settings -->
+    <string name="group_appearance">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="theme_system">Follow system</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_black">Pure black</string>
+    <string name="dynamic_colour">Dynamic colour</string>
+    <string name="dynamic_colour_subtitle">Use colours from your wallpaper</string>
+    <string name="group_privacy">Privacy</string>
+    <string name="hide_content">Hide content in screenshots &amp; recents</string>
+    <string name="hide_content_subtitle">Screenshots, screen recordings and the recent apps view show a blank screen</string>
+    <string name="hide_content_footer">Your query log shows what everyone on your network visits, so this is on by default.</string>
+</resources>
