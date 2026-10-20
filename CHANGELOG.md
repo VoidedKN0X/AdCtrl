@@ -30,3 +30,4 @@ The first build of AdCtrl: the app's shell, ready for the features that follow. 
 ### Fixed
 
 - The first build of 0.1.0 didn't compile because the bundled Manrope variable font's weights need an extra compiler setting; it's added, so 0.1.0 now builds and is published
+- The Google-free library check stopped the second build of 0.1.0 because it ran after the release key had already been cleaned up, and the build refuses to set up a release without the key. The check now runs while the key is still available, and shows the reason on the build page if it ever fails again
