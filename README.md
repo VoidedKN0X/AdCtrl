@@ -19,7 +19,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Quick Settings tile** to pause protection or turn it back on with one tap (long-press opens AdCtrl)
 - **Several servers**, such as a primary and a secondary, with "apply to all servers" for rule changes and pausing
 - **App lock** with its own PIN and optional fingerprint unlock; your server passwords stay encrypted while the app is locked, and **Confirm changes** can ask for the PIN or fingerprint before anything changes on a server
-- **Safe by design**: a read-only mode, confirmation before changes, certificate pinning, screenshot protection, and passwords encrypted with the Android Keystore
+- **Safe by design**: a read-only mode, confirmation before changes, certificate pinning, optional **Hide in screenshots** and **Hide in recent apps**, and passwords encrypted with the Android Keystore
 
 ## Planned
 
@@ -77,9 +77,9 @@ Turn it on under **Account > Settings > Privacy and security > App lock**. It's 
 - **Change app PIN** asks for your current PIN first, and turning the app lock off asks for the PIN too.
 - **Forgot your PIN?** It can't be recovered, because it encrypts your passwords. The lock screen offers to remove your servers and their passwords and the statistics AdCtrl keeps on the phone, so you can add them again; nothing changes on your AdGuard Home servers.
 - **Confirm changes** (optional) asks for your fingerprint or app PIN before anything that changes a server, such as pausing protection, blocking a domain or editing rules. One confirmation covers the next minute.
-- **With the app lock on**, the recent-apps screen always shows a blank card, and the Quick Settings tile says AdCtrl is locked and opens it instead of pausing protection, so nobody can pause it without your PIN. With **Confirm changes** on, a tap on the tile always opens AdCtrl.
+- **The Quick Settings tile** says AdCtrl is locked and opens it instead of pausing protection while AdCtrl is locked, so nobody can pause it without your PIN. With **Confirm changes** on, a tap on the tile always opens AdCtrl.
 
-**Hide in screenshots and recent apps** (in the same section, also without the app lock) keeps AdCtrl out of screenshots, screen recordings and the recent-apps view. It's on by default, because your query log shows what everyone on your network visits. Server setup, the lock screen and the PIN screens are always hidden.
+**Hide in screenshots** and **Hide in recent apps** (the last two switches in the same section, also without the app lock, both off by default): the first keeps AdCtrl out of screenshots and screen recordings (and blanks its recent-apps preview), the second shows a blank card for AdCtrl in the recent-apps view while screenshots still work. With the app lock on, the recent-apps view always shows a blank card. Server setup, the lock screen and the PIN screens are always kept out of screenshots.
 
 ## Privacy
 

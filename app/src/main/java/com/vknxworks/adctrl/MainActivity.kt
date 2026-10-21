@@ -27,26 +27,22 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Recents shows a blank card, never a snapshot of the query log.
+        // Blank Recents card and no screenshots until the settings have been read; the switches below lift it.
         setRecentsScreenshotEnabled(false)
-        // Secure from the first frame; the setting below can lift it once it has been read.
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         enableEdgeToEdge()
         val c = container
         setContent {
             val settings by c.settings.settings.collectAsStateWithLifecycle()
-            // FLAG_SECURE follows "Hide in screenshots and recent apps" (on by default, and on
-            // before the setting has been read), and is always on while server setup, the lock screen
-            // or a PIN screen is open.
-            val secure = settings.hideContent || ScreenPrivacy.forced > 0 || lockCovering(c.vault)
-            // With the app lock on, the recent-apps view always shows a blank card.
-            val blankRecents = secure || c.vault.enabled
+            // "Hide in screenshots": FLAG_SECURE (also blanks the Recents preview). Always on, whatever the
+            // switch says, while server setup, the lock screen or a PIN screen is open.
+            val secure = settings.hideScreenshots || ScreenPrivacy.forced > 0 || lockCovering(c.vault)
+            // "Hide in recent apps": a blank Recents card; screenshots still work. Always with the app lock on,
+            // so Recents never shows what's behind the lock.
+            val blankRecents = settings.hideRecents || c.vault.enabled
             LaunchedEffect(secure, blankRecents) {
-                if (secure) {
-                    window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-                } else {
-                    window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
-                }
+                if (secure) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                 setRecentsScreenshotEnabled(!blankRecents)
             }
             val dark = when (settings.theme) {

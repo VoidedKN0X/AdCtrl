@@ -4,6 +4,14 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.8.2 (2026-10-21)
+
+### Changed
+
+- **Hide in screenshots** and **Hide in recent apps** are now two separate switches in Settings › Privacy and security, both off by default, the same in every Ctrl app. **Hide in screenshots** keeps AdCtrl out of screenshots and screen recordings (and blanks its preview in recent apps); **Hide in recent apps** only shows a blank card in the recent apps view, so screenshots still work. Until now one switch did both and was on by default. If you had it on and ever changed a setting, both new switches start on; otherwise both start off, so screenshots of AdCtrl work and recent apps shows its preview until you turn them on
+- **Always protected, whatever the switches say:** server setup (where your password is typed), the lock screen and the PIN screens are never in screenshots or screen recordings, and with the app lock on the recent apps view always shows a blank card
+- **README** and **PRIVACY.md** describe the two switches
+
 ## v0.8.1 (2026-10-21)
 
 ### Changed
