@@ -4,6 +4,34 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.8.0 (2026-10-21)
+
+The app lock: the same one as in every other Ctrl app, with its own PIN, optional fingerprint unlock and your server passwords sealed while AdCtrl is locked.
+
+### New
+
+- **App lock** (**Account › Settings › Privacy and security › App lock**, off until you turn it on). AdCtrl asks for its own app PIN when you open it. The PIN needs at least 6 digits and is separate from your phone's; very obvious ones like 111111 or 123456 are refused. You choose it twice when turning the lock on
+- **Unlock with fingerprint** (optional): only strong biometrics such as your fingerprint, not face unlock that only uses the camera, which a photo can sometimes fool. The PIN is still needed after the phone restarts and at least every 72 hours, the same as Android does for your screen lock
+- **Lock again**: as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Opening a link in your browser from the Account page doesn't count as leaving, unless you stay away longer than 5 minutes
+- **Confirm changes** (optional, with the app lock on): AdCtrl asks for your fingerprint or app PIN before anything that changes a server, such as pausing protection, blocking or unblocking a domain, editing rules, lists, blocked services, rewrites or clients. One confirmation covers the next minute. Cancelling sends nothing
+- **Change app PIN** asks for your current PIN first, and turning the app lock off asks for the PIN too
+- **Forgot PIN?** on the lock screen removes your servers and their passwords, and the statistics kept on the phone, so you can add them again. Nothing changes on your AdGuard Home servers
+
+### Changed
+
+- **Settings › Privacy** is now **Privacy and security**, with the app lock rows first and **Hide content in screenshots & recents** renamed to **Hide in screenshots and recent apps** (still on by default), the same as in the other Ctrl apps
+- **Quick Settings tile with the app lock on:** while AdCtrl is locked, the tile shows "AdCtrl is locked · tap to open" and a tap opens AdCtrl's lock screen instead of pausing protection, so nobody can pause it without your PIN. With **Confirm changes** on, a tap always opens AdCtrl, because the tile itself can't ask for your fingerprint or PIN. With the lock unlocked (for example with "Lock again" after 15 minutes), the tile works as before
+- The message when a change isn't confirmed now says it wasn't confirmed with your fingerprint or app PIN, and that nothing was sent
+- **README**: new App lock section; Features list only what's in the app now, with the widget, app shortcuts and notifications under Planned; install through Obtainium or the CtrlF-Droid repo; MemoCtrl added to the Ctrl series table. **PRIVACY.md**: no notification permission (AdCtrl has no notifications yet), and how the app lock protects your passwords
+
+### Security
+
+- **Your server passwords are sealed while AdCtrl is locked.** With the app lock on, every saved password is also encrypted with a key that only exists in memory while AdCtrl is unlocked, and is wiped the moment it locks, together with any decrypted password. A locked AdCtrl, or a copy of its files, can't sign in to your servers, and nothing is sent to them until you unlock
+- **The PIN can't be guessed off the phone.** It's never stored. It's stretched with 600,000 rounds of PBKDF2 and mixed with a secret held in the phone's secure hardware (StrongBox where available), so copying AdCtrl's files to a computer isn't enough to try PINs there
+- **Wrong PINs lock the screen**: after 5 tries you wait 30 seconds, doubling with every further 5 wrong tries up to 15 minutes. Restarting the app or the phone, or changing the clock, doesn't reset the wait
+- **Fingerprint unlock can't be faked**: the fingerprint has to unlock a key in the phone's secure hardware, so a tampered "success" on a rooted phone doesn't open the app. Adding a new fingerprint turns fingerprint unlock off until you turn it on again with your PIN
+- With the app lock on, the recent apps view always shows a blank card, even with **Hide in screenshots and recent apps** off
+
 ## v0.7.1 (2026-10-21)
 
 ### Fixed

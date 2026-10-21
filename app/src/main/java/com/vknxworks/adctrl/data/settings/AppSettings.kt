@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-/** App-wide preferences (not per server). Server settings and passwords will live elsewhere, encrypted. */
+/** App-wide preferences (not per server). Server settings and passwords live in ServerStore, encrypted. */
 val Context.appDataStore: DataStore<Preferences> by preferencesDataStore(name = "adctrl")
 
 enum class ThemeChoice(@StringRes val label: Int) {
@@ -25,6 +25,16 @@ enum class ThemeChoice(@StringRes val label: Int) {
     DARK(R.string.theme_dark),
     LIGHT(R.string.theme_light),
     BLACK(R.string.theme_black),
+}
+
+/** How long AdCtrl can be in the background before the app lock asks again (-1: only after a restart). */
+enum class LockTimeout(@StringRes val label: Int, val millis: Long) {
+    IMMEDIATELY(R.string.lock_again_immediately, 0L),
+    MINUTE_1(R.string.lock_again_1m, 60_000L),
+    MINUTES_5(R.string.lock_again_5m, 5 * 60_000L),
+    MINUTES_15(R.string.lock_again_15m, 15 * 60_000L),
+    HOUR_1(R.string.lock_again_1h, 60 * 60_000L),
+    RESTART(R.string.lock_again_restart, -1L),
 }
 
 data class AppSettings(
@@ -38,6 +48,10 @@ data class AppSettings(
     val tileAllServers: Boolean = false,
     /** The Queries tab adds new queries by itself while it's on screen. */
     val queriesLive: Boolean = true,
+    /** App lock: when it asks again after AdCtrl was in the background. */
+    val lockTimeout: LockTimeout = LockTimeout.IMMEDIATELY,
+    /** App lock: ask for the fingerprint or app PIN before every change to a server ("Confirm changes"). */
+    val lockChanges: Boolean = false,
 )
 
 class SettingsRepository(private val context: Context, scope: CoroutineScope) {
@@ -48,6 +62,8 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         val tilePause = stringPreferencesKey("tile_pause")
         val tileAll = booleanPreferencesKey("tile_all_servers")
         val queriesLive = booleanPreferencesKey("queries_live")
+        val lockTimeout = stringPreferencesKey("lock_timeout")
+        val lockChanges = booleanPreferencesKey("lock_changes")
     }
 
     val settings: StateFlow<AppSettings> = context.appDataStore.data
@@ -64,6 +80,8 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         tilePause = enumOr(this[K.tilePause], PauseDuration.M5),
         tileAllServers = this[K.tileAll] ?: false,
         queriesLive = this[K.queriesLive] ?: true,
+        lockTimeout = enumOr(this[K.lockTimeout], LockTimeout.IMMEDIATELY),
+        lockChanges = this[K.lockChanges] ?: false,
     )
 
     suspend fun update(transform: (AppSettings) -> AppSettings) {
@@ -75,6 +93,8 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             p[K.tilePause] = s.tilePause.name
             p[K.tileAll] = s.tileAllServers
             p[K.queriesLive] = s.queriesLive
+            p[K.lockTimeout] = s.lockTimeout.name
+            p[K.lockChanges] = s.lockChanges
         }
     }
 

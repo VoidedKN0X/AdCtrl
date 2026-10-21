@@ -8,6 +8,12 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import com.vknxworks.adctrl.ui.lock.AppLockOverlay
+import com.vknxworks.adctrl.ui.lock.lockCovering
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,16 +35,18 @@ class MainActivity : ComponentActivity() {
         val c = container
         setContent {
             val settings by c.settings.settings.collectAsStateWithLifecycle()
-            // FLAG_SECURE follows "Hide content in screenshots & recents" (on by default, and on
+            // FLAG_SECURE follows "Hide in screenshots and recent apps" (on by default, and on
             // before the setting has been read), and is always on while server setup is open.
             val secure = settings.hideContent || ScreenPrivacy.forced > 0
-            LaunchedEffect(secure) {
+            // With the app lock on, the recent-apps view always shows a blank card.
+            val blankRecents = secure || c.vault.enabled
+            LaunchedEffect(secure, blankRecents) {
                 if (secure) {
                     window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
                 } else {
                     window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                 }
-                setRecentsScreenshotEnabled(!secure)
+                setRecentsScreenshotEnabled(!blankRecents)
             }
             val dark = when (settings.theme) {
                 ThemeChoice.SYSTEM -> isSystemInDarkTheme()
@@ -52,8 +60,14 @@ class MainActivity : ComponentActivity() {
                 enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
                 onDispose { }
             }
+            val covered = lockCovering(c.vault)
             AdCtrlTheme(settings.theme, settings.dynamicColor) {
-                AppRoot()
+                Box(Modifier.fillMaxSize()) {
+                    // The app stays underneath (so nothing you typed is lost), hidden from TalkBack too.
+                    Box(if (covered) Modifier.fillMaxSize().clearAndSetSemantics { } else Modifier.fillMaxSize()) { AppRoot() }
+                    // The app lock: lock screen, PIN screens and "Confirm changes".
+                    AppLockOverlay()
+                }
             }
         }
     }

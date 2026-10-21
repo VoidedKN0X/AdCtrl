@@ -12,11 +12,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 
 /** The active server and its API client. */
 class ActiveServer(val server: Server, val client: AghClient)
@@ -37,7 +39,12 @@ class Sessions(
     private val store: ServerStore,
     private val baseHttp: OkHttpClient,
     private val scope: CoroutineScope,
+    /** The app lock is locked: the passwords are sealed, and requests wait until it's unlocked. */
+    private val locked: StateFlow<Boolean>,
 ) {
+    /** Decrypted passwords, kept in memory only while unlocked (see [forgetSecrets]). */
+    private val secretCache = ConcurrentHashMap<String, ServerSecrets>()
+
     val servers: StateFlow<List<Server>> = store.servers
 
     /** Bumped when the password changes without other server settings changing, so the client is rebuilt. */
@@ -63,11 +70,18 @@ class Sessions(
     fun clientFor(server: Server): AghClient = AghClient(
         server,
         baseHttp,
-        store.secrets(server.id),
+        secrets = { cachedSecrets(server.id) },
         // The saved setting, not this copy of the server: a client made before read-only was
         // switched on must not keep writing.
         isReadOnly = { store.servers.value.firstOrNull { it.id == server.id }?.readOnly ?: server.readOnly },
+        awaitUnlocked = { locked.first { !it } },
     )
+
+    private fun cachedSecrets(id: String): ServerSecrets =
+        secretCache[id] ?: store.secrets(id).also { if (it.password.isNotEmpty() && !locked.value) secretCache[id] = it }
+
+    /** The app locked: drop every decrypted password from memory. */
+    fun forgetSecrets() = secretCache.clear()
 
     /** Reloads the active server's status and version. */
     fun refreshStatus() {
@@ -114,6 +128,7 @@ class Sessions(
     fun add(server: Server, secrets: ServerSecrets): Server {
         val saved = if (server.id.isBlank()) server.copy(id = UUID.randomUUID().toString()) else server
         store.saveSecrets(saved.id, secrets)
+        secretCache.remove(saved.id)
         store.save(saved)
         store.setActive(saved.id)
         // Editing a server can leave its settings unchanged but its password new: rebuild the client either way.
@@ -123,7 +138,10 @@ class Sessions(
 
     fun switchTo(id: String) = store.setActive(id)
 
-    fun remove(id: String) = store.remove(id)
+    fun remove(id: String) {
+        secretCache.remove(id)
+        store.remove(id)
+    }
 
     fun setReadOnly(id: String, readOnly: Boolean) = store.update(id) { it.copy(readOnly = readOnly) }
 

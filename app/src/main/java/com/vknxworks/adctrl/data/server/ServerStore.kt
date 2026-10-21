@@ -4,6 +4,7 @@ import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Base64
+import com.vknxworks.adctrl.data.lock.LockVault
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,11 +18,12 @@ import javax.crypto.spec.GCMParameterSpec
 
 /**
  * Saved servers and the active one. Server settings are plain JSON; passwords are encrypted with an
- * AES-GCM key that lives in the Android Keystore and never leaves it. This is done directly rather
- * than with EncryptedSharedPreferences, which would bring in Google's Tink library. Nothing here is
- * backed up or moved to another phone (see data_extraction_rules).
+ * AES-GCM key that lives in the Android Keystore and never leaves it (done directly, without an extra
+ * crypto library). With the app lock on, every password is also sealed with the lock's vault key, so
+ * it can't be read while AdCtrl is locked. Nothing here is backed up or moved to another phone (see
+ * data_extraction_rules).
  */
-class ServerStore(context: Context) {
+class ServerStore(context: Context, private val vault: LockVault) {
     private val sp = context.getSharedPreferences("servers", Context.MODE_PRIVATE)
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
     private val listSerializer = ListSerializer(Server.serializer())
@@ -70,10 +72,49 @@ class ServerStore(context: Context) {
         _activeId.value = id
     }
 
-    fun secrets(id: String): ServerSecrets = ServerSecrets(password = decrypt(sp.getString(secretKey(id), null)))
+    /** The password is empty while it's sealed and AdCtrl is locked. */
+    fun secrets(id: String): ServerSecrets = ServerSecrets(password = read(sp.getString(secretKey(id), null)))
 
     fun saveSecrets(id: String, s: ServerSecrets) {
-        sp.edit().putString(secretKey(id), encrypt(s.password)).apply()
+        sp.edit().putString(secretKey(id), write(s.password, vault.enabled)).commit()
+    }
+
+    private fun read(stored: String?): String {
+        val plain = decrypt(stored)
+        return if (LockVault.isSealed(plain)) vault.open(plain).orEmpty() else plain
+    }
+
+    /** Keystore-encrypted, and sealed with the app lock's key when [seal]. */
+    private fun write(plain: String, seal: Boolean): String? {
+        if (plain.isEmpty()) return null
+        return encrypt(if (seal) vault.seal(plain) ?: plain else plain)
+    }
+
+    /**
+     * Seals or unseals every saved password to match [seal] (the app lock was turned on or off). Only
+     * while unlocked; a sealed password that can't be opened stays as it is.
+     */
+    @Synchronized
+    fun applySealing(seal: Boolean) {
+        val edit = sp.edit()
+        for ((key, value) in sp.all) {
+            if (!key.startsWith("secret_") || value !is String) continue
+            val plain = decrypt(value)
+            val sealed = LockVault.isSealed(plain)
+            if (sealed == seal) continue
+            val clear = if (sealed) vault.open(plain) ?: continue else plain
+            if (clear.isEmpty()) continue
+            write(clear, seal)?.let { edit.putString(key, it) }
+        }
+        edit.commit()
+    }
+
+    /** Deletes every saved server and password ("Forgot PIN?"). */
+    @Synchronized
+    fun removeAll() {
+        sp.edit().clear().commit()
+        _servers.value = emptyList()
+        _activeId.value = null
     }
 
     private fun secretKey(id: String) = "secret_${id}_password"

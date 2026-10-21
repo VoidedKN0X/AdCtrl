@@ -8,19 +8,22 @@ AdCtrl is an Android app for [AdGuard Home](https://github.com/AdguardTeam/AdGua
 
 Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
-> **Early development.** AdCtrl is being built one part at a time. All four tabs and the Quick Settings tile are done; the widget, app shortcuts, notifications and app lock follow. See [CHANGELOG.md](CHANGELOG.md) for what's in each version.
+> **Early development.** AdCtrl is being built one part at a time. All four tabs, the Quick Settings tile and the app lock are done; a widget, app shortcuts and notifications follow. See [CHANGELOG.md](CHANGELOG.md) for what's in each version.
 
 ## Features
-
-What AdCtrl is being built to do:
 
 - **Overview**: a big protection switch with pause for 30 seconds up to 8 hours (with a countdown), statistics for the last day to 90 days, a queries vs. blocked graph, top domains, clients and upstreams, and an attention list for paused protection, failing filter lists and updates
 - **Queries**: the live query log with search and filters, the matched rule and list for every answer, and **one-tap block or unblock** of any domain, for one subdomain, the whole domain or one client
 - **Filters**: blocklists and allowlists (with 45 well-known lists to pick from), a custom rules editor with highlighting, search, mistake hints and a look at the changes before saving, blocked services with a pause schedule, DNS rewrites, and safe browsing, parental control and safe search
 - **Clients**: every device with its queries, recent activity and its own settings (filtering, blocked services, upstreams, query log and statistics), adding found devices as clients, and blocking a device entirely
-- **Quick Settings tile** to pause protection or turn it back on with one tap (long-press opens AdCtrl), plus a widget and app shortcuts
+- **Quick Settings tile** to pause protection or turn it back on with one tap (long-press opens AdCtrl)
 - **Several servers**, such as a primary and a secondary, with "apply to all servers" for rule changes and pausing
-- **Safe by design**: a read-only mode, confirmation before changes, certificate pinning, screenshot protection, an optional app lock, and passwords encrypted with the Android Keystore
+- **App lock** with its own PIN and optional fingerprint unlock; your server passwords stay encrypted while the app is locked, and **Confirm changes** can ask for the PIN or fingerprint before anything changes on a server
+- **Safe by design**: a read-only mode, confirmation before changes, certificate pinning, screenshot protection, and passwords encrypted with the Android Keystore
+
+## Planned
+
+Not in the app yet: a home screen widget, app shortcuts and notifications.
 
 ## Screenshots
 
@@ -38,9 +41,12 @@ Coming soon.
 2. Open it on your phone. Android may ask you to allow installing apps from your browser or file manager.
 3. Updates install over the old version. Your settings are kept.
 
-**Automatic updates:** on your phone, tap the button below. Install [Obtainium](https://github.com/ImranR98/Obtainium) first; the button adds AdCtrl and installs every new release for you. AdCtrl joins the [CtrlF-Droid repo](https://voidedkn0x.github.io/CtrlF-Droid/) once it can connect to a server.
+**Automatic updates:** on your phone, tap one of the buttons below.
 
-<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/VoidedKN0X/AdCtrl"><img src=".github/assets/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a>
+- **Obtainium:** install [Obtainium](https://github.com/ImranR98/Obtainium) first. The button adds AdCtrl and installs every new release for you.
+- **F-Droid:** adds the [CtrlF-Droid repo](https://voidedkn0x.github.io/CtrlF-Droid/) to F-Droid, Droid-ify or Neo Store, with every Ctrl app and automatic updates.
+
+<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/VoidedKN0X/AdCtrl"><img src=".github/assets/badge_obtainium.png" alt="Get it on Obtainium" height="80"></a> <a href="https://voidedkn0x.github.io/CtrlF-Droid/"><img src=".github/assets/badge_ctrlf-droid.png" alt="Get it from our F-Droid repo" height="80"></a>
 
 If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X/AdCtrl` in Obtainium by hand.
 
@@ -58,6 +64,21 @@ Add a second server, such as a secondary AdGuard Home, under **Account › Serve
 - **Use HTTPS.** AdGuard Home signs you in with a username and password on every request (HTTP Basic auth), so reach it over HTTPS: turn on encryption in AdGuard Home under **Settings › Encryption settings**, or put it behind a reverse proxy such as Nginx Proxy Manager. AdCtrl only allows plain HTTP for addresses on your own network (private IPs and `.lan`, `.local`, `.home.arpa`, `.internal` or single-word names that point to a private IP), and only when you switch it on for that server.
 - **Use a dedicated, strong password.** Give the AdGuard Home admin account a long, random password that you don't use anywhere else.
 - **Self-signed certificate?** AdCtrl shows its SHA-256 fingerprint the first time it connects. Compare it with your certificate and tap **Trust**; AdCtrl then accepts only that exact certificate for that server.
+
+## App lock
+
+Turn it on under **Account › Settings › Privacy and security › App lock** (it's off until you do).
+
+- **Its own PIN**, at least 6 digits and separate from your phone's; very obvious ones like 111111 or 123456 are refused. The PIN is never stored: it's stretched with 600,000 rounds of PBKDF2 and mixed with a secret held in the phone's secure hardware, so copying AdCtrl's files off the phone isn't enough to guess it.
+- **Unlock with fingerprint** (optional): only strong biometrics such as your fingerprint, checked by the phone's secure hardware. Adding a new fingerprint turns it off until you turn it on again with your PIN. The PIN is still needed after the phone restarts and at least every 72 hours.
+- **Wrong PINs make you wait**: 30 seconds after 5 tries, doubling up to 15 minutes. Restarting the app or the phone, or changing the clock, doesn't skip the wait.
+- **Lock again**: as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Opening a link in your browser from AdCtrl doesn't count as leaving, unless you stay away longer than 5 minutes.
+- **Your passwords are sealed while locked.** They're encrypted with a key that only exists in memory while AdCtrl is unlocked and is wiped the moment it locks, so a locked AdCtrl, or a copy of its files, can't sign in to your servers. Nothing is sent to your servers until you unlock.
+- **Confirm changes** (optional): asks for your fingerprint or app PIN before anything that changes a server, such as pausing protection, blocking a domain or editing rules. One confirmation covers the next minute.
+- **Quick Settings tile:** while AdCtrl is locked, the tile says so and a tap opens AdCtrl, so nobody can pause protection without your PIN. With **Confirm changes** on, a tap always opens AdCtrl.
+- **Change app PIN** asks for your current PIN first, and so does turning the lock off.
+- **Forgot your PIN?** The lock screen can remove your servers and their passwords so you can add them again. Nothing changes on your AdGuard Home servers.
+- **Hide in screenshots and recent apps** (on by default) blanks screenshots, screen recordings and the recent apps view. With the app lock on, the recent apps view is always blank.
 
 ## Privacy
 
@@ -104,6 +125,7 @@ Native Android apps for self-hosted services and everyday tools, all with the sa
 | [FrigateCtrl](https://github.com/VoidedKN0X/FrigateCtrl) | Watch and review your Frigate NVR cameras |
 | [ImmichCtrl](https://github.com/VoidedKN0X/ImmichCtrl) | Photos and backup for your Immich server |
 | [JellyCtrl](https://github.com/VoidedKN0X/JellyCtrl) | Movies, shows, music and Live TV from Jellyfin |
+| [MemoCtrl](https://github.com/VoidedKN0X/MemoCtrl) | Notes on your Memos server |
 | [NaviCtrl](https://github.com/VoidedKN0X/NaviCtrl) | Music player for Navidrome servers |
 | [PaperCtrl](https://github.com/VoidedKN0X/PaperCtrl) | Scan and browse documents on Paperless-ngx |
 | [PrintCtrl](https://github.com/VoidedKN0X/PrintCtrl) | Bambu Lab printers through Bambuddy, and Spoolman spools |
