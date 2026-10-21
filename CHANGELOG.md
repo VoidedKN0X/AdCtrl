@@ -4,6 +4,14 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.8.3 (2026-10-21)
+
+### Changed
+
+- **The page behind your profile picture is now called You**, the same name as in every Ctrl app (before: "Account"). It still holds your servers, read-only mode, **Settings** and **About**, and the profile picture at the top right of every tab is still the only way into Settings.
+- **The profile picture's placeholder** is now the same person picture as in the other Ctrl apps, instead of AdCtrl's shield. It shows when the server's name doesn't start with a letter; otherwise you still see the name's first letter.
+- **README**: the paths to your servers, the app lock and Support now say "tap your profile picture › …" and name the **You** page.
+
 ## v0.8.2 (2026-10-21)
 
 ### Changed

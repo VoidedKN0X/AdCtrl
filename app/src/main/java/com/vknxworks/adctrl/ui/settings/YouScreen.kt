@@ -18,6 +18,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Dns
@@ -92,7 +93,7 @@ fun YouScreen() {
                     val initial = server?.initial
                     when {
                         server == null -> Icon(Icons.Filled.Dns, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
-                        initial == null -> Icon(Icons.Filled.Shield, null, Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary)
+                        initial == null -> Icon(Icons.Filled.AccountCircle, null, Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary)
                         else -> Text(initial, style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.primary)
                     }
                 }
