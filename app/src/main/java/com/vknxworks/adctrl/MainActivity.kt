@@ -36,8 +36,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             val settings by c.settings.settings.collectAsStateWithLifecycle()
             // FLAG_SECURE follows "Hide in screenshots and recent apps" (on by default, and on
-            // before the setting has been read), and is always on while server setup is open.
-            val secure = settings.hideContent || ScreenPrivacy.forced > 0
+            // before the setting has been read), and is always on while server setup, the lock screen
+            // or a PIN screen is open.
+            val secure = settings.hideContent || ScreenPrivacy.forced > 0 || lockCovering(c.vault)
             // With the app lock on, the recent-apps view always shows a blank card.
             val blankRecents = secure || c.vault.enabled
             LaunchedEffect(secure, blankRecents) {

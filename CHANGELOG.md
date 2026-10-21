@@ -4,6 +4,17 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.8.1 (2026-10-21)
+
+### Changed
+
+- **Settings are in the same order as in the other Ctrl apps**: Appearance, then Privacy and security, then the Quick Settings tile
+- **README**: the App lock section now uses the same wording as the other Ctrl apps
+
+### Security
+
+- **The lock screen and the PIN screens are always kept out of screenshots, screen recordings and the recent apps view**, even with **Hide in screenshots and recent apps** turned off
+
 ## v0.8.0 (2026-10-21)
 
 The app lock: the same one as in every other Ctrl app, with its own PIN, optional fingerprint unlock and your server passwords sealed while AdCtrl is locked.
