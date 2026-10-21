@@ -43,7 +43,7 @@ import com.vknxworks.adctrl.ui.components.GroupSwitch
 import com.vknxworks.adctrl.ui.components.ScreenTopBar
 import kotlinx.coroutines.launch
 
-/** App settings: appearance, the Quick Settings tile, and privacy and security (app lock). */
+/** App settings, in the Ctrl series order: appearance, privacy and security (app lock), then the Quick Settings tile. */
 @Composable
 fun SettingsScreen() {
     val c = LocalContext.current.container
@@ -67,6 +67,7 @@ fun SettingsScreen() {
                     icon = Icons.Filled.Palette,
                 ) { on -> c.appScope.launch { c.settings.update { it.copy(dynamicColor = on) } } }
             }
+            PrivacyAndSecurityGroup(settings.hideContent, settings.lockTimeout, settings.lockChanges)
             Group(stringResource(R.string.tile_settings_group), footer = stringResource(R.string.tile_settings_footer)) {
                 GroupChoice(
                     stringResource(R.string.tile_pause_setting),
@@ -81,7 +82,6 @@ fun SettingsScreen() {
                     icon = Icons.Filled.Dns,
                 ) { on -> c.appScope.launch { c.settings.update { it.copy(tileAllServers = on) } } }
             }
-            PrivacyAndSecurityGroup(settings.hideContent, settings.lockTimeout, settings.lockChanges)
         }
     }
 }

@@ -67,18 +67,19 @@ Add a second server, such as a secondary AdGuard Home, under **Account › Serve
 
 ## App lock
 
-Turn it on under **Account › Settings › Privacy and security › App lock** (it's off until you do).
+Turn it on under **Account > Settings > Privacy and security > App lock**. It's off until you turn it on.
 
-- **Its own PIN**, at least 6 digits and separate from your phone's; very obvious ones like 111111 or 123456 are refused. The PIN is never stored: it's stretched with 600,000 rounds of PBKDF2 and mixed with a secret held in the phone's secure hardware, so copying AdCtrl's files off the phone isn't enough to guess it.
-- **Unlock with fingerprint** (optional): only strong biometrics such as your fingerprint, checked by the phone's secure hardware. Adding a new fingerprint turns it off until you turn it on again with your PIN. The PIN is still needed after the phone restarts and at least every 72 hours.
-- **Wrong PINs make you wait**: 30 seconds after 5 tries, doubling up to 15 minutes. Restarting the app or the phone, or changing the clock, doesn't skip the wait.
-- **Lock again**: as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Opening a link in your browser from AdCtrl doesn't count as leaving, unless you stay away longer than 5 minutes.
-- **Your passwords are sealed while locked.** They're encrypted with a key that only exists in memory while AdCtrl is unlocked and is wiped the moment it locks, so a locked AdCtrl, or a copy of its files, can't sign in to your servers. Nothing is sent to your servers until you unlock.
-- **Confirm changes** (optional): asks for your fingerprint or app PIN before anything that changes a server, such as pausing protection, blocking a domain or editing rules. One confirmation covers the next minute.
-- **Quick Settings tile:** while AdCtrl is locked, the tile says so and a tap opens AdCtrl, so nobody can pause protection without your PIN. With **Confirm changes** on, a tap always opens AdCtrl.
-- **Change app PIN** asks for your current PIN first, and so does turning the lock off.
-- **Forgot your PIN?** The lock screen can remove your servers and their passwords so you can add them again. Nothing changes on your AdGuard Home servers.
-- **Hide in screenshots and recent apps** (on by default) blanks screenshots, screen recordings and the recent apps view. With the app lock on, the recent apps view is always blank.
+- **Its own app PIN** of at least 6 digits, separate from your phone's screen lock. Very obvious PINs such as 111111 or 123456 are refused.
+- **Unlock with fingerprint** (optional) only accepts strong biometrics, such as the fingerprint sensor, checked by the phone's secure hardware. Face unlock that only uses the camera isn't accepted. The PIN is still needed after the phone restarts and at least every 72 hours, and adding a new fingerprint to the phone turns fingerprint unlock off until you turn it on again.
+- **Your server passwords are encrypted with the PIN while AdCtrl is locked.** The key only exists in memory while the app is unlocked and is wiped the moment it locks, and nothing is sent to your servers until you unlock. The PIN itself is never stored: it's stretched with 600,000 rounds of PBKDF2 and mixed with a key held in the phone's secure hardware, so a copy of the app's files isn't enough to guess it on a computer.
+- **Wrong PINs:** after 5 tries you wait 30 seconds, doubling up to 15 minutes. Restarting the app or the phone, or changing the clock, doesn't skip the wait.
+- **Lock again:** as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Opening a link in your browser from the Account page doesn't count as leaving, unless you stay away for more than 5 minutes.
+- **Change app PIN** asks for your current PIN first, and turning the app lock off asks for the PIN too.
+- **Forgot your PIN?** It can't be recovered, because it encrypts your passwords. The lock screen offers to remove your servers and their passwords and the statistics AdCtrl keeps on the phone, so you can add them again; nothing changes on your AdGuard Home servers.
+- **Confirm changes** (optional) asks for your fingerprint or app PIN before anything that changes a server, such as pausing protection, blocking a domain or editing rules. One confirmation covers the next minute.
+- **With the app lock on**, the recent-apps screen always shows a blank card, and the Quick Settings tile says AdCtrl is locked and opens it instead of pausing protection, so nobody can pause it without your PIN. With **Confirm changes** on, a tap on the tile always opens AdCtrl.
+
+**Hide in screenshots and recent apps** (in the same section, also without the app lock) keeps AdCtrl out of screenshots, screen recordings and the recent-apps view. It's on by default, because your query log shows what everyone on your network visits. Server setup, the lock screen and the PIN screens are always hidden.
 
 ## Privacy
 
