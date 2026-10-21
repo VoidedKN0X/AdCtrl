@@ -4,6 +4,13 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.9.3 (2026-10-21)
+
+### Fixed
+
+- **Fingerprint unlock works again after you leave the app**: once you'd left AdCtrl with the back gesture or by swiping home, the lock screen no longer asked for your fingerprint when you came back, and tapping **Use fingerprint** did nothing either; only the PIN worked until the app was force-closed. The fingerprint prompt was asked for while AdCtrl was still coming back on screen, and the phone dropped it without answering, which left AdCtrl waiting for an answer that never came. Now the prompt only opens once AdCtrl is fully back on screen, a prompt that never answered can't block the next one, and the lock screen offers your fingerprint again every time you come back to it, not just the first time after it locked.
+- **Confirm changes asks for your fingerprint again after you leave the app**: the same fix applies to the **Confirm changes** screen. If you leave AdCtrl while it's asking and come back, it offers your fingerprint again, and **Use fingerprint** always works.
+
 ## v0.9.2 (2026-10-21)
 
 ### Security
