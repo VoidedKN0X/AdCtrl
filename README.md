@@ -4,11 +4,9 @@
 
 [![Latest release](https://img.shields.io/github/v/release/VoidedKN0X/AdCtrl?label=download)](https://github.com/VoidedKN0X/AdCtrl/releases/latest) ![Android 13+](https://img.shields.io/badge/Android-13%2B-3DDC84?logo=android&logoColor=white) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE) ![Telemetry-free](https://img.shields.io/badge/telemetry-none-brightgreen) [![Sponsor](https://img.shields.io/badge/sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/VoidedKN0X)
 
-AdCtrl is an Android app for [AdGuard Home](https://github.com/AdguardTeam/AdGuardHome): a fast, touch-first alternative to the web UI for what you do from your phone. See what's blocked, unblock a site that broke, pause protection and keep an eye on the devices on your network.
+AdCtrl is an Android app for [AdGuard Home](https://github.com/AdguardTeam/AdGuardHome): a fast, touch-first alternative to the web UI for what you do from your phone. See what's blocked, unblock a site that broke, pause protection and keep an eye on the devices on your network, from the app, a Quick Settings tile, a home screen widget or app shortcuts, with notifications when protection stays off or a server goes down.
 
 Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
-
-> **Early development.** AdCtrl is being built one part at a time. All four tabs, the Quick Settings tile and the app lock are done; a widget, app shortcuts and notifications follow. See [CHANGELOG.md](CHANGELOG.md) for what's in each version.
 
 ## Features
 
@@ -17,13 +15,12 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Filters**: blocklists and allowlists (with 45 well-known lists to pick from), a custom rules editor with highlighting, search, mistake hints and a look at the changes before saving, blocked services with a pause schedule, DNS rewrites, and safe browsing, parental control and safe search
 - **Clients**: every device with its queries, recent activity and its own settings (filtering, blocked services, upstreams, query log and statistics), adding found devices as clients, and blocking a device entirely
 - **Quick Settings tile** to pause protection or turn it back on with one tap (long-press opens AdCtrl)
+- **Home screen widget** with protection on, paused (with a live countdown) or off, and the last 24 hours' queries and blocked share
+- **App shortcuts** (long-press the AdCtrl icon): Pause protection, Query log, Search the query log and Blocked queries
+- **Notifications** from AdCtrl's own background checks: protection turned off, paused for longer than you expect, a server that can't be reached, filter lists that stop updating and AdGuard Home updates
 - **Several servers**, such as a primary and a secondary, with "apply to all servers" for rule changes and pausing
 - **App lock** with its own PIN and optional fingerprint unlock; your server passwords stay encrypted while the app is locked, and **Confirm changes** can ask for the PIN or fingerprint before anything changes on a server
 - **Safe by design**: a read-only mode, confirmation before changes, certificate pinning, optional **Hide in screenshots** and **Hide in recent apps**, and passwords encrypted with the Android Keystore
-
-## Planned
-
-Not in the app yet: a home screen widget, app shortcuts and notifications.
 
 ## Screenshots
 
@@ -78,8 +75,23 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 - **Forgot your PIN?** It can't be recovered, because it encrypts your passwords. The lock screen offers to remove your servers and their passwords and the statistics AdCtrl keeps on the phone, so you can add them again; nothing changes on your AdGuard Home servers.
 - **Confirm changes** (optional) asks for your fingerprint or app PIN before anything that changes a server, such as pausing protection, blocking a domain or editing rules. One confirmation covers the next minute.
 - **The Quick Settings tile** says AdCtrl is locked and opens it instead of pausing protection while AdCtrl is locked, so nobody can pause it without your PIN. With **Confirm changes** on, a tap on the tile always opens AdCtrl.
+- **The widget** only says "AdCtrl is locked" while your passwords are sealed, and **app shortcuts** open the lock screen first; **Pause protection** then still needs a duration picked on the phone (and **Confirm changes**, when it's on).
+- **Background checks** for notifications have to sign in while AdCtrl is locked. While they're on, your server passwords are only encrypted with the Android Keystore, as without the app lock, and the widget keeps showing your server; turn them off to keep the passwords sealed with your PIN.
 
 **Hide in screenshots** and **Hide in recent apps** (the last two switches in the same section, also without the app lock, both off by default): the first keeps AdCtrl out of screenshots and screen recordings (and blanks its recent-apps preview), the second shows a blank card for AdCtrl in the recent-apps view while screenshots still work. With the app lock on, the recent-apps view always shows a blank card. Server setup, the lock screen and the PIN screens are always kept out of screenshots.
+
+## Widget, shortcuts and notifications
+
+- **Widget:** add **AdGuard protection** from your home screen's widget list. It shows the server you have selected in AdCtrl: protection on, paused with a live countdown, or off, and the DNS queries and blocked share of the last 24 hours. Tap it to open AdCtrl. It refreshes when you use the app, with every background check and at least every 30 minutes, and never changes anything itself.
+- **App shortcuts:** long-press the AdCtrl icon for **Pause protection** (opens the pause menu, nothing changes until you pick how long), **Query log**, **Search the query log** and **Blocked queries**. With the app lock on, AdCtrl asks for your PIN first.
+- **Notifications:** AdGuard Home can't send notifications itself, so AdCtrl checks your servers in the background: tap your profile picture › **Settings › Notifications** and turn on **Check in the background** (off until you do; every 15, 30, 60 or 120 minutes). Each kind can be switched on or off:
+  - **Protection turned off** (on): protection or filtering switched off until someone turns it back on
+  - **Paused longer than expected** (on): protection paused or off for longer than the time you choose (15 minutes to 8 hours, 1 hour by default)
+  - **Server unreachable** (on): two checks in a row couldn't reach AdGuard Home, or its sign-in stopped working
+  - **Filter lists not updating** (off): enabled lists with no rules, or that haven't updated for much longer than their update interval
+  - **AdGuard Home updates** (off): once for each new version
+
+  The checks only read from your own servers. On the lock screen, notifications only say that something needs a look. On ColorOS and other phones that close background apps, allow AdCtrl to run in the background (the Battery row on the same page opens the right settings).
 
 ## Privacy
 

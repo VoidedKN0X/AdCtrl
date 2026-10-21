@@ -29,7 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.R
+import com.vknxworks.adctrl.ShortcutAction
 import com.vknxworks.adctrl.container
+import com.vknxworks.adctrl.ui.lock.lockCovering
 import com.vknxworks.adctrl.data.api.AghError
 import com.vknxworks.adctrl.data.api.AghVersion
 import com.vknxworks.adctrl.data.api.QueryFilter
@@ -76,6 +78,16 @@ fun OverviewScreen() {
     var pauseSheet by remember { mutableStateOf(false) }
     var pending by remember { mutableStateOf<Pending?>(null) }
     val snackbar = remember { SnackbarHostState() }
+
+    // The "Pause protection" launcher shortcut opens the pause menu here, after unlocking. Nothing
+    // changes until a duration is picked, and "Confirm changes" still asks before it's sent.
+    val shortcut by c.pendingShortcut.collectAsStateWithLifecycle()
+    val covered = lockCovering(c.vault)
+    LaunchedEffect(shortcut, covered) {
+        if (shortcut != ShortcutAction.PAUSE || covered) return@LaunchedEffect
+        c.pendingShortcut.value = null
+        if (server != null && !readOnly) pauseSheet = true
+    }
 
     PollWhileVisible(server?.id, POLL_MS) {
         c.overview.refresh()

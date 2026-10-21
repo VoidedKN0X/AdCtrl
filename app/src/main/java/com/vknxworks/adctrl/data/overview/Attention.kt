@@ -1,6 +1,7 @@
 package com.vknxworks.adctrl.data.overview
 
 import com.vknxworks.adctrl.data.api.FilterList
+import com.vknxworks.adctrl.data.api.FilteringStatus
 import java.time.OffsetDateTime
 
 enum class Severity { CRITICAL, WARNING, INFO }
@@ -40,7 +41,7 @@ object Attention {
         }
         snap.filtering?.let { f ->
             if (!f.enabled) items += AttentionItem.FilteringOff
-            val failing = (f.filters + f.whitelistFilters).filter { it.enabled && isFailing(it, f.interval, now) }
+            val failing = failingLists(f, now)
             if (failing.isNotEmpty()) items += AttentionItem.ListsNotUpdating(failing)
         }
         snap.versionInfo?.let { v ->
@@ -51,6 +52,10 @@ object Attention {
         if (snap.statsConfig?.enabled == false) items += AttentionItem.StatsOff
         return items.sortedBy { it.severity.ordinal }
     }
+
+    /** Enabled blocklists and allowlists that look like their updates fail (see [AttentionItem.ListsNotUpdating]). */
+    fun failingLists(f: FilteringStatus, now: Long = System.currentTimeMillis()): List<FilterList> =
+        (f.filters + f.whitelistFilters).filter { it.enabled && isFailing(it, f.interval, now) }
 
     private fun isFailing(list: FilterList, intervalHours: Int, now: Long): Boolean {
         if (list.rulesCount == 0L) return true

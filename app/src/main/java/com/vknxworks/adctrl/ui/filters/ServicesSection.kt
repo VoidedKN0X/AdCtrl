@@ -205,7 +205,7 @@ private fun ScheduleSheet(initial: PauseSchedule, readOnly: Boolean, onDismiss: 
         Column(Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.services_schedule), style = MaterialTheme.typography.titleLarge)
             Text(
-                stringResource(R.string.schedule_body, schedule.timeZone.ifBlank { "Local" }),
+                stringResource(R.string.schedule_body, schedule.timeZone.ifBlank { stringResource(R.string.time_zone_local) }),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

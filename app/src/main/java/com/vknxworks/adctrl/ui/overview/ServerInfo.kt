@@ -48,7 +48,7 @@ fun ServerInfoCard(
                 val ups = dns.upstreams
                 GroupRow(
                     stringResource(R.string.info_upstreams),
-                    if (ups.isEmpty()) stringResource(R.string.info_none) else ups.take(5).joinToString("\n") + if (ups.size > 5) "\n" + stringResource(R.string.info_more, ups.size - 5) else "",
+                    if (ups.isEmpty()) stringResource(R.string.info_none) else (ups.take(5) + listOfNotNull(if (ups.size > 5) stringResource(R.string.info_more, ups.size - 5) else null)).joinToString("\n"),
                     icon = Icons.Filled.CloudSync,
                 )
                 dns.cacheEnabled?.let { on ->

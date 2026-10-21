@@ -191,7 +191,9 @@ fun RulesEditor(
         Row(Modifier.fillMaxWidth().padding(horizontal = Gutter - 8.dp), verticalAlignment = Alignment.CenterVertically) {
             val ruleCount = lines.count { RulesSyntax.kind(it).let { k -> k != LineKind.BLANK && k != LineKind.COMMENT } }
             Text(
-                pluralStringResource(R.plurals.rules_count, ruleCount, ruleCount) + if (dirty) " · " + stringResource(R.string.rules_unsaved) else "",
+                pluralStringResource(R.plurals.rules_count, ruleCount, ruleCount).let { count ->
+                    if (dirty) stringResource(R.string.dot_pair, count, stringResource(R.string.rules_unsaved)) else count
+                },
                 style = MaterialTheme.typography.labelLarge,
                 color = if (dirty) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f).padding(start = 8.dp),

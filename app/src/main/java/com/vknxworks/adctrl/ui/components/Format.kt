@@ -1,6 +1,8 @@
 package com.vknxworks.adctrl.ui.components
 
+import android.content.Context
 import android.text.format.DateUtils
+import com.vknxworks.adctrl.R
 import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -15,9 +17,10 @@ fun relativeTime(epochMs: Long): String =
 fun formatCount(n: Long): String = NumberFormat.getIntegerInstance(Locale.getDefault()).format(n)
 
 /** Milliseconds from seconds: 12 ms, 0.4 ms. */
-fun formatMs(seconds: Double): String {
+fun formatMs(context: Context, seconds: Double): String {
     val ms = seconds * 1000
-    return if (ms >= 10) "${ms.roundToInt()} ms" else String.format(Locale.getDefault(), "%.1f ms", ms)
+    val n = if (ms >= 10) ms.roundToInt().toString() else String.format(Locale.getDefault(), "%.1f", ms)
+    return context.getString(R.string.value_ms, n)
 }
 
 /** A countdown: 0:42, 9:05, 1:02:30. */

@@ -30,6 +30,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -50,6 +51,7 @@ fun QueryDetailSheet(
     onClientQueries: () -> Unit,
     onCheckHost: () -> Unit,
 ) {
+    val context = LocalContext.current
     val kind = item.kind
     val cs = MaterialTheme.colorScheme
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = cs.surfaceContainer) {
@@ -106,7 +108,7 @@ fun QueryDetailSheet(
             Section(stringResource(R.string.detail_request))
             Line(stringResource(R.string.detail_type), listOf(item.question.type, item.question.klass).filter { it.isNotBlank() }.joinToString(" · "))
             if (item.status.isNotBlank()) Line(stringResource(R.string.detail_status), item.status)
-            item.elapsed?.let { Line(stringResource(R.string.detail_elapsed), formatMs(it / 1000)) }
+            item.elapsed?.let { Line(stringResource(R.string.detail_elapsed), formatMs(context, it / 1000)) }
             if (item.upstream.isNotBlank()) Line(stringResource(R.string.detail_upstream), item.upstream)
             Line(stringResource(R.string.detail_cached), stringResource(if (item.cached) R.string.yes else R.string.no))
             Line(stringResource(R.string.detail_dnssec), stringResource(if (item.answerDnssec) R.string.yes else R.string.no))

@@ -77,6 +77,18 @@ class Sessions(
         awaitUnlocked = { locked.first { !it } },
     )
 
+    /**
+     * A client for background work (notifications, the widget) that reads the password straight from
+     * storage and doesn't wait for the app lock: it only works while the password isn't sealed (see
+     * [ServerStore.sealedNow]). Reads only; it refuses to send any change.
+     */
+    fun backgroundClient(server: Server): AghClient = AghClient(
+        server,
+        baseHttp,
+        secrets = { store.secrets(server.id) },
+        isReadOnly = { true },
+    )
+
     private fun cachedSecrets(id: String): ServerSecrets =
         secretCache[id] ?: store.secrets(id).also { if (it.password.isNotEmpty() && !locked.value) secretCache[id] = it }
 

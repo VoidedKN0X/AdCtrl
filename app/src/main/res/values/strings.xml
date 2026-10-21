@@ -43,8 +43,8 @@
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
     <string name="theme_black">Pure black</string>
-    <string name="dynamic_colour">Dynamic colour</string>
-    <string name="dynamic_colour_subtitle">Use colours from your wallpaper</string>
+    <string name="dynamic_colour">Use wallpaper colours</string>
+    <string name="dynamic_colour_subtitle">Replaces the default colours with ones from your wallpaper</string>
     <!-- Common actions -->
     <string name="cancel">Cancel</string>
     <string name="retry">Retry</string>
@@ -598,8 +598,9 @@
     <!-- Privacy and security: the shared Ctrl series app lock -->
     <string name="group_privacy">Privacy and security</string>
     <string name="app_lock">App lock</string>
-    <string name="app_lock_subtitle">Ask for an app PIN (and optionally your fingerprint) when opening AdCtrl. While locked, your server passwords stay encrypted with the PIN and nothing is sent to your servers</string>
-    <string name="app_lock_footer">AdCtrl has no analytics or tracking. It only talks to your own AdGuard Home servers. While AdCtrl is locked, the Quick Settings tile only opens the app, so nobody can pause protection without your PIN.</string>
+    <string name="app_lock_subtitle">Ask for an app PIN (and optionally your fingerprint) when opening AdCtrl. While locked, your server passwords stay encrypted with the PIN and nothing is sent to your servers, unless you turned on background checks</string>
+    <string name="app_lock_footer">AdCtrl has no analytics or tracking. It only talks to your own AdGuard Home servers. While AdCtrl is locked, the Quick Settings tile only opens the app, so nobody can pause protection without your PIN, and the widget only says that AdCtrl is locked.</string>
+    <string name="app_lock_footer_background">Background checks are on, so they can still sign in while AdCtrl is locked: your server passwords are then only encrypted with the Android Keystore, as without the app lock, and the widget keeps showing your server. Turn off background checks in Notifications to keep them sealed with your PIN too. The Quick Settings tile still only opens the app while AdCtrl is locked. AdCtrl has no analytics or tracking.</string>
     <string name="hide_screenshots">Hide in screenshots</string>
     <string name="hide_screenshots_subtitle">Screenshots and screen recordings show a blank screen</string>
     <string name="hide_recents">Hide in recent apps</string>
@@ -654,4 +655,95 @@
     <string name="lock_confirm_subtitle">AdCtrl is about to change something on your server</string>
     <string name="lock_confirm_body">AdCtrl is about to change something on your server. Enter your app PIN or use your fingerprint.</string>
     <string name="tile_locked">AdCtrl is locked · tap to open</string>
+    <!-- Notifications: AdCtrl's own background checks (AdGuard Home can't push) -->
+    <string name="group_notifications">Notifications</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_subtitle">Background checks and what to notify about</string>
+    <string name="notif_intro">AdGuard Home can\'t send notifications itself, so AdCtrl checks your servers in the background and tells you when protection is off or paused for too long, a server can\'t be reached, filter lists stop updating or a new version is out. The checks only read; nothing changes on your servers.</string>
+    <string name="notif_permission_off">Notifications are blocked for AdCtrl, so the background checks can\'t tell you anything.</string>
+    <string name="notif_permission_allow">Allow notifications</string>
+    <string name="group_polling">Background checks</string>
+    <string name="polling_title">Check in the background</string>
+    <string name="polling_subtitle">Looks at every saved server and notifies about new problems</string>
+    <string name="polling_interval">Check every</string>
+    <plurals name="polling_interval_value">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <string name="polling_footer">Android runs background checks at most every 15 minutes, and can delay them to save battery. They only talk to your own AdGuard Home servers. With the app lock on, your server passwords stay usable in the background while these checks are on (see Privacy and security).</string>
+    <string name="check_now">Check now</string>
+    <string name="check_started">Checking your servers…</string>
+    <string name="last_check">Last check %1$s</string>
+    <string name="last_check_never">Not checked yet</string>
+    <string name="last_check_failed">Last check %1$s couldn\'t reach the server</string>
+    <string name="group_events">What to notify about</string>
+    <string name="events_footer">The first three are on as soon as background checks are. Filter lists and updates are up to you.</string>
+    <string name="ev_protection_off">Protection turned off</string>
+    <string name="ev_protection_off_sub">Protection or filtering is switched off until someone turns it back on</string>
+    <string name="ev_paused_long">Paused longer than expected</string>
+    <string name="ev_paused_long_sub">Protection is paused or off for longer than the time below</string>
+    <string name="pause_limit">Expect protection back within</string>
+    <string name="ev_unreachable">Server unreachable</string>
+    <string name="ev_unreachable_sub">Two checks in a row couldn\'t reach AdGuard Home, or its sign-in stopped working</string>
+    <string name="ev_lists_failing">Filter lists not updating</string>
+    <string name="ev_lists_failing_sub">Enabled blocklists or allowlists with no rules, or that haven\'t updated for longer than expected</string>
+    <string name="ev_update">AdGuard Home updates</string>
+    <string name="ev_update_sub">Once for each new version</string>
+    <plurals name="duration_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="duration_hours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <string name="group_battery">Battery</string>
+    <string name="battery_unrestricted">AdCtrl may run in the background</string>
+    <string name="battery_restricted">Battery optimisation can delay or skip checks</string>
+    <string name="battery_open">Open battery settings</string>
+    <string name="battery_footer">On ColorOS (OPPO, OnePlus) and other phones that close background apps aggressively: open AdCtrl\'s app info, then under Battery choose Allow background activity (or Don\'t optimise), and allow Auto launch if your phone has it.</string>
+    <string name="ch_critical">Protection off</string>
+    <string name="ch_critical_desc">Protection or filtering turned off</string>
+    <string name="ch_warning">Warnings</string>
+    <string name="ch_warning_desc">Protection paused for long, unreachable servers, filter lists that stopped updating</string>
+    <string name="ch_info">Updates</string>
+    <string name="ch_info_desc">New AdGuard Home versions</string>
+    <string name="nt_public_text">Something on your AdGuard Home needs a look. Unlock to see it.</string>
+    <string name="nt_title_server">%1$s: %2$s</string>
+    <string name="nt_protection_off_text">Nothing is blocked until someone turns protection back on.</string>
+    <string name="nt_paused_long_title">Protection is paused for longer than %1$s</string>
+    <string name="nt_paused_long_text">It comes back on by itself at %1$s.</string>
+    <string name="nt_off_long_title">Protection has been off for longer than %1$s</string>
+    <string name="nt_off_long_text">Nothing is blocked until someone turns protection back on.</string>
+    <string name="nt_unreachable_title">Can\'t reach %1$s</string>
+    <string name="nt_signin_title">Can\'t sign in to %1$s</string>
+    <string name="nt_update_text">Open AdCtrl to install it from Server info.</string>
+
+    <!-- Home screen widget -->
+    <string name="widget_name">AdGuard protection</string>
+    <string name="widget_description">Protection on, paused or off, and the last 24 hours</string>
+    <string name="widget_locked">AdCtrl is locked</string>
+    <string name="widget_locked_subtitle">Unlock AdCtrl to see your server</string>
+    <string name="widget_unreachable">Can\'t reach the server · %1$s</string>
+    <string name="widget_back_in">Back on in</string>
+    <string name="widget_blocking">Blocking ads and trackers</string>
+    <string name="widget_off_until">Off until turned back on</string>
+    <string name="widget_queries_label">Queries, last 24 h</string>
+    <string name="widget_blocked_label">Blocked</string>
+    <string name="widget_no_value">–</string>
+
+    <!-- Launcher shortcuts (long-press the app icon) -->
+    <string name="shortcut_pause">Pause</string>
+    <string name="shortcut_pause_long">Pause protection</string>
+    <string name="shortcut_queries">Query log</string>
+    <string name="shortcut_queries_long">Query log</string>
+    <string name="shortcut_search">Search</string>
+    <string name="shortcut_search_long">Search the query log</string>
+    <string name="shortcut_blocked">Blocked</string>
+    <string name="shortcut_blocked_long">Blocked queries</string>
+
+    <!-- Units and fallbacks -->
+    <string name="value_ms">%1$s ms</string>
+    <string name="time_zone_local">Local</string>
+    <string name="dot_pair">%1$s · %2$s</string>
 </resources>

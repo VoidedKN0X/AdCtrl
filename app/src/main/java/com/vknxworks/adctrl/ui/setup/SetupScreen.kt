@@ -158,9 +158,9 @@ fun SetupScreen(editId: String? = null, onDone: () -> Unit, onCancel: (() -> Uni
                     status = status,
                 )
             } catch (e: AghError.UntrustedCertificate) {
-                askToTrust(url, changed = false, onCert = { certPrompt = it }, onFail = { error = it })
+                askToTrust(url, changed = false, onCert = { certPrompt = it }, onFail = { error = errorMessage(context, it, url.host) })
             } catch (e: AghError.PinMismatch) {
-                askToTrust(url, changed = true, onCert = { certPrompt = it }, onFail = { error = it })
+                askToTrust(url, changed = true, onCert = { certPrompt = it }, onFail = { error = errorMessage(context, it, url.host) })
             } catch (e: Exception) {
                 error = errorMessage(context, e, url.host)
             } finally {
@@ -323,11 +323,13 @@ fun SetupScreen(editId: String? = null, onDone: () -> Unit, onCancel: (() -> Uni
 }
 
 /** Reads the certificate the server presents and asks the user to confirm it. */
-private suspend fun askToTrust(url: HttpUrl, changed: Boolean, onCert: (CertPrompt) -> Unit, onFail: (String) -> Unit) {
+private suspend fun askToTrust(url: HttpUrl, changed: Boolean, onCert: (CertPrompt) -> Unit, onFail: (AghError) -> Unit) {
     try {
         onCert(CertPrompt(fetchCertInfo(url), changed))
+    } catch (e: java.io.IOException) {
+        onFail(AghError.fromIo(e))
     } catch (e: Exception) {
-        onFail(e.message ?: url.host)
+        onFail(AghError.UntrustedCertificate(e))
     }
 }
 

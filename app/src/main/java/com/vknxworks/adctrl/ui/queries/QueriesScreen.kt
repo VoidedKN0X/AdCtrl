@@ -58,7 +58,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.R
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import com.vknxworks.adctrl.ShortcutAction
 import com.vknxworks.adctrl.container
+import com.vknxworks.adctrl.ui.lock.lockCovering
 import com.vknxworks.adctrl.data.api.QueryFilter
 import com.vknxworks.adctrl.data.api.QueryKind
 import com.vknxworks.adctrl.data.api.QueryLogItem
@@ -103,6 +107,25 @@ fun QueriesScreen() {
     var selected by remember { mutableStateOf<QueryLogItem?>(null) }
     var ruleTarget by remember { mutableStateOf<RuleTarget?>(null) }
     var text by remember(search.text) { mutableStateOf(search.text) }
+
+    // Launcher shortcuts, after unlocking: "Search the query log" puts the cursor in the search field,
+    // "Blocked queries" shows only blocked ones.
+    val searchFocus = remember { FocusRequester() }
+    val shortcut by c.pendingShortcut.collectAsStateWithLifecycle()
+    val covered = lockCovering(c.vault)
+    LaunchedEffect(shortcut, covered) {
+        val action = shortcut ?: return@LaunchedEffect
+        if (covered || action == ShortcutAction.PAUSE) return@LaunchedEffect
+        c.pendingShortcut.value = null
+        when (action) {
+            ShortcutAction.SEARCH -> {
+                delay(300)
+                runCatching { searchFocus.requestFocus() }
+            }
+            ShortcutAction.BLOCKED -> c.queries.setSearch(c.queries.state.value.search.copy(filter = QueryFilter.BLOCKED))
+            else -> Unit
+        }
+    }
 
     // First load, and again whenever the server changes.
     LaunchedEffect(server?.id) {
@@ -155,7 +178,7 @@ fun QueriesScreen() {
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search, autoCorrectEnabled = false),
                 keyboardActions = KeyboardActions(onSearch = { focus.clearFocus() }),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 4.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 4.dp).focusRequester(searchFocus),
             )
             Row(
                 Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = Gutter, vertical = 4.dp),
@@ -276,6 +299,7 @@ fun QueriesScreen() {
 /** One query: time, domain, type, client, what happened, response time and upstream. */
 @Composable
 private fun QueryRow(item: QueryLogItem, listNames: Map<Long, String>, onClick: () -> Unit) {
+    val context = LocalContext.current
     val kind = item.kind
     val cs = MaterialTheme.colorScheme
     Row(
@@ -300,7 +324,7 @@ private fun QueryRow(item: QueryLogItem, listNames: Map<Long, String>, onClick: 
             val meta = listOfNotNull(
                 item.question.type.takeIf { it.isNotBlank() },
                 item.clientLabel.takeIf { it.isNotBlank() },
-                item.elapsed?.let { formatMs(it / 1000) },
+                item.elapsed?.let { formatMs(context, it / 1000) },
                 item.upstream.takeIf { it.isNotBlank() }?.let(::shortUpstream),
             ).joinToString(" · ")
             Text(meta, style = MaterialTheme.typography.bodySmall, color = cs.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)

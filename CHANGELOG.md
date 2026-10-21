@@ -4,6 +4,36 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.9.0 (2026-10-21)
+
+AdCtrl is no longer in early development: the widget, app shortcuts and notifications are here, so everything that was planned is in the app.
+
+### New
+
+- **Home screen widget "AdGuard protection"**: shows whether protection is on, paused (with a live countdown until it comes back on) or off on the server you have selected, plus the DNS queries and the share blocked by filters in the last 24 hours. Tap it to open AdCtrl. It updates when you use the app, with every background check, when a pause runs out and at least every 30 minutes, and it never changes anything itself. With more than one server it shows the server's name. When the server can't be reached it says so and how old the numbers are
+- **App shortcuts** (long-press the AdCtrl icon): **Pause protection** opens the Overview's pause menu (nothing changes until you pick how long, and **Confirm changes** still asks when it's on), **Query log** opens the Queries tab, **Search the query log** opens it with the cursor in the search field, and **Blocked queries** opens it showing only blocked queries. With the app lock on, AdCtrl asks for your PIN before any of them does anything
+- **Notifications** (tap your profile picture › **Settings › Notifications**): AdGuard Home can't send notifications itself, so AdCtrl checks your servers in the background every 15, 30, 60 or 120 minutes once you turn on **Check in the background** (off until you do). The checks only read from your own servers. Each kind can be switched on or off:
+  - **Protection turned off** (on by default): protection, or filtering in AdGuard Home's settings, is off until someone turns it back on
+  - **Paused longer than expected** (on by default): protection has been paused or off for longer than the time you choose under **Expect protection back within** (15 minutes to 8 hours, 1 hour by default), or a pause was set for longer than that
+  - **Server unreachable** (on by default): two checks in a row couldn't reach AdGuard Home, or it refused the username and password
+  - **Filter lists not updating** (off by default): enabled blocklists or allowlists with no rules, or that haven't updated for much longer than their update interval
+  - **AdGuard Home updates** (off by default): once for each new version
+- A notification goes away by itself once its problem is gone (protection back on, server reachable again). On the lock screen, notifications only say that something on your AdGuard Home needs a look, without server names or details. The Notifications page also shows when each server was last checked, has a **Check now** button and helps you let AdCtrl run in the background on ColorOS and similar phones
+- Notifications have their own channels (**Protection off**, **Warnings**, **Updates**), so you can set the sound and importance of each in Android's settings
+
+### Changed
+
+- **App lock and background checks:** with background checks on, they have to sign in while AdCtrl is locked, so your server passwords are then only encrypted with the Android Keystore (as without the app lock) and the widget keeps showing your server. With them off, the passwords stay sealed with your PIN as before, and the widget only says "AdCtrl is locked". **Settings › Privacy and security** explains which one applies
+- **The Quick Settings tile still only opens AdCtrl while it's locked**, whatever the background checks do
+- **Use wallpaper colours** is the new name of the Dynamic colour switch, with "Replaces the default colours with ones from your wallpaper" underneath, the same wording as in every Ctrl app
+- All text is now in one place, ready for translations: the last few bits (the "ms" unit, the local time zone name, and the error shown when a certificate can't be read during setup) moved there too
+- **README**: the "Early development" notice and the Planned list are gone, and there's a new section on the widget, shortcuts and notifications. **PRIVACY.md** covers what the background checks and the widget keep on the phone
+
+### Fixed
+
+- Setting up a server with an unreadable certificate showed a raw technical error; it now shows the same clear message as other connection problems
+- A failed fingerprint prompt could show a technical error message instead of "Couldn't unlock with your fingerprint"
+
 ## v0.8.3 (2026-10-21)
 
 ### Changed

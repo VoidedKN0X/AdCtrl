@@ -1,5 +1,6 @@
 package com.vknxworks.adctrl
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
@@ -32,6 +33,7 @@ class MainActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         enableEdgeToEdge()
         val c = container
+        if (savedInstanceState == null) handleIntent(intent)
         setContent {
             val settings by c.settings.settings.collectAsStateWithLifecycle()
             // "Hide in screenshots": FLAG_SECURE (also blanks the Recents preview). Always on, whatever the
@@ -67,5 +69,30 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    /** A launcher shortcut: the main screen handles it once AdCtrl is unlocked. */
+    private fun handleIntent(intent: Intent?) {
+        val action = when (intent?.action) {
+            ACTION_PAUSE -> ShortcutAction.PAUSE
+            ACTION_QUERIES -> ShortcutAction.QUERIES
+            ACTION_SEARCH -> ShortcutAction.SEARCH
+            ACTION_BLOCKED -> ShortcutAction.BLOCKED
+            else -> null
+        } ?: return
+        container.pendingShortcut.value = action
+    }
+
+    companion object {
+        const val ACTION_PAUSE = "com.vknxworks.adctrl.PAUSE"
+        const val ACTION_QUERIES = "com.vknxworks.adctrl.QUERIES"
+        const val ACTION_SEARCH = "com.vknxworks.adctrl.SEARCH"
+        const val ACTION_BLOCKED = "com.vknxworks.adctrl.BLOCKED"
     }
 }

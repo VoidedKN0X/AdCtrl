@@ -13,6 +13,7 @@ import com.vknxworks.adctrl.data.api.StatsConfig
 import com.vknxworks.adctrl.data.api.VersionInfo
 import com.vknxworks.adctrl.data.server.Server
 import com.vknxworks.adctrl.data.server.Sessions
+import com.vknxworks.adctrl.data.widget.WidgetData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -172,6 +173,15 @@ class OverviewRepository(
                 error = null,
             )
             save(snap)
+            // The widget shows the same state; it takes the numbers when they cover the last 24 hours.
+            val st = snap.status
+            if (st != null) {
+                val stats = snap.stats
+                val day = StatsRange.DAY.ms
+                val covers24h = snap.statsRangeMs == day || (snap.statsRangeMs == 0L && (snap.statsConfig?.interval ?: 0L) in 1..day)
+                val counts = if (stats != null && covers24h && snap.statsConfig?.enabled != false) stats.numDnsQueries to stats.numBlockedFiltering else null
+                WidgetData.fromApp(context, server, st, counts)
+            }
         } catch (e: AghError) {
             if (sessions.active.value?.server?.id != server.id) return@withLock
             sessions.reportError(server.id, e)
@@ -186,6 +196,7 @@ class OverviewRepository(
             val st = active.client.status()
             if (sessions.active.value?.server?.id != active.server.id) return
             sessions.reportStatus(active.server.id, st)
+            WidgetData.fromApp(context, active.server, st)
             val now = System.currentTimeMillis()
             _state.value = _state.value.copy(
                 snapshot = _state.value.snapshot.copy(status = st),

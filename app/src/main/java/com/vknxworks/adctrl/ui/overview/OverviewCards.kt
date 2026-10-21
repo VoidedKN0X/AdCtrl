@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -149,6 +150,7 @@ fun rangeLabel(r: StatsRange): Int = when (r) {
 
 @Composable
 fun StatsGrid(stats: Stats) {
+    val context = LocalContext.current
     val total = stats.numDnsQueries
     val blockedPct = if (total > 0) percent(stats.numBlockedFiltering.toDouble() / total) else 0
     val tiles = listOf(
@@ -157,7 +159,7 @@ fun StatsGrid(stats: Stats) {
         Triple(stringResource(R.string.stat_safebrowsing), formatCount(stats.numReplacedSafebrowsing), null),
         Triple(stringResource(R.string.stat_parental), formatCount(stats.numReplacedParental), null),
         Triple(stringResource(R.string.stat_safesearch), formatCount(stats.numReplacedSafesearch), null),
-        Triple(stringResource(R.string.stat_avg_time), formatMs(stats.avgProcessingTime), null),
+        Triple(stringResource(R.string.stat_avg_time), formatMs(context, stats.avgProcessingTime), null),
     )
     Column(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         tiles.chunked(2).forEach { row ->
@@ -249,6 +251,7 @@ fun TopListCard(
 /** Upstreams with their number of responses and average response time. */
 @Composable
 fun UpstreamsCard(stats: Stats) {
+    val context = LocalContext.current
     val responses = TopEntry.parse(stats.topUpstreamsResponses)
     val times = TopEntry.parse(stats.topUpstreamsAvgTime).associate { it.key to it.value }
     TopListCard(
@@ -257,7 +260,7 @@ fun UpstreamsCard(stats: Stats) {
         empty = stringResource(R.string.top_empty),
         format = { e ->
             val t = times[e.key]
-            if (t != null) "${formatCount(e.value.toLong())} · ${formatMs(t)}" else formatCount(e.value.toLong())
+            if (t != null) context.getString(R.string.dot_pair, formatCount(e.value.toLong()), formatMs(context, t)) else formatCount(e.value.toLong())
         },
     )
 }

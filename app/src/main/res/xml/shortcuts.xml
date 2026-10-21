@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher shortcuts (long-press the AdCtrl icon). They only open AdCtrl: the app lock asks first, and
+     pausing still needs a duration picked on the phone (and "Confirm changes" when it is on). -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_pause"
+        android:shortcutId="pause"
+        android:shortcutLongLabel="@string/shortcut_pause_long"
+        android:shortcutShortLabel="@string/shortcut_pause">
+        <intent
+            android:action="com.vknxworks.adctrl.PAUSE"
+            android:targetClass="com.vknxworks.adctrl.MainActivity"
+            android:targetPackage="com.vknxworks.adctrl" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_queries"
+        android:shortcutId="queries"
+        android:shortcutLongLabel="@string/shortcut_queries_long"
+        android:shortcutShortLabel="@string/shortcut_queries">
+        <intent
+            android:action="com.vknxworks.adctrl.QUERIES"
+            android:targetClass="com.vknxworks.adctrl.MainActivity"
+            android:targetPackage="com.vknxworks.adctrl" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_search"
+        android:shortcutId="search"
+        android:shortcutLongLabel="@string/shortcut_search_long"
+        android:shortcutShortLabel="@string/shortcut_search">
+        <intent
+            android:action="com.vknxworks.adctrl.SEARCH"
+            android:targetClass="com.vknxworks.adctrl.MainActivity"
+            android:targetPackage="com.vknxworks.adctrl" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_blocked"
+        android:shortcutId="blocked"
+        android:shortcutLongLabel="@string/shortcut_blocked_long"
+        android:shortcutShortLabel="@string/shortcut_blocked">
+        <intent
+            android:action="com.vknxworks.adctrl.BLOCKED"
+            android:targetClass="com.vknxworks.adctrl.MainActivity"
+            android:targetPackage="com.vknxworks.adctrl" />
+    </shortcut>
+</shortcuts>
