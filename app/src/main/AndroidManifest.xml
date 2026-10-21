@@ -4,6 +4,8 @@
 
     <!-- Talking to your own AdGuard Home servers (and nothing else). -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Fingerprint unlock for the app lock (framework BiometricManager/BiometricPrompt). -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <!-- Notifications from the background checks; asked for only when you turn them on. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
