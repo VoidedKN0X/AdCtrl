@@ -50,17 +50,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.container
 import com.vknxworks.adctrl.data.lock.LockVault
@@ -69,6 +74,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -99,7 +105,28 @@ object AppLock {
     /** Set by the app: wipes the vault key and holds back requests until the next unlock. */
     var onLocked: () -> Unit = {}
 
-    private var authenticating = false
+    /**
+     * Goes up every time you come back to the app after really leaving it (not for the fingerprint prompt
+     * itself), so the lock screen offers the fingerprint again on every return, not just once per lock.
+     */
+    var returns by mutableIntStateOf(0)
+        private set
+
+    /** The fingerprint prompt that is open right now, if any. */
+    private var promptSignal: CancellationSignal? = null
+    private var promptStartedAt = 0L
+    private var promptGeneration = 0
+
+    /**
+     * A fingerprint prompt is open. Some phones drop a prompt without ever answering (for example one asked
+     * for while the app was still coming back on screen); such a prompt stops counting after a minute, and
+     * asking again always replaces it, so it can never block fingerprint unlock until the app is closed.
+     */
+    private val authenticating: Boolean
+        get() = promptSignal != null && SystemClock.elapsedRealtime() - promptStartedAt < PROMPT_STALE_MS
+
+    private const val PROMPT_STALE_MS = 60_000L
+
     private var backgroundAt = 0L
     private var expectReturnAt = 0L
 
@@ -136,6 +163,7 @@ object AppLock {
         backgroundAt = 0L
         expectReturnAt = 0L
         exemptTrip = false
+        if (since > 0) returns++
         if (!enabled || !unlocked || since <= 0 || timeoutMillis < 0) return
         // A trip the app started still locks if you stay away long: after 5 minutes, or the chosen time if longer.
         val limit = if (exempt) maxOf(timeoutMillis, EXEMPT_TRIP_MAX) else timeoutMillis
@@ -202,31 +230,40 @@ object AppLock {
         onError: (String?) -> Unit = {},
         onSuccess: (Cipher) -> Unit,
     ) {
-        if (authenticating) return
-        authenticating = true
+        // Replaces a prompt that is still marked as open; its late answer (if any) is ignored below.
+        promptSignal?.let { runCatching { it.cancel() } }
+        val generation = ++promptGeneration
+        val signal = CancellationSignal()
+        promptSignal = signal
+        promptStartedAt = SystemClock.elapsedRealtime()
+        // True once, and only for the newest prompt.
+        fun finish(): Boolean {
+            if (generation != promptGeneration || promptSignal !== signal) return false
+            promptSignal = null
+            return true
+        }
         try {
             val prompt = BiometricPrompt.Builder(activity)
                 .setTitle(title)
                 .setSubtitle(subtitle)
                 .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
                 .setNegativeButton(activity.getString(R.string.lock_use_pin), activity.mainExecutor) { _, _ ->
-                    authenticating = false
-                    onError(null)
+                    if (finish()) onError(null)
                 }
                 .build()
             prompt.authenticate(
                 BiometricPrompt.CryptoObject(cipher),
-                CancellationSignal(),
+                signal,
                 activity.mainExecutor,
                 object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                        authenticating = false
+                        if (!finish()) return
                         val c = result.cryptoObject?.cipher
                         if (c != null) onSuccess(c) else onError(activity.getString(R.string.lock_fingerprint_failed))
                     }
 
                     override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                        authenticating = false
+                        if (!finish()) return
                         val cancelled = errorCode == BiometricPrompt.BIOMETRIC_ERROR_USER_CANCELED ||
                             errorCode == BiometricPrompt.BIOMETRIC_ERROR_CANCELED
                         onError(if (cancelled) null else errString.toString())
@@ -234,10 +271,19 @@ object AppLock {
                 },
             )
         } catch (e: Exception) {
-            authenticating = false
-            onError(activity.getString(R.string.lock_fingerprint_failed))
+            if (finish()) onError(activity.getString(R.string.lock_fingerprint_failed))
         }
     }
+}
+
+/**
+ * Waits until the app is really back on screen: resumed, with its window focused. A fingerprint prompt asked
+ * for earlier (while the app is still coming back from the background) is dropped by the system, on some
+ * phones without any answer, which used to leave fingerprint unlock not working until the app was closed.
+ */
+suspend fun awaitOnScreen(lifecycle: Lifecycle, windowInfo: WindowInfo) {
+    lifecycle.currentStateFlow.first { it.isAtLeast(Lifecycle.State.RESUMED) }
+    snapshotFlow { windowInfo.isWindowFocused }.first { it }
 }
 
 /** What a PIN screen on top of the app is for. */
@@ -324,7 +370,7 @@ private fun PinLockScreen() {
     var checking by remember { mutableStateOf(false) }
     var lockout by remember { mutableLongStateOf(vault.lockoutRemaining()) }
     var forgetting by remember { mutableStateOf(false) }
-    val bioAvailable = remember(AppLock.lockCount) {
+    val bioAvailable = remember(AppLock.lockCount, AppLock.returns) {
         vault.biometricEnabled && AppLock.biometricAvailable(context) && !vault.pinRequired()
     }
 
@@ -351,7 +397,14 @@ private fun PinLockScreen() {
             if (vault.unlockWithBiometric(unlocked)) c.onUnlocked() else message = context.getString(R.string.lock_fingerprint_failed)
         }
     }
-    LaunchedEffect(AppLock.lockCount) { if (bioAvailable) askFingerprint() }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val windowInfo = LocalWindowInfo.current
+    // Offered on every lock and every time you come back to the lock screen, once the app is really on screen.
+    LaunchedEffect(AppLock.lockCount, AppLock.returns) {
+        if (!bioAvailable) return@LaunchedEffect
+        awaitOnScreen(lifecycle, windowInfo)
+        askFingerprint()
+    }
 
     fun submit() {
         if (checking || lockout > 0 || pin.length < LockVault.PIN_MIN) return
@@ -437,7 +490,9 @@ private fun ConfirmChangeScreen(onResult: (Boolean) -> Unit) {
     var message by remember { mutableStateOf<String?>(null) }
     var checking by remember { mutableStateOf(false) }
     var lockout by remember { mutableLongStateOf(vault.lockoutRemaining()) }
-    val bioAvailable = remember { vault.biometricEnabled && AppLock.biometricAvailable(context) && !vault.pinRequired() }
+    val bioAvailable = remember(AppLock.returns) {
+        vault.biometricEnabled && AppLock.biometricAvailable(context) && !vault.pinRequired()
+    }
 
     BackHandler { onResult(false) }
     LaunchedEffect(lockout > 0) {
@@ -460,7 +515,14 @@ private fun ConfirmChangeScreen(onResult: (Boolean) -> Unit) {
             if (vault.unlockWithBiometric(unlocked)) onResult(true) else message = context.getString(R.string.lock_fingerprint_failed)
         }
     }
-    LaunchedEffect(Unit) { if (bioAvailable) askFingerprint() }
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val windowInfo = LocalWindowInfo.current
+    // Offered when the screen opens and again every time you come back to it, once the app is really on screen.
+    LaunchedEffect(AppLock.returns) {
+        if (!bioAvailable) return@LaunchedEffect
+        awaitOnScreen(lifecycle, windowInfo)
+        askFingerprint()
+    }
 
     fun submit() {
         if (checking || lockout > 0 || pin.length < LockVault.PIN_MIN) return
