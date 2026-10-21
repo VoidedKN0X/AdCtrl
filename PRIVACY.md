@@ -10,7 +10,7 @@ AdCtrl is built so that your DNS data stays between your phone and your own AdGu
 - **App lock.** The app PIN is never stored, only used to unlock a key; fingerprint unlock uses a key in the phone's secure hardware. While AdCtrl is locked, nothing is sent to your servers.
 - **Nothing is backed up.** AdCtrl's data is excluded from Android backups and from moving to a new phone.
 - **Secure connections.** HTTPS by default. Plain HTTP is only possible for addresses on your own network, per server, after a warning. A self-signed certificate is accepted only after you confirm its SHA-256 fingerprint, and only for that server.
-- **Screenshots.** By default, screenshots, screen recordings and the recent apps view show a blank screen. You can change this in Settings › Privacy and security; with the app lock on, the recent apps view is always blank.
+- **Screenshots and recent apps.** **Hide in screenshots** and **Hide in recent apps** (Settings › Privacy and security, both off by default) blank AdCtrl in screenshots and screen recordings, and in the recent apps view. Server setup, the lock screen and the PIN screens are always kept out of screenshots, and with the app lock on the recent apps view is always blank.
 - **Links.** The Support, Report a bug, Source code and Licence rows open in your browser only when you tap them.
 
 The only permission AdCtrl asks for is network access.

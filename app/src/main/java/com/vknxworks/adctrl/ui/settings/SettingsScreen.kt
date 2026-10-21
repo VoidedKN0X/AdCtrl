@@ -14,10 +14,12 @@ import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material.icons.outlined.Timer
+import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material.icons.outlined.VisibilityOff
 import android.widget.Toast
 import androidx.compose.runtime.remember
 import com.vknxworks.adctrl.data.lock.LockVault
+import com.vknxworks.adctrl.data.settings.AppSettings
 import com.vknxworks.adctrl.data.settings.LockTimeout
 import com.vknxworks.adctrl.ui.components.GroupRow
 import com.vknxworks.adctrl.ui.lock.AppLock
@@ -67,7 +69,7 @@ fun SettingsScreen() {
                     icon = Icons.Filled.Palette,
                 ) { on -> c.appScope.launch { c.settings.update { it.copy(dynamicColor = on) } } }
             }
-            PrivacyAndSecurityGroup(settings.hideContent, settings.lockTimeout, settings.lockChanges)
+            PrivacyAndSecurityGroup(settings)
             Group(stringResource(R.string.tile_settings_group), footer = stringResource(R.string.tile_settings_footer)) {
                 GroupChoice(
                     stringResource(R.string.tile_pause_setting),
@@ -88,7 +90,7 @@ fun SettingsScreen() {
 
 /** Privacy and security: the shared Ctrl series app lock, then hiding AdCtrl in screenshots. */
 @Composable
-private fun PrivacyAndSecurityGroup(hideContent: Boolean, lockTimeout: LockTimeout, lockChanges: Boolean) {
+private fun PrivacyAndSecurityGroup(settings: AppSettings) {
     val context = LocalContext.current
     val c = context.container
     val bioAvailable = remember { AppLock.biometricAvailable(context) }
@@ -138,21 +140,27 @@ private fun PrivacyAndSecurityGroup(hideContent: Boolean, lockTimeout: LockTimeo
             GroupChoice(
                 stringResource(R.string.lock_again),
                 LockTimeout.entries.map { it to stringResource(it.label) },
-                lockTimeout,
+                settings.lockTimeout,
                 icon = Icons.Outlined.Timer,
             ) { t -> c.appScope.launch { c.settings.update { it.copy(lockTimeout = t) } } }
             GroupSwitch(
                 stringResource(R.string.lock_changes),
                 stringResource(R.string.lock_changes_subtitle),
-                checked = lockChanges,
+                checked = settings.lockChanges,
                 icon = Icons.Outlined.Key,
             ) { on -> c.appScope.launch { c.settings.update { it.copy(lockChanges = on) } } }
         }
         GroupSwitch(
-            stringResource(R.string.hide_content),
-            stringResource(R.string.hide_content_subtitle),
-            checked = hideContent,
+            stringResource(R.string.hide_screenshots),
+            stringResource(R.string.hide_screenshots_subtitle),
+            checked = settings.hideScreenshots,
             icon = Icons.Outlined.VisibilityOff,
-        ) { on -> c.appScope.launch { c.settings.update { it.copy(hideContent = on) } } }
+        ) { on -> c.appScope.launch { c.settings.update { it.copy(hideScreenshots = on) } } }
+        GroupSwitch(
+            stringResource(R.string.hide_recents),
+            stringResource(R.string.hide_recents_subtitle),
+            checked = settings.hideRecents,
+            icon = Icons.Outlined.Layers,
+        ) { on -> c.appScope.launch { c.settings.update { it.copy(hideRecents = on) } } }
     }
 }

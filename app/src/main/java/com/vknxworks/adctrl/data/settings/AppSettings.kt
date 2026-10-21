@@ -40,8 +40,10 @@ enum class LockTimeout(@StringRes val label: Int, val millis: Long) {
 data class AppSettings(
     val theme: ThemeChoice = ThemeChoice.SYSTEM,
     val dynamicColor: Boolean = false,
-    /** FLAG_SECURE on the whole app: blank screenshots, screen recordings and Recents card. On by default. */
-    val hideContent: Boolean = true,
+    /** "Hide in screenshots": FLAG_SECURE on the app's windows (screenshots, recordings and the Recents preview). */
+    val hideScreenshots: Boolean = false,
+    /** "Hide in recent apps": the Recents view shows a blank card. Screenshots still work. */
+    val hideRecents: Boolean = false,
     /** How long a tap on the Quick Settings tile pauses protection. */
     val tilePause: PauseDuration = PauseDuration.M5,
     /** The tile pauses and resumes every server that isn't read-only, not only the active one. */
@@ -58,7 +60,10 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
     private object K {
         val theme = stringPreferencesKey("theme")
         val dynamic = booleanPreferencesKey("dynamic_color")
-        val hideContent = booleanPreferencesKey("hide_content")
+        val hideScreenshots = booleanPreferencesKey("hide_screenshots")
+        val hideRecents = booleanPreferencesKey("hide_recents")
+        /** The earlier single "hide in screenshots and recent apps" switch; an "on" turns on both new ones. */
+        val legacyHide = booleanPreferencesKey("hide_content")
         val tilePause = stringPreferencesKey("tile_pause")
         val tileAll = booleanPreferencesKey("tile_all_servers")
         val queriesLive = booleanPreferencesKey("queries_live")
@@ -76,7 +81,8 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
     private fun Preferences.toSettings() = AppSettings(
         theme = enumOr(this[K.theme], ThemeChoice.SYSTEM),
         dynamicColor = this[K.dynamic] ?: false,
-        hideContent = this[K.hideContent] ?: true,
+        hideScreenshots = this[K.hideScreenshots] ?: this[K.legacyHide] ?: false,
+        hideRecents = this[K.hideRecents] ?: this[K.legacyHide] ?: false,
         tilePause = enumOr(this[K.tilePause], PauseDuration.M5),
         tileAllServers = this[K.tileAll] ?: false,
         queriesLive = this[K.queriesLive] ?: true,
@@ -89,7 +95,9 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             val s = transform(p.toSettings())
             p[K.theme] = s.theme.name
             p[K.dynamic] = s.dynamicColor
-            p[K.hideContent] = s.hideContent
+            p[K.hideScreenshots] = s.hideScreenshots
+            p[K.hideRecents] = s.hideRecents
+            p.remove(K.legacyHide)
             p[K.tilePause] = s.tilePause.name
             p[K.tileAll] = s.tileAllServers
             p[K.queriesLive] = s.queriesLive
