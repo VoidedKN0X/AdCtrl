@@ -57,7 +57,7 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 3. If AdGuard Home uses a self-signed certificate, compare the fingerprint AdCtrl shows with your certificate's (on the server: `openssl x509 -in cert.pem -noout -fingerprint -sha256`), then tap **Trust**.
 4. Check the version and protection state AdCtrl shows, choose whether to use **read-only mode**, and tap **Continue**.
 
-Add a second server, such as a secondary AdGuard Home, under **Account › Servers**.
+Your servers, **Settings** and **About** are on the **You** page: tap your profile picture at the top right of any tab. Add a second server, such as a secondary AdGuard Home, there under **Servers**.
 
 ## Recommended AdGuard Home setup
 
@@ -67,13 +67,13 @@ Add a second server, such as a secondary AdGuard Home, under **Account › Serve
 
 ## App lock
 
-Turn it on under **Account > Settings > Privacy and security > App lock**. It's off until you turn it on.
+Turn it on: tap your profile picture › **Settings › Privacy and security › App lock**. It's off until you turn it on.
 
 - **Its own app PIN** of at least 6 digits, separate from your phone's screen lock. Very obvious PINs such as 111111 or 123456 are refused.
 - **Unlock with fingerprint** (optional) only accepts strong biometrics, such as the fingerprint sensor, checked by the phone's secure hardware. Face unlock that only uses the camera isn't accepted. The PIN is still needed after the phone restarts and at least every 72 hours, and adding a new fingerprint to the phone turns fingerprint unlock off until you turn it on again.
 - **Your server passwords are encrypted with the PIN while AdCtrl is locked.** The key only exists in memory while the app is unlocked and is wiped the moment it locks, and nothing is sent to your servers until you unlock. The PIN itself is never stored: it's stretched with 600,000 rounds of PBKDF2 and mixed with a key held in the phone's secure hardware, so a copy of the app's files isn't enough to guess it on a computer.
 - **Wrong PINs:** after 5 tries you wait 30 seconds, doubling up to 15 minutes. Restarting the app or the phone, or changing the clock, doesn't skip the wait.
-- **Lock again:** as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Opening a link in your browser from the Account page doesn't count as leaving, unless you stay away for more than 5 minutes.
+- **Lock again:** as soon as you leave the app (the default), after 1, 5 or 15 minutes or 1 hour away, or only when the app restarts. Opening a link in your browser from the You page doesn't count as leaving, unless you stay away for more than 5 minutes.
 - **Change app PIN** asks for your current PIN first, and turning the app lock off asks for the PIN too.
 - **Forgot your PIN?** It can't be recovered, because it encrypts your passwords. The lock screen offers to remove your servers and their passwords and the statistics AdCtrl keeps on the phone, so you can add them again; nothing changes on your AdGuard Home servers.
 - **Confirm changes** (optional) asks for your fingerprint or app PIN before anything that changes a server, such as pausing protection, blocking a domain or editing rules. One confirmation covers the next minute.
@@ -109,7 +109,7 @@ Or open the folder in Android Studio and press **Run** with your phone connected
 
 AdCtrl is free and open source. If it's useful to you, you can support development on [GitHub Sponsors](https://github.com/sponsors/VoidedKN0X). Starring the repo and [reporting bugs](https://github.com/VoidedKN0X/AdCtrl/issues) helps too.
 
-In the app, the **About** section at the bottom of the Account page has **Support AdCtrl** and **Report a bug** rows that open these pages.
+In the app, the **About** section at the bottom of the **You** page (tap your profile picture) has **Support AdCtrl** and **Report a bug** rows that open these pages.
 
 ## The Ctrl series
 

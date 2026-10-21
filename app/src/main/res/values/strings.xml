@@ -18,10 +18,9 @@
     <!-- Common -->
     <string name="back">Back</string>
     <string name="selected">Selected</string>
-    <string name="account_and_settings">Account and settings</string>
 
-    <!-- Account (opened from the profile picture) -->
-    <string name="you_title">Account</string>
+    <!-- You page (opened from the profile picture) -->
+    <string name="you_title">You</string>
     <string name="you_not_connected">Not connected</string>
     <string name="you_not_connected_body">Add your AdGuard Home server to get started.</string>
     <string name="settings">Settings</string>
