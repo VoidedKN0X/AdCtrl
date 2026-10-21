@@ -147,6 +147,9 @@ class AppContainer(val context: Context) {
     fun onUnlocked() {
         AppLock.markUnlocked()
         locked.value = false
+        // Seal any password left unsealed (AdCtrl stopped between setting up the lock and sealing them),
+        // and match background checks turned on or off since.
+        if (vault.enabled) appScope.launch { runCatching { serverStore.applySealing(sealing()) } }
         if (ProtectionWidget.anyPlaced(context)) {
             ProtectionWidget.redraw(context)
             WidgetRefreshWorker.enqueue(context)

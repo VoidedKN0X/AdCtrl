@@ -4,6 +4,16 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.9.1 (2026-10-21)
+
+### Fixed
+
+- **Fingerprint unlock works again**: AdCtrl didn't ask Android for permission to use the fingerprint sensor, so the phone always answered that no fingerprint was available and **Unlock with fingerprint** in the app lock settings could never be turned on. AdCtrl now has that permission, so you can turn fingerprint unlock on (strong biometrics only, as before). The PIN keeps working as it did.
+
+### Security
+
+- **Your server passwords are always sealed with the app lock**: if AdCtrl was stopped in the split second between setting up the app lock and encrypting your server passwords with the PIN, they could stay encrypted with the Android Keystore only. AdCtrl now checks every time you unlock and seals anything that was missed.
+
 ## v0.9.0 (2026-10-21)
 
 AdCtrl is no longer in early development: the widget, app shortcuts and notifications are here, so everything that was planned is in the app.
