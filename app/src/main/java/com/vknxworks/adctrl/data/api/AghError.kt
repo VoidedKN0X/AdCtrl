@@ -48,7 +48,7 @@ sealed class AghError(val detail: String? = null, cause: Throwable? = null) : IO
     /** The server is in read-only mode, so AdCtrl refused to send a change. Raised before anything is sent. */
     class ReadOnly : AghError(null)
 
-    /** The user cancelled the fingerprint or screen-lock check before a change; nothing was sent. */
+    /** The change wasn't confirmed with the fingerprint or app PIN ("Confirm changes"); nothing was sent. */
     class Cancelled : AghError(null)
 
     /** Any other error status from AdGuard Home (bad request, internal error, …). */

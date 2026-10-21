@@ -1,5 +1,6 @@
 package com.vknxworks.adctrl.ui.settings
 
+import com.vknxworks.adctrl.ui.lock.AppLock
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -70,6 +71,8 @@ fun YouScreen() {
     val server = active?.server
     fun open(url: String) {
         try {
+            // Opening the browser from here doesn't count as leaving AdCtrl for the app lock.
+            AppLock.expectReturn()
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         } catch (_: ActivityNotFoundException) {
         }

@@ -32,6 +32,9 @@ import kotlinx.coroutines.launch
  *   read-only is changed.
  * - Long-press: opens AdCtrl (MainActivity handles QS_TILE_PREFERENCES).
  * - A read-only server shows its state but a tap only opens the app.
+ * - App lock: while AdCtrl is locked the saved password is sealed, so the tile says it's locked and a
+ *   tap opens AdCtrl (to its lock screen). With "Confirm changes" on, a tap opens AdCtrl too, since
+ *   the tile can't ask for the fingerprint or PIN itself.
  */
 class ProtectionTileService : TileService() {
 
@@ -52,6 +55,10 @@ class ProtectionTileService : TileService() {
     private fun watch() {
         listening?.cancel()
         listening = scope.launch {
+            if (container.locked.value) {
+                render(getString(R.string.tile_locked))
+                return@launch
+            }
             showCached()
             refresh()
             while (isActive && pausedUntil > 0) {
@@ -81,7 +88,8 @@ class ProtectionTileService : TileService() {
     override fun onClick() {
         super.onClick()
         val server = container.sessions.active.value?.server
-        if (server == null || server.readOnly) {
+        val c = container
+        if (server == null || server.readOnly || c.locked.value || (c.vault.enabled && c.settings.settings.value.lockChanges)) {
             openApp()
             return
         }

@@ -63,16 +63,21 @@ fun httpFor(base: OkHttpClient, url: HttpUrl, certPin: String): OkHttpClient {
 class AghClient(
     val server: Server,
     base: OkHttpClient,
-    private val secrets: ServerSecrets,
+    /** The saved password, read when a request is sent: it's sealed while the app lock is locked. */
+    private val secrets: () -> ServerSecrets,
     /**
      * Whether the server is in read-only mode right now. Read on every request (not copied from
      * [server] once), so switching read-only on also stops clients a screen is still holding.
      */
     private val isReadOnly: () -> Boolean = { server.readOnly },
+    /** Waits while AdCtrl is locked, so nothing is sent without the password (or while you're away). */
+    private val awaitUnlocked: suspend () -> Unit = {},
 ) {
+    /** A client for a server being set up, with the password just typed in. */
+    constructor(server: Server, base: OkHttpClient, secrets: ServerSecrets) : this(server, base, { secrets })
+
     private val baseUrl: HttpUrl = server.url.toHttpUrl()
     val http: OkHttpClient = httpFor(base, baseUrl, server.certPin)
-    private val auth = Credentials.basic(server.username, secrets.password, Charsets.UTF_8)
 
     fun url(path: String, query: List<Pair<String, String>> = emptyList()): HttpUrl {
         val b = baseUrl.newBuilder().addPathSegment("control")
@@ -128,7 +133,9 @@ class AghClient(
     ): JsonElement {
         // Read-only mode is enforced here, for every request that could change something, not only by hiding buttons.
         if (write && isReadOnly()) throw AghError.ReadOnly()
+        awaitUnlocked()
         if (write && !WriteGuard.check()) throw AghError.Cancelled()
+        val auth = Credentials.basic(server.username, secrets().password, Charsets.UTF_8)
         return withContext(Dispatchers.IO) {
             val requestBody = when {
                 method == "GET" -> null
