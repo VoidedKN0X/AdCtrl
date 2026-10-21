@@ -38,6 +38,9 @@ import com.vknxworks.adctrl.data.overview.PauseDuration
 import com.vknxworks.adctrl.data.settings.ThemeChoice
 import com.vknxworks.adctrl.ui.overview.pauseLabel
 import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Notifications
+import com.vknxworks.adctrl.ui.nav.LocalNavigator
+import com.vknxworks.adctrl.ui.nav.NotificationsRoute
 import androidx.compose.material.icons.filled.Timer
 import com.vknxworks.adctrl.ui.components.Group
 import com.vknxworks.adctrl.ui.components.GroupChoice
@@ -49,6 +52,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen() {
     val c = LocalContext.current.container
+    val nav = LocalNavigator.current
     val settings by c.settings.settings.collectAsStateWithLifecycle()
     val themeOptions = ThemeChoice.entries.map { it to stringResource(it.label) }
 
@@ -68,6 +72,15 @@ fun SettingsScreen() {
                     checked = settings.dynamicColor,
                     icon = Icons.Filled.Palette,
                 ) { on -> c.appScope.launch { c.settings.update { it.copy(dynamicColor = on) } } }
+            }
+            Group(stringResource(R.string.group_notifications)) {
+                GroupRow(
+                    stringResource(R.string.notifications),
+                    stringResource(R.string.notifications_subtitle),
+                    icon = Icons.Filled.Notifications,
+                    showChevron = true,
+                    onClick = { nav.navigate(NotificationsRoute) },
+                )
             }
             PrivacyAndSecurityGroup(settings)
             Group(stringResource(R.string.tile_settings_group), footer = stringResource(R.string.tile_settings_footer)) {
@@ -95,7 +108,11 @@ private fun PrivacyAndSecurityGroup(settings: AppSettings) {
     val c = context.container
     val bioAvailable = remember { AppLock.biometricAvailable(context) }
     val lockOn = c.vault.enabled
-    Group(stringResource(R.string.group_privacy), footer = stringResource(R.string.app_lock_footer)) {
+    val notify by c.notifySettings.settings.collectAsStateWithLifecycle()
+    Group(
+        stringResource(R.string.group_privacy),
+        footer = stringResource(if (lockOn && notify.polling) R.string.app_lock_footer_background else R.string.app_lock_footer),
+    ) {
         GroupSwitch(
             stringResource(R.string.app_lock),
             stringResource(R.string.app_lock_subtitle),

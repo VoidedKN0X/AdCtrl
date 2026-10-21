@@ -119,7 +119,7 @@ fun ListsSection(
             item(key = "head-$allow") {
                 Row(Modifier.fillMaxWidth().padding(start = Gutter + 4.dp, end = Gutter, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        stringResource(if (allow) R.string.allowlists else R.string.blocklists) + " · " + lists.size,
+                        stringResource(R.string.dot_pair, stringResource(if (allow) R.string.allowlists else R.string.blocklists), lists.size.toString()),
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(1f),
@@ -150,8 +150,11 @@ fun ListsSection(
                         list.name.ifBlank { list.url },
                         listOfNotNull(
                             list.url.takeIf { list.name.isNotBlank() },
-                            pluralStringResource(R.plurals.list_rules, list.rulesCount.toInt().coerceAtLeast(0), formatCount(list.rulesCount)) + " · " +
-                                (updated?.let { stringResource(R.string.list_updated, relativeTime(it)) } ?: stringResource(R.string.list_never_updated)),
+                            stringResource(
+                                R.string.dot_pair,
+                                pluralStringResource(R.plurals.list_rules, list.rulesCount.toInt().coerceAtLeast(0), formatCount(list.rulesCount)),
+                                updated?.let { stringResource(R.string.list_updated, relativeTime(it)) } ?: stringResource(R.string.list_never_updated),
+                            ),
                         ).joinToString("\n"),
                         icon = when {
                             failing -> Icons.Filled.Warning

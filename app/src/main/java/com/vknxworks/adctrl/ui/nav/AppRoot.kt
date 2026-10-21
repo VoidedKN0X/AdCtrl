@@ -34,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,9 +64,12 @@ import com.vknxworks.adctrl.ui.overview.OverviewScreen
 import com.vknxworks.adctrl.ui.queries.CheckHostScreen
 import com.vknxworks.adctrl.ui.queries.QueriesScreen
 import com.vknxworks.adctrl.ui.settings.ServersScreen
+import com.vknxworks.adctrl.ui.settings.NotificationsScreen
 import com.vknxworks.adctrl.ui.settings.SettingsScreen
 import com.vknxworks.adctrl.ui.setup.SetupScreen
+import com.vknxworks.adctrl.ShortcutAction
 import com.vknxworks.adctrl.container
+import com.vknxworks.adctrl.ui.lock.lockCovering
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.toRoute
@@ -118,6 +122,17 @@ private fun MainScaffold() {
             launchSingleTop = true
             restoreState = true
         }
+    }
+
+    // Launcher shortcuts: open the right tab once AdCtrl is unlocked; the tab itself does the rest
+    // (the pause menu, the search field, the blocked filter).
+    val c = LocalContext.current.container
+    val shortcut by c.pendingShortcut.collectAsStateWithLifecycle()
+    val covered = lockCovering(c.vault)
+    LaunchedEffect(shortcut, covered, backStack != null) {
+        val action = shortcut ?: return@LaunchedEffect
+        if (covered || backStack == null) return@LaunchedEffect
+        selectTab(if (action == ShortcutAction.PAUSE) 0 else 1)
     }
 
     CompositionLocalProvider(LocalNavigator provides navigator) {
@@ -223,6 +238,7 @@ private fun AppNavHost(navController: NavHostController) {
         }
         composable<YouRoute> { YouScreen() }
         composable<SettingsRoute> { SettingsScreen() }
+        composable<NotificationsRoute> { NotificationsScreen() }
         composable<ServersRoute> { ServersScreen() }
         composable<AddServerRoute> {
             val navigator = LocalNavigator.current

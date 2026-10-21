@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- The only permission: talking to your own AdGuard Home servers. -->
+    <!-- Talking to your own AdGuard Home servers (and nothing else). -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Notifications from the background checks; asked for only when you turn them on. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".AdCtrlApp"
@@ -32,7 +34,23 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
+
+        <!-- Home screen widget: protection state with a pause countdown, and the last 24 hours. -->
+        <receiver
+            android:name=".ui.widgets.ProtectionWidget"
+            android:exported="false"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_protection_info" />
+        </receiver>
 
         <!-- Quick Settings tile: protection on, paused or off; tap to pause or resume. Exported because
              only System UI can bind to it (BIND_QUICK_SETTINGS_TILE). -->

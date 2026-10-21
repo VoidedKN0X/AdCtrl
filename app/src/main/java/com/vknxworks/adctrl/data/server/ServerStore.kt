@@ -76,7 +76,19 @@ class ServerStore(context: Context, private val vault: LockVault) {
     fun secrets(id: String): ServerSecrets = ServerSecrets(password = read(sp.getString(secretKey(id), null)))
 
     fun saveSecrets(id: String, s: ServerSecrets) {
-        sp.edit().putString(secretKey(id), write(s.password, vault.enabled)).commit()
+        sp.edit().putString(secretKey(id), write(s.password, sealPolicy())).commit()
+    }
+
+    /**
+     * Whether passwords are sealed with the app lock (set by AppContainer): with the lock on, unless
+     * background checks are on, because those have to sign in while AdCtrl is locked.
+     */
+    var sealPolicy: () -> Boolean = { vault.enabled }
+
+    /** The server's password is sealed and AdCtrl is locked, so nothing can sign in to it right now. */
+    fun sealedNow(id: String): Boolean {
+        if (vault.isOpen) return false
+        return LockVault.isSealed(decrypt(sp.getString(secretKey(id), null)))
     }
 
     private fun read(stored: String?): String {

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Launcher shortcut "Pause protection": a pause sign on the graphite circle. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="#FF2B3038"
+        android:pathData="M24,0 A24,24 0 1 1 23.99,0 Z" />
+    <group
+        android:translateX="12"
+        android:translateY="12">
+        <path
+            android:fillColor="#FF7EDC9C"
+            android:pathData="M6,19h4V5H6v14zM14,5v14h4V5h-4z" />
+    </group>
+</vector>
