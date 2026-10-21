@@ -75,8 +75,13 @@ class ServerStore(context: Context, private val vault: LockVault) {
     /** The password is empty while it's sealed and AdCtrl is locked. */
     fun secrets(id: String): ServerSecrets = ServerSecrets(password = read(sp.getString(secretKey(id), null)))
 
+    @Synchronized
     fun saveSecrets(id: String, s: ServerSecrets) {
-        sp.edit().putString(secretKey(id), write(s.password, sealPolicy())).commit()
+        val seal = sealPolicy()
+        // Locked: the key isn't in memory, so nothing can be sealed. Keep what's stored rather than
+        // writing a password that isn't sealed (or losing it).
+        if (seal && !vault.isOpen) return
+        sp.edit().putString(secretKey(id), write(s.password, seal)).commit()
     }
 
     /**
@@ -96,10 +101,11 @@ class ServerStore(context: Context, private val vault: LockVault) {
         return if (LockVault.isSealed(plain)) vault.open(plain).orEmpty() else plain
     }
 
-    /** Keystore-encrypted, and sealed with the app lock's key when [seal]. */
+    /** Keystore-encrypted, and sealed with the app lock's key when [seal]. Null when it can't be sealed. */
     private fun write(plain: String, seal: Boolean): String? {
         if (plain.isEmpty()) return null
-        return encrypt(if (seal) vault.seal(plain) ?: plain else plain)
+        // Never fall back to a password that isn't sealed when it should be.
+        return encrypt(if (seal) vault.seal(plain) ?: return null else plain)
     }
 
     /**

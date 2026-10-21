@@ -4,6 +4,12 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.9.2 (2026-10-21)
+
+### Security
+
+- **Your server passwords are never saved without the app lock's seal**: if AdCtrl had to save a server's password while it was locked (with the app lock on and background checks off), it saved it encrypted with the Android Keystore only, because the PIN's key wasn't in memory. It now keeps what's stored instead and saves new passwords only while unlocked, like ProxCtrl and TrueCtrl.
+
 ## v0.9.1 (2026-10-21)
 
 ### Fixed
