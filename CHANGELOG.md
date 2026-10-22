@@ -4,6 +4,18 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.9.4 (2026-10-22)
+
+### Fixed
+
+- **AdCtrl now really asks to show notifications**: on Android 13 and later an app can only show notifications after you allow it, and AdCtrl only asked when you turned **Check in the background** on. If that question was missed or answered with no, the background checks kept running but every alert (protection off, paused too long, server unreachable, failing lists, updates) was silently dropped. With background checks on, AdCtrl now asks once by itself as soon as it's unlocked, and never again after that, so it doesn't nag on every start.
+- **Allow notifications always does something**: once you'd said no twice, Android stops showing its question, and the **Allow notifications** button on the Notifications screen did nothing at all. It now opens AdCtrl's notification settings in Android when the question can't be shown any more (and when notifications are turned off there), and the app lock doesn't lock you out when you come back.
+
+### Changed
+
+- **Notification switches show the truth**: while notifications are blocked, **Check in the background** and the **What to notify about** switches show as off, because nothing can reach you, and the red banner at the top explains why. Turning any of them on asks for the permission (or opens Android's settings when it can't ask any more). As soon as you allow notifications, in the dialog or in Android's settings, the switches show your saved choices again; you don't have to set anything twice.
+- **Settings shows when notifications are blocked**: the **Notifications** row in Settings reads "Notifications are blocked: tap to allow them" while background checks are on but AdCtrl can't show notifications.
+
 ## v0.9.3 (2026-10-21)
 
 ### Fixed

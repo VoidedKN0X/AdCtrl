@@ -46,6 +46,7 @@ import com.vknxworks.adctrl.ui.components.Group
 import com.vknxworks.adctrl.ui.components.GroupChoice
 import com.vknxworks.adctrl.ui.components.GroupSwitch
 import com.vknxworks.adctrl.ui.components.ScreenTopBar
+import com.vknxworks.adctrl.ui.components.rememberNotificationAccess
 import kotlinx.coroutines.launch
 
 /** App settings, in the Ctrl series order: appearance, privacy and security (app lock), then the Quick Settings tile. */
@@ -55,6 +56,8 @@ fun SettingsScreen() {
     val nav = LocalNavigator.current
     val settings by c.settings.settings.collectAsStateWithLifecycle()
     val themeOptions = ThemeChoice.entries.map { it to stringResource(it.label) }
+    val notify by c.notifySettings.settings.collectAsStateWithLifecycle()
+    val notificationAccess = rememberNotificationAccess()
 
     Column(Modifier.fillMaxSize()) {
         ScreenTopBar(stringResource(R.string.settings))
@@ -76,7 +79,9 @@ fun SettingsScreen() {
             Group(stringResource(R.string.group_notifications)) {
                 GroupRow(
                     stringResource(R.string.notifications),
-                    stringResource(R.string.notifications_subtitle),
+                    stringResource(
+                        if (notify.polling && !notificationAccess.canPost) R.string.notifications_subtitle_blocked else R.string.notifications_subtitle,
+                    ),
                     icon = Icons.Filled.Notifications,
                     showChevron = true,
                     onClick = { nav.navigate(NotificationsRoute) },

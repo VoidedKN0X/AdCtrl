@@ -659,6 +659,7 @@
     <string name="group_notifications">Notifications</string>
     <string name="notifications">Notifications</string>
     <string name="notifications_subtitle">Background checks and what to notify about</string>
+    <string name="notifications_subtitle_blocked">Notifications are blocked: tap to allow them</string>
     <string name="notif_intro">AdGuard Home can\'t send notifications itself, so AdCtrl checks your servers in the background and tells you when protection is off or paused for too long, a server can\'t be reached, filter lists stop updating or a new version is out. The checks only read; nothing changes on your servers.</string>
     <string name="notif_permission_off">Notifications are blocked for AdCtrl, so the background checks can\'t tell you anything.</string>
     <string name="notif_permission_allow">Allow notifications</string>
