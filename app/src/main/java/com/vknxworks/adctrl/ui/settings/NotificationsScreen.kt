@@ -1,14 +1,10 @@
 package com.vknxworks.adctrl.ui.settings
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,7 +34,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -50,13 +45,13 @@ import com.vknxworks.adctrl.data.notify.Checker
 import com.vknxworks.adctrl.data.notify.NotifyEvent
 import com.vknxworks.adctrl.data.notify.NotifySettings
 import com.vknxworks.adctrl.data.notify.NotifyWorker
-import com.vknxworks.adctrl.data.notify.Notifier
 import com.vknxworks.adctrl.ui.components.Group
 import com.vknxworks.adctrl.ui.components.GroupChoice
 import com.vknxworks.adctrl.ui.components.GroupRow
 import com.vknxworks.adctrl.ui.components.GroupSwitch
 import com.vknxworks.adctrl.ui.components.ScreenTopBar
 import com.vknxworks.adctrl.ui.components.relativeTime
+import com.vknxworks.adctrl.ui.components.rememberNotificationAccess
 import com.vknxworks.adctrl.ui.lock.AppLock
 import com.vknxworks.adctrl.ui.theme.Gutter
 import kotlinx.coroutines.launch
@@ -72,8 +67,8 @@ fun NotificationsScreen() {
     val settings by c.notifySettings.settings.collectAsStateWithLifecycle()
     val servers by c.sessions.servers.collectAsStateWithLifecycle()
     val lastCheck by CheckStore.lastCheck.collectAsStateWithLifecycle()
-    var permissionVersion by remember { mutableIntStateOf(0) }
-    val canPost = remember(permissionVersion) { Notifier.canPost(context) }
+    val access = rememberNotificationAccess()
+    val canPost = access.canPost
     var batteryVersion by remember { mutableIntStateOf(0) }
     val unrestricted = remember(batteryVersion) {
         context.getSystemService(PowerManager::class.java)?.isIgnoringBatteryOptimizations(context.packageName) == true
@@ -83,18 +78,14 @@ fun NotificationsScreen() {
     val owner = LocalLifecycleOwner.current
     LaunchedEffect(owner) {
         owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            permissionVersion++
             batteryVersion++
             servers.forEach { CheckStore.read(context, it.id) }
         }
     }
 
-    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { permissionVersion++ }
+    /** Turning a notification feature on asks for the permission (or opens Android's settings) when notifications are blocked. */
     fun ensurePermission() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            AppLock.expectReturn()
-            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
+        if (!canPost) access.fix()
     }
     fun update(transform: (NotifySettings) -> NotifySettings) {
         c.appScope.launch { c.notifySettings.update(transform) }
@@ -118,17 +109,7 @@ fun NotificationsScreen() {
                 ) {
                     Column(Modifier.padding(16.dp)) {
                         Text(stringResource(R.string.notif_permission_off), color = MaterialTheme.colorScheme.onErrorContainer)
-                        TextButton(onClick = {
-                            if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                                ensurePermission()
-                            } else {
-                                AppLock.expectReturn()
-                                context.startActivity(
-                                    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                                )
-                            }
-                        }) { Text(stringResource(R.string.notif_permission_allow)) }
+                        TextButton(onClick = { access.fix() }) { Text(stringResource(R.string.notif_permission_allow)) }
                     }
                 }
             }
@@ -138,13 +119,14 @@ fun NotificationsScreen() {
                 GroupSwitch(
                     stringResource(R.string.polling_title),
                     stringResource(R.string.polling_subtitle),
-                    checked = settings.polling,
+                    // Shown off while notifications are blocked: the checks can't tell you anything then.
+                    checked = settings.polling && canPost,
                     icon = Icons.Filled.Schedule,
                 ) { on ->
                     if (on) ensurePermission()
                     update { it.copy(polling = on) }
                 }
-                if (settings.polling) {
+                if (settings.polling && canPost) {
                     GroupChoice(
                         stringResource(R.string.polling_interval),
                         NotifySettings.INTERVALS.map { it to pluralStringResource(R.plurals.polling_interval_value, it, it) },
@@ -165,7 +147,7 @@ fun NotificationsScreen() {
                     stringResource(R.string.check_now),
                     icon = Icons.Filled.Refresh,
                     onClick = {
-                        ensurePermission()
+                        access.askIfPossible()
                         NotifyWorker.runNow(context)
                         Toast.makeText(context, context.getString(R.string.check_started), Toast.LENGTH_SHORT).show()
                     },
@@ -178,9 +160,12 @@ fun NotificationsScreen() {
                     GroupSwitch(
                         stringResource(e.label),
                         stringResource(e.summary),
-                        checked = settings.on(e),
-                    ) { on -> update { s -> s.copy(events = if (on) s.events + e else s.events - e) } }
-                    if (e == NotifyEvent.PAUSED_LONG && settings.on(e)) {
+                        checked = settings.on(e) && canPost,
+                    ) { on ->
+                        if (on) ensurePermission()
+                        update { s -> s.copy(events = if (on) s.events + e else s.events - e) }
+                    }
+                    if (e == NotifyEvent.PAUSED_LONG && settings.on(e) && canPost) {
                         GroupChoice(
                             stringResource(R.string.pause_limit),
                             NotifySettings.PAUSE_LIMITS.map { it to Checker.durationLabel(context, it) },

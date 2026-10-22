@@ -57,6 +57,7 @@ import androidx.navigation.compose.rememberNavController
 import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.ui.components.LocalBottomClearance
 import com.vknxworks.adctrl.ui.components.LocalHazeState
+import com.vknxworks.adctrl.ui.components.rememberNotificationAccess
 import com.vknxworks.adctrl.ui.clients.ClientScreen
 import com.vknxworks.adctrl.ui.clients.ClientsScreen
 import com.vknxworks.adctrl.ui.filters.FiltersScreen
@@ -133,6 +134,14 @@ private fun MainScaffold() {
         val action = shortcut ?: return@LaunchedEffect
         if (covered || backStack == null) return@LaunchedEffect
         selectTab(if (action == ShortcutAction.PAUSE) 0 else 1)
+    }
+
+    // Android 13+ drops notifications until they're allowed: with background checks on, ask once,
+    // as soon as AdCtrl is unlocked. After that, Notifications in Settings shows it and offers the fix.
+    val notifySettings by c.notifySettings.settings.collectAsStateWithLifecycle()
+    val notificationAccess = rememberNotificationAccess()
+    LaunchedEffect(covered, notifySettings.polling, notificationAccess.granted) {
+        if (!covered && notifySettings.polling) notificationAccess.askOnce()
     }
 
     CompositionLocalProvider(LocalNavigator provides navigator) {
