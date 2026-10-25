@@ -14,6 +14,9 @@ data class AghVersion(val raw: String, val major: Int, val minor: Int, val patch
     /** Supported at all: pausing protection for a set time (0.107.27) and blocked services with schedules (0.107.37). */
     val supported: Boolean get() = atLeast(37)
 
+    /** "upstream_mode" takes "load_balance"; before, load balancing was the empty string (0.107.44). */
+    val loadBalanceMode: Boolean get() = atLeast(44)
+
     /** POST /control/clients/search replaces GET /control/clients/find (0.107.56). */
     val clientsSearch: Boolean get() = atLeast(56)
 
@@ -31,6 +34,9 @@ data class AghVersion(val raw: String, val major: Int, val minor: Int, val patch
 
     /** GET /control/querylog filters with "reason"; "response_status" is deprecated (0.107.77). */
     val querylogReason: Boolean get() = atLeast(77)
+
+    /** Comment lines ("#…") are accepted in bootstrap_dns (0.107.79). */
+    val bootstrapComments: Boolean get() = atLeast(79)
 
     override fun toString(): String = raw
 

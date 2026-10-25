@@ -14,6 +14,12 @@ import kotlinx.serialization.Serializable
 /** Check host, optionally filled in with a domain and client. */
 @Serializable data class CheckHostRoute(val host: String = "", val client: String = "")
 
+/** Upstream DNS servers, bootstrap, fallback and private reverse DNS, upstream mode and cache. */
+@Serializable data object DnsSettingsRoute
+
+/** Query log and statistics: retention, and clearing them. */
+@Serializable data object LogsStatsRoute
+
 // Account and settings, opened from the profile picture
 @Serializable data object YouRoute
 @Serializable data object SettingsRoute

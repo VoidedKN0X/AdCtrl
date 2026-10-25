@@ -74,6 +74,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.toRoute
 import com.vknxworks.adctrl.ui.settings.YouScreen
+import com.vknxworks.adctrl.ui.dns.DnsSettingsScreen
+import com.vknxworks.adctrl.ui.dns.LogsStatsScreen
 
 @Composable
 fun AppRoot() {
@@ -229,7 +231,6 @@ private fun PhoneLayout(
 @Composable
 private fun AppNavHost(navController: NavHostController) {
     NavHost(navController, startDestination = OverviewRoute) {
-        // Each tab is a placeholder until its part of the app is built.
         topDestinations.forEach { top ->
             when (top.route) {
                 OverviewRoute -> composable<OverviewRoute> { OverviewScreen() }
@@ -247,6 +248,8 @@ private fun AppNavHost(navController: NavHostController) {
             CheckHostScreen(r.host, r.client)
         }
         composable<YouRoute> { YouScreen() }
+        composable<DnsSettingsRoute> { DnsSettingsScreen() }
+        composable<LogsStatsRoute> { LogsStatsScreen() }
         composable<SettingsRoute> { SettingsScreen() }
         composable<NotificationsRoute> { NotificationsScreen() }
         composable<ServersRoute> { ServersScreen() }

@@ -7,6 +7,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -59,7 +60,8 @@ object CheckStore {
 /**
  * Background check of every saved server (AdGuard Home can't push notifications). Runs every 15,
  * 30, 60 or 120 minutes while background checks are on (Android doesn't allow less than 15), only
- * with a network connection, and once right away when "Check now" is tapped. Only reads; it never
+ * with a network connection, once right away when "Check now" is tapped, and right away when ntfy
+ * delivers a push to AdCtrl's push address (see [Push]). Only reads; it never
  * changes anything on a server. A server whose password is sealed by the app lock is skipped while
  * AdCtrl is locked.
  */
@@ -89,6 +91,7 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
     companion object {
         private const val PERIODIC = "adctrl-check"
         private const val ONCE = "adctrl-check-now"
+        private const val PUSHED = "adctrl-check-push"
         const val KEY_FORCE = "force"
 
         private val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
@@ -114,6 +117,19 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
                 .setInputData(workDataOf(KEY_FORCE to true))
                 .build()
             WorkManager.getInstance(context).enqueueUniqueWork(ONCE, ExistingWorkPolicy.REPLACE, request)
+        }
+
+        /**
+         * One check because ntfy delivered a push (a wake-up call: AdGuard Home can't push itself). Runs
+         * as soon as possible (expedited while Android allows it), and only while background checks are on.
+         * A check that's already waiting or running is kept rather than started again.
+         */
+        fun runFromPush(context: Context) {
+            val request = OneTimeWorkRequestBuilder<NotifyWorker>()
+                .setConstraints(constraints)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .build()
+            WorkManager.getInstance(context).enqueueUniqueWork(PUSHED, ExistingWorkPolicy.KEEP, request)
         }
     }
 }
