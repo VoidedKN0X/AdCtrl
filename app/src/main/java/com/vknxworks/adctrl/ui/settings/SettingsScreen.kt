@@ -47,7 +47,7 @@ import kotlinx.coroutines.launch
 
 /**
  * App settings, in the Ctrl series order: notifications, privacy and security (app lock), then the Quick
- * Settings tile. Ctrl / Signal is dark only, so there is no theme or dynamic colour choice any more.
+ * Settings tile. Ctrl / Signal follows the device's dark or light mode, so there is no theme or dynamic colour choice.
  */
 @Composable
 fun SettingsScreen() {

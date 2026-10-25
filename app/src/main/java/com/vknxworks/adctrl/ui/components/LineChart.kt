@@ -1,5 +1,6 @@
 package com.vknxworks.adctrl.ui.components
 
+import com.vknxworks.adctrl.ui.theme.CtrlColors
 import android.text.format.DateFormat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -46,9 +47,9 @@ import java.util.Date
  * A single-series chart uses the first one.
  */
 object ChartColors {
-    // Ctrl / Signal: all queries in off-white, blocked in the accent.
-    val darkSeries = listOf(Color(0xFFF4F4F2), Color(0xFFB48CFF))
-    val lightSeries = darkSeries
+    // Ctrl / Signal: all queries in the text colour, blocked in the accent (text shade) of each theme.
+    val darkSeries = listOf(CtrlColors.Dark.text, CtrlColors.Dark.accentText)
+    val lightSeries = listOf(CtrlColors.Light.text, CtrlColors.Light.accentText)
 
     @Composable
     fun series(): List<Color> = if (MaterialTheme.colorScheme.background.luminanceIsDark()) darkSeries else lightSeries

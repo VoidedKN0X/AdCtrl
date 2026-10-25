@@ -273,7 +273,7 @@ private fun ClientRowView(row: ClientItem, onClick: () -> Unit) {
             contentAlignment = Alignment.Center,
         ) {
             if (row.blocked) Icon(Icons.Outlined.Block, stringResource(R.string.client_blocked), Modifier.size(20.dp), tint = Health.critical)
-            else Text(row.name.take(1).uppercase(), style = MaterialTheme.typography.titleMedium, color = if (row.persistent) CtrlColors.Accent else CtrlColors.Muted)
+            else Text(row.name.take(1).uppercase(), style = MaterialTheme.typography.titleMedium, color = if (row.persistent) CtrlColors.AccentText else CtrlColors.Muted)
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {

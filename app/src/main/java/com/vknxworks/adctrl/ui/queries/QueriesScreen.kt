@@ -169,7 +169,7 @@ fun QueriesScreen() {
                     if (settings.queriesLive) Icons.Outlined.Pause else Icons.Outlined.PlayArrow,
                     stringResource(if (settings.queriesLive) R.string.live_pause else R.string.live_resume),
                     onClick = { c.appScope.launch { c.settings.update { it.copy(queriesLive = !it.queriesLive) } } },
-                    tint = if (settings.queriesLive) CtrlColors.Accent else CtrlColors.Text,
+                    tint = if (settings.queriesLive) CtrlColors.AccentText else CtrlColors.Text,
                 )
             })
             if (connection.error != null) ConnectionBanner()

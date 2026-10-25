@@ -1,5 +1,7 @@
 package com.vknxworks.adctrl.ui.widgets
 
+import com.vknxworks.adctrl.ui.theme.CtrlColors
+import androidx.compose.ui.graphics.toArgb
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -18,13 +20,19 @@ import com.vknxworks.adctrl.data.widget.WidgetStore
 import com.vknxworks.adctrl.ui.components.formatCount
 import com.vknxworks.adctrl.ui.components.percent
 
-/** Health colours as on the Overview (see ui.theme.Health): Ctrl / Signal accent, warning, error and stopped. */
-private object WidgetColors {
-    const val OK = 0xFFB48CFF.toInt()
-    const val WARN = 0xFFF2C94C.toInt()
-    const val CRITICAL = 0xFFFF6B6B.toInt()
-    const val IDLE = 0xFF8C8C94.toInt()
+/**
+ * Health colours as on the Overview (see ui.theme.Health), as light/dark pairs from the Ctrl / Signal
+ * palettes: the widget follows the device's dark mode.
+ */
+private enum class WidgetColors(val light: Int, val dark: Int) {
+    OK(CtrlColors.Light.accentText.toArgb(), CtrlColors.Dark.accentText.toArgb()),
+    WARN(CtrlColors.Light.warn.toArgb(), CtrlColors.Dark.warn.toArgb()),
+    CRITICAL(CtrlColors.Light.error.toArgb(), CtrlColors.Dark.error.toArgb()),
+    IDLE(CtrlColors.Light.disabled.toArgb(), CtrlColors.Dark.disabled.toArgb()),
 }
+
+/** Tints the status icon, switching with the launcher's dark mode. */
+private fun RemoteViews.tintIcon(c: WidgetColors) = setColorInt(R.id.widget_icon, "setColorFilter", c.light, c.dark)
 
 /**
  * Home screen widget for the active server: protection on, paused (with a live countdown) or off,
@@ -80,20 +88,20 @@ class ProtectionWidget : AppWidgetProvider() {
             val now = System.currentTimeMillis()
             when {
                 server == null -> {
-                    views.setInt(R.id.widget_icon, "setColorFilter", WidgetColors.IDLE)
+                    views.tintIcon(WidgetColors.IDLE)
                     views.setTextViewText(R.id.widget_title, context.getString(R.string.app_name))
                     views.setTextViewText(R.id.widget_subtitle, context.getString(R.string.tile_no_server))
                     views.setViewVisibility(R.id.widget_stats, View.GONE)
                 }
                 // The password is sealed and AdCtrl is locked: show nothing about the server.
                 c.serverStore.sealedNow(server.id) -> {
-                    views.setInt(R.id.widget_icon, "setColorFilter", WidgetColors.IDLE)
+                    views.tintIcon(WidgetColors.IDLE)
                     views.setTextViewText(R.id.widget_title, context.getString(R.string.widget_locked))
                     views.setTextViewText(R.id.widget_subtitle, context.getString(R.string.widget_locked_subtitle))
                     views.setViewVisibility(R.id.widget_stats, View.GONE)
                 }
                 snap == null -> {
-                    views.setInt(R.id.widget_icon, "setColorFilter", WidgetColors.IDLE)
+                    views.tintIcon(WidgetColors.IDLE)
                     views.setTextViewText(R.id.widget_title, server.name)
                     views.setTextViewText(R.id.widget_subtitle, context.getString(R.string.tile_unknown))
                     views.setViewVisibility(R.id.widget_stats, View.GONE)
@@ -107,7 +115,7 @@ class ProtectionWidget : AppWidgetProvider() {
                         paused -> R.string.protection_paused to WidgetColors.WARN
                         else -> R.string.protection_off to WidgetColors.CRITICAL
                     }
-                    views.setInt(R.id.widget_icon, "setColorFilter", if (snap.unreachable) WidgetColors.IDLE else color)
+                    views.tintIcon(if (snap.unreachable) WidgetColors.IDLE else color)
                     views.setTextViewText(R.id.widget_title, context.getString(title))
                     val many = c.sessions.servers.value.size > 1
                     val subtitle = when {

@@ -4,6 +4,27 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.11.0 (2026-10-25)
+
+### New
+
+- **Light mode that follows the device theme**: AdCtrl is now dark when your phone is in dark mode and light ("Signal Light") when it's in light mode, and switches by itself as soon as you change it (also with a scheduled or sunset dark mode). There's no setting for it in the app, and it still doesn't use your wallpaper (Material You) colours.
+- **Signal Light colours**: an off-white background (#F5F5F1), white cards and sheets with light grey borders, near-black text (#0B0B0D) and grey secondary text (#5C5C64).
+- **Same accent in both**: the hero card, main buttons, the selected tab, switches that are on and the PIN cells are filled with the same lilac (#B48CFF) with dark text on top in both modes. Where the accent is text or an icon on a light background (the slash in "AD/CTRL", status words, the selected Filters section, text buttons, links, the focused text field border and cursor, the fingerprint key, the "protection on" shield, chart lines for blocked queries), it uses a deeper violet (#6A3BDB) so it stays readable; in dark mode it stays #B48CFF.
+
+### Changed
+
+- **Status and navigation bars** match the theme: the background colour behind them, with light icons in dark mode and dark icons in light mode. The screen shown while AdCtrl starts also follows the theme, so there's no dark flash in light mode.
+- **Every screen works in both modes**: Overview (hero card, protection card, metric cards, top lists, server info), Queries (rows, filters, the query details sheet, Check host), Filters (lists, the rules editor, services, rewrites, protection), Clients, your profile page, Settings, Notifications, Servers, server setup, all dialogs and bottom sheets, and the lock, PIN and Confirm changes screens.
+- **Switches in light mode**: off is a light grey track with a grey knob; on is the accent with a dark knob, as in dark mode.
+- **Progress bars in light mode**: a light grey track with a near-black bar (the accent for the top entry of each top list).
+- **Lock screen in light mode**: white keys with a thin grey border, light grey borders on the empty PIN cells, and the accent fingerprint key in the deeper violet.
+- **Floating tab bar in light mode**: white at 92 % with a thin grey border; the selected tab is still the accent block.
+- **Errors and warnings** use a darker red (#D93636) and amber in light mode so they're readable on white.
+- **Home screen widget** follows the phone's dark mode too: white card with dark text in light mode, the dark card as before in dark mode. The status icon colours switch with it.
+- **Notifications** now have the accent colour on their icon, in the shade that fits the phone's theme.
+- The launcher icon stays as it is (dark) in both modes.
+
 ## v0.10.0 (2026-10-25)
 
 AdCtrl has a new look: "Ctrl / Signal", the design every Ctrl app is moving to. It's dark and high-contrast, with one lilac accent (#B48CFF). It only changes how AdCtrl looks: every screen, feature, setting and shortcut works the same as before.
