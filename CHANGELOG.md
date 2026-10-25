@@ -4,6 +4,25 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.12.1 (2026-10-25)
+
+### Fixed
+
+- **No crash when closing AdCtrl with a dialog or sheet open**: closing the app, pressing Back on the first screen or swiping it away from recent apps while a dialog or bottom sheet was open (or while the app lock was locking straight away) could crash AdCtrl on some phones, Samsung ones among them. Dialogs and sheets are no longer opened on a screen that is being closed, and the fingerprint prompt isn't asked for while AdCtrl is closing (it's offered again next time).
+- **Dialogs and sheets stay under the lock**: an open dialog or bottom sheet (a rule, a client, a schedule, a confirmation) could stay on top of the lock screen or the **Confirm changes** screen, readable and usable, and in the way of the PIN pad. They're now hidden while AdCtrl is locked or asking to confirm a change, and come back as they were afterwards.
+- **No crash from background work**: a failure in work AdCtrl finishes after you leave a screen (saving a setting, refreshing after a change, a push from ntfy starting a check) no longer crashes the app; that one step just doesn't happen.
+- **Quick Settings tile**: a tap that failed in an unexpected way no longer leaves the tile stuck on "Working…" or crashes it.
+- **Home screen widget**: a launcher that refuses a widget update while AdCtrl locks or closes can no longer crash the app.
+- **Query log and statistics**: a retention period set on the server that isn't a whole number of hours (in AdGuard Home's config file, say) and reads like one of the choices ("1 day") no longer appears twice in the list or crashes the picker.
+
+### Security
+
+- WorkManager's debugging receiver, which AdCtrl never uses, is left out of the app.
+
+### Changed
+
+- Internal cleanup: removed unused code and resources.
+
 ## v0.12.0 (2026-10-25)
 
 ### New

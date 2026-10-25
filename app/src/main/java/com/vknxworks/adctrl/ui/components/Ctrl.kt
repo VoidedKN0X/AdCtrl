@@ -74,7 +74,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import com.vknxworks.adctrl.R
+import com.vknxworks.adctrl.container
+import com.vknxworks.adctrl.ui.lock.LocalOverLock
+import com.vknxworks.adctrl.ui.lock.findActivity
+import com.vknxworks.adctrl.ui.lock.lockCovering
 import com.vknxworks.adctrl.ui.theme.CtrlColors
 import com.vknxworks.adctrl.ui.theme.CtrlShapes
 import com.vknxworks.adctrl.ui.theme.CtrlType
@@ -392,6 +397,20 @@ fun CtrlTextField(
 
 // ---------- Dialogs and sheets ----------
 
+/**
+ * Whether a dialog or sheet (each its own window) may be shown now. Not while the lock, PIN or "Confirm
+ * changes" screen covers the app: a window would sit on top of it, readable and usable. It comes back
+ * as it was once the app is unlocked. And never on an activity that is finishing or gone (the app being
+ * closed or swiped away), where Android refuses a new window and the app would crash.
+ */
+@Composable
+private fun windowAllowed(): Boolean {
+    val context = LocalContext.current
+    if (!LocalOverLock.current && lockCovering(context.container.vault)) return false
+    val activity = context.findActivity() ?: return true
+    return !activity.isFinishing && !activity.isDestroyed
+}
+
 /** A dialog: surface fill, 26dp corners, 1dp border. Same slots as Material's AlertDialog. */
 @Composable
 fun CtrlAlertDialog(
@@ -403,6 +422,7 @@ fun CtrlAlertDialog(
     title: (@Composable () -> Unit)? = null,
     text: (@Composable () -> Unit)? = null,
 ) {
+    if (!windowAllowed()) return
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = confirmButton,
@@ -427,6 +447,7 @@ fun CtrlSheet(
     sheetState: SheetState = rememberModalBottomSheetState(),
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    if (!windowAllowed()) return
     val shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp)
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,

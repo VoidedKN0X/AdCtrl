@@ -62,11 +62,14 @@ class ProtectionWidget : AppWidgetProvider() {
         fun anyPlaced(context: Context): Boolean =
             runCatching { AppWidgetManager.getInstance(context).getAppWidgetIds(component(context)).isNotEmpty() }.getOrDefault(false)
 
-        /** Redraws every placed widget from what's saved (no network). */
+        /**
+         * Redraws every placed widget from what's saved (no network). Also runs while AdCtrl is being closed
+         * (locking redraws it), so a launcher that refuses the update can never crash the app.
+         */
         fun redraw(context: Context) {
-            val manager = AppWidgetManager.getInstance(context) ?: return
+            val manager = runCatching { AppWidgetManager.getInstance(context) }.getOrNull() ?: return
             val ids = runCatching { manager.getAppWidgetIds(component(context)) }.getOrNull() ?: return
-            if (ids.isNotEmpty()) draw(context, manager, ids)
+            if (ids.isNotEmpty()) runCatching { draw(context, manager, ids) }
         }
 
         private fun openApp(context: Context): PendingIntent = PendingIntent.getActivity(

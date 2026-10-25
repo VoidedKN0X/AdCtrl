@@ -57,6 +57,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -236,6 +238,8 @@ object AppLock {
         onError: (String?) -> Unit = {},
         onSuccess: (Cipher) -> Unit,
     ) {
+        // AdCtrl is being closed: Android won't show a prompt on a finishing window. It's offered again next time.
+        if (activity.isFinishing || activity.isDestroyed) return
         // Replaces a prompt that is still marked as open; its late answer (if any) is ignored below.
         promptSignal?.let { runCatching { it.cancel() } }
         val generation = ++promptGeneration
@@ -305,6 +309,9 @@ tailrec fun Context.findActivity(): Activity? = when (this) {
 fun lockCovering(vault: LockVault): Boolean =
     (vault.enabled && !AppLock.unlocked) || AppLock.request != null || AppLock.confirm != null
 
+/** True inside the lock and PIN screens, whose own dialogs ("Forgot PIN?") may show while the app is covered. */
+val LocalOverLock = staticCompositionLocalOf { false }
+
 /**
  * The lock and PIN screens shown on top of the app. The app underneath stays where it was, so
  * nothing you were typing (custom rules, a form) is lost, but it can't be seen or touched.
@@ -314,6 +321,7 @@ fun AppLockOverlay() {
     val c = LocalContext.current.container
     val vault = c.vault
     val confirm = AppLock.confirm
+    CompositionLocalProvider(LocalOverLock provides true) {
     when {
         vault.enabled && !AppLock.unlocked -> PinLockScreen()
         confirm != null -> ConfirmChangeScreen(onResult = { ok -> confirm.complete(ok) })
@@ -345,6 +353,7 @@ fun AppLockOverlay() {
             )
             null -> Unit
         }
+    }
     }
 }
 

@@ -103,6 +103,11 @@
                 android:value="true" />
         </service>
 
+        <!-- WorkManager's diagnostics receiver (debug dumps over adb) isn't needed; leave it out. -->
+        <receiver
+            android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+            tools:node="remove" />
+
         <!-- Don't let androidx.emoji2 look up a downloadable emoji font at start-up: emoji are drawn with the
              phone's own emoji font, and nothing is fetched. -->
         <provider

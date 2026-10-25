@@ -156,9 +156,6 @@ object CtrlShapes {
     val Dot = RoundedCornerShape(2.dp)
 }
 
-/** AdCtrl's accent. */
-val AdAccent = CtrlColors.Accent
-
 private fun scheme(p: CtrlPalette): ColorScheme {
     // Material's primary is used for text-like accents (text buttons, radio buttons, spinners, the time
     // picker), so it is the accent text colour; the Ctrl components fill with CtrlColors.Accent themselves.

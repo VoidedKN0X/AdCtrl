@@ -26,6 +26,7 @@ import com.vknxworks.adctrl.data.server.HostAllowlist
 import com.vknxworks.adctrl.data.server.ServerStore
 import com.vknxworks.adctrl.data.server.Sessions
 import com.vknxworks.adctrl.data.settings.SettingsRepository
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -43,7 +44,12 @@ enum class ShortcutAction { PAUSE, QUERIES, SEARCH, BLOCKED }
 
 /** Manual dependency container; one per process. */
 class AppContainer(val context: Context) {
-    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    /**
+     * Fire-and-forget work that outlives a screen (saving a setting, a refresh after a change, a push
+     * from ntfy). A failure there (storage, network, a server answering oddly) must never crash AdCtrl,
+     * least of all while it's being closed, so it ends that job only. Nothing is logged.
+     */
+    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Default + CoroutineExceptionHandler { _, _ -> })
 
     val settings = SettingsRepository(context, appScope)
 

@@ -13,6 +13,7 @@ import com.vknxworks.adctrl.data.api.AghError
 import com.vknxworks.adctrl.data.api.ServerStatus
 import com.vknxworks.adctrl.ui.components.formatCountdown
 import com.vknxworks.adctrl.ui.overview.pauseLabel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -38,7 +39,11 @@ import kotlinx.coroutines.launch
  */
 class ProtectionTileService : TileService() {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    /**
+     * The tile's work runs on the main thread. A failure (a setting that can't be read, an unexpected
+     * answer) must never take System UI's tile down with a crash, so it only ends that job.
+     */
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main + CoroutineExceptionHandler { _, _ -> })
     private var listening: Job? = null
 
     /** Last known protection state, so a tap knows whether to pause or resume. */
@@ -108,10 +113,13 @@ class ProtectionTileService : TileService() {
         render(getString(R.string.tile_working))
         scope.launch {
             val c = container
-            val settings = c.settings.current()
-            val pause = if (st.protectionEnabled) settings.tilePause else null
-            val result = c.overview.setProtection(pause, settings.tileAllServers)
-            busy = false
+            val result = try {
+                val settings = c.settings.current()
+                val pause = if (st.protectionEnabled) settings.tilePause else null
+                c.overview.setProtection(pause, settings.tileAllServers)
+            } finally {
+                busy = false
+            }
             if (result.failed.isNotEmpty()) {
                 render(getString(R.string.tile_failed))
                 delay(2_000)
