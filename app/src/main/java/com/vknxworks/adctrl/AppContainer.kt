@@ -10,11 +10,14 @@ import com.vknxworks.adctrl.data.notify.CheckStore
 import com.vknxworks.adctrl.data.notify.Notifier
 import com.vknxworks.adctrl.data.notify.NotifySettingsRepository
 import com.vknxworks.adctrl.data.notify.NotifyWorker
+import com.vknxworks.adctrl.data.notify.Push
+import com.vknxworks.adctrl.data.notify.PushStatus
 import com.vknxworks.adctrl.data.widget.WidgetRefreshWorker
 import com.vknxworks.adctrl.data.widget.WidgetStore
 import com.vknxworks.adctrl.ui.widgets.ProtectionWidget
 import com.vknxworks.adctrl.ui.lock.AppLock
 import com.vknxworks.adctrl.data.clients.ClientsRepository
+import com.vknxworks.adctrl.data.dns.DnsRepository
 import com.vknxworks.adctrl.data.filters.FiltersRepository
 import com.vknxworks.adctrl.data.overview.OverviewRepository
 import com.vknxworks.adctrl.data.queries.QueriesRepository
@@ -96,6 +99,7 @@ class AppContainer(val context: Context) {
     val userRules = UserRules(sessions)
     val filters = FiltersRepository(sessions, appScope)
     val clients = ClientsRepository(sessions, appScope)
+    val dns = DnsRepository(sessions)
 
     /** Turns the app lock on with [pin]: every saved password is sealed with it from now on. */
     suspend fun enableLock(pin: String) {
@@ -169,7 +173,19 @@ class AppContainer(val context: Context) {
         // Background checks follow their settings; turning them on or off unseals or seals the
         // passwords again (only possible while unlocked, where the settings are).
         appScope.launch {
-            NotifyWorker.schedule(context, notifySettings.current())
+            val first = notifySettings.current()
+            NotifyWorker.schedule(context, first)
+            // Push through ntfy: register again at every start (same address), register when turned on, drop
+            // it when turned off. It follows its own switch only, so pausing background checks keeps the address.
+            Push.start(context, first.push)
+            launch {
+                notifySettings.settings.drop(1).map { it.push }.distinctUntilChanged().collect { on ->
+                    when {
+                        on -> Push.register(context)
+                        Push.status.value !is PushStatus.Off -> Push.unregister(context)
+                    }
+                }
+            }
             notifySettings.settings.drop(1).map { it.polling to it.intervalMinutes }.distinctUntilChanged().collect { (polling, _) ->
                 NotifyWorker.schedule(context, notifySettings.current())
                 if (vault.isOpen) withContext(Dispatchers.Default) { serverStore.applySealing(vault.enabled && !polling) }

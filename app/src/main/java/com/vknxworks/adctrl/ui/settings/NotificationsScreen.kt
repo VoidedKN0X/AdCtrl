@@ -17,10 +17,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BatteryAlert
 import androidx.compose.material.icons.outlined.BatteryFull
+import androidx.compose.material.icons.outlined.Campaign
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.HourglassBottom
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Timer
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,6 +50,11 @@ import com.vknxworks.adctrl.data.notify.Checker
 import com.vknxworks.adctrl.data.notify.NotifyEvent
 import com.vknxworks.adctrl.data.notify.NotifySettings
 import com.vknxworks.adctrl.data.notify.NotifyWorker
+import com.vknxworks.adctrl.data.notify.Push
+import com.vknxworks.adctrl.data.notify.PushStatus
+import com.vknxworks.adctrl.data.notify.UnifiedPush
+import com.vknxworks.adctrl.ui.components.CtrlSecondaryButton
+import com.vknxworks.adctrl.ui.components.copySensitive
 import com.vknxworks.adctrl.ui.components.Group
 import com.vknxworks.adctrl.ui.components.GroupChoice
 import com.vknxworks.adctrl.ui.components.GroupRow
@@ -59,7 +68,7 @@ import kotlinx.coroutines.launch
 
 /**
  * Background checks (AdGuard Home can't push notifications, so AdCtrl checks your servers itself),
- * what to notify about, and battery advice.
+ * push through ntfy that wakes those checks at once, what to notify about, and battery advice.
  */
 @Composable
 fun NotificationsScreen() {
@@ -68,6 +77,7 @@ fun NotificationsScreen() {
     val settings by c.notifySettings.settings.collectAsStateWithLifecycle()
     val servers by c.sessions.servers.collectAsStateWithLifecycle()
     val lastCheck by CheckStore.lastCheck.collectAsStateWithLifecycle()
+    val pushStatus by Push.status.collectAsStateWithLifecycle()
     val access = rememberNotificationAccess()
     val canPost = access.canPost
     var batteryVersion by remember { mutableIntStateOf(0) }
@@ -75,12 +85,16 @@ fun NotificationsScreen() {
         context.getSystemService(PowerManager::class.java)?.isIgnoringBatteryOptimizations(context.packageName) == true
     }
 
-    // Re-check permission and battery state when coming back from system settings.
+    val ntfyInstalled = remember(batteryVersion) { UnifiedPush.isNtfyInstalled(context) }
+    val ntfyUnrestricted = remember(batteryVersion) { UnifiedPush.isNtfyUnrestricted(context) }
+
+    // Re-check permission, battery and push state when coming back from system settings or ntfy.
     val owner = LocalLifecycleOwner.current
     LaunchedEffect(owner) {
         owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             batteryVersion++
             servers.forEach { CheckStore.read(context, it.id) }
+            Push.load(context, c.notifySettings.current().push)
         }
     }
 
@@ -90,6 +104,15 @@ fun NotificationsScreen() {
     }
     fun update(transform: (NotifySettings) -> NotifySettings) {
         c.appScope.launch { c.notifySettings.update(transform) }
+    }
+    fun copyEndpoint(text: String) {
+        // The push address holds the secret ntfy topic: keep it out of clipboard previews and keyboard history.
+        copySensitive(context, "AdCtrl", text)
+        Toast.makeText(context, context.getString(R.string.copied), Toast.LENGTH_SHORT).show()
+    }
+    fun openOutside(intent: Intent) {
+        AppLock.expectReturn()
+        runCatching { context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
     }
 
     Column(Modifier.fillMaxSize()) {
@@ -156,6 +179,48 @@ fun NotificationsScreen() {
                 )
             }
 
+            // --- Push through ntfy: wakes the background check right away ---
+            Group(stringResource(R.string.group_push), footer = stringResource(R.string.push_footer)) {
+                GroupSwitch(
+                    stringResource(R.string.push_title),
+                    stringResource(R.string.push_subtitle),
+                    checked = settings.push && canPost,
+                    icon = Icons.Outlined.Campaign,
+                ) { on ->
+                    if (on) ensurePermission()
+                    update { it.copy(push = on) }
+                }
+                if (!ntfyInstalled) {
+                    PushNote(stringResource(R.string.push_no_ntfy)) {
+                        CtrlSecondaryButton(onClick = { openOutside(Intent(Intent.ACTION_VIEW, Uri.parse(UnifiedPush.NTFY_DOWNLOAD))) }) {
+                            Text(stringResource(R.string.push_install_ntfy))
+                        }
+                    }
+                }
+                if (settings.push && canPost && ntfyInstalled) {
+                    if (!settings.polling) PushNote(stringResource(R.string.push_needs_polling)) {}
+                    when (val st = pushStatus) {
+                        PushStatus.NoNtfy, PushStatus.Off, PushStatus.Registering -> PushNote(stringResource(R.string.push_registering)) {
+                            CtrlTextButton(onClick = { Push.register(context) }) { Text(stringResource(R.string.retry)) }
+                        }
+                        is PushStatus.Failed -> PushNote(stringResource(R.string.push_failed, st.reason)) {
+                            CtrlTextButton(onClick = { Push.register(context) }) { Text(stringResource(R.string.retry)) }
+                        }
+                        is PushStatus.Unavailable -> PushNote(stringResource(R.string.push_unavailable)) {}
+                        is PushStatus.Registered -> {
+                            GroupRow(
+                                stringResource(R.string.push_endpoint),
+                                st.endpoint,
+                                icon = Icons.Outlined.NotificationsActive,
+                                trailing = { Icon(Icons.Outlined.ContentCopy, stringResource(R.string.copy)) },
+                                onClick = { copyEndpoint(st.endpoint) },
+                            )
+                            PushNote(stringResource(R.string.push_endpoint_note)) {}
+                        }
+                    }
+                }
+            }
+
             // --- What to notify about ---
             Group(stringResource(R.string.group_events), footer = stringResource(R.string.events_footer)) {
                 NotifyEvent.entries.forEach { e ->
@@ -185,6 +250,16 @@ fun NotificationsScreen() {
                     icon = if (unrestricted) Icons.Outlined.BatteryFull else Icons.Outlined.BatteryAlert,
                     iconTint = if (unrestricted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                 )
+                if (settings.push && ntfyInstalled && !ntfyUnrestricted) {
+                    GroupRow(
+                        stringResource(R.string.battery_ntfy_restricted),
+                        stringResource(R.string.battery_ntfy_restricted_body),
+                        icon = Icons.Outlined.BatteryAlert,
+                        iconTint = MaterialTheme.colorScheme.error,
+                        showChevron = true,
+                        onClick = { openOutside(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${UnifiedPush.NTFY}"))) },
+                    )
+                }
                 GroupRow(
                     stringResource(R.string.battery_open),
                     showChevron = true,
@@ -202,5 +277,14 @@ fun NotificationsScreen() {
                 )
             }
         }
+    }
+}
+
+/** A line of explanation inside the push group, with an optional action under it. */
+@Composable
+private fun PushNote(text: String, action: @Composable () -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        action()
     }
 }

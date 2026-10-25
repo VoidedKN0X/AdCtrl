@@ -32,6 +32,11 @@ data class NotifySettings(
     /** Check the servers in the background with WorkManager. Off until turned on. */
     val polling: Boolean = false,
     val intervalMinutes: Int = 15,
+    /**
+     * Wake the background check through ntfy (UnifiedPush) whenever something posts to AdCtrl's push
+     * address. Only works with [polling] on, which stays the fallback.
+     */
+    val push: Boolean = false,
     /** The events that are switched on. */
     val events: Set<NotifyEvent> = NotifyEvent.entries.filter { it.defaultOn }.toSet(),
     /** Protection paused or off for longer than this (minutes) counts as "longer than expected". */
@@ -49,6 +54,7 @@ class NotifySettingsRepository(private val context: Context, scope: CoroutineSco
     private object K {
         val polling = booleanPreferencesKey("notify_polling")
         val interval = intPreferencesKey("notify_interval")
+        val push = booleanPreferencesKey("notify_push")
         val events = stringSetPreferencesKey("notify_events")
         val pauseLimit = intPreferencesKey("notify_pause_limit")
     }
@@ -69,6 +75,7 @@ class NotifySettingsRepository(private val context: Context, scope: CoroutineSco
     private fun Preferences.toSettings() = NotifySettings(
         polling = this[K.polling] ?: false,
         intervalMinutes = (this[K.interval] ?: 15).let { if (it in NotifySettings.INTERVALS) it else 15 },
+        push = this[K.push] ?: false,
         events = this[K.events]?.mapNotNull { n -> NotifyEvent.entries.firstOrNull { it.name == n } }?.toSet()
             ?: NotifyEvent.entries.filter { it.defaultOn }.toSet(),
         pauseLimitMinutes = (this[K.pauseLimit] ?: 60).let { if (it in NotifySettings.PAUSE_LIMITS) it else 60 },
@@ -80,6 +87,7 @@ class NotifySettingsRepository(private val context: Context, scope: CoroutineSco
             val s = transform(p.toSettings())
             p[K.polling] = s.polling
             p[K.interval] = s.intervalMinutes
+            p[K.push] = s.push
             p[K.events] = s.events.map { it.name }.toSet()
             p[K.pauseLimit] = s.pauseLimitMinutes
             polling = s.polling

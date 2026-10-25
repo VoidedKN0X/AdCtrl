@@ -13,11 +13,14 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Overview**: a big protection switch with pause for 30 seconds up to 8 hours (with a countdown), statistics for the last day to 90 days, a queries vs. blocked graph, top domains, clients and upstreams, and an attention list for paused protection, failing filter lists and updates
 - **Queries**: the live query log with search and filters, the matched rule and list for every answer, and **one-tap block or unblock** of any domain, for one subdomain, the whole domain or one client
 - **Filters**: blocklists and allowlists (with 45 well-known lists to pick from), a custom rules editor with highlighting, search, mistake hints and a look at the changes before saving, blocked services with a pause schedule, DNS rewrites, and safe browsing, parental control and safe search
+- **Upstream DNS**: view and edit the upstream, fallback, bootstrap and private reverse DNS servers, the upstream mode (load balancing, parallel requests or fastest IP address) and the DNS cache, with **Test upstreams** showing which servers work before you apply anything
+- **Query log and statistics**: turn them on or off, choose how long they're kept, anonymise client IPs, and clear the query log or reset the statistics (each after a confirmation)
 - **Clients**: every device with its queries, recent activity and its own settings (filtering, blocked services, upstreams, query log and statistics), adding found devices as clients, and blocking a device entirely
 - **Quick Settings tile** to pause protection or turn it back on with one tap (long-press opens AdCtrl)
 - **Home screen widget** with protection on, paused (with a live countdown) or off, and the last 24 hours' queries and blocked share
 - **App shortcuts** (long-press the AdCtrl icon): Pause protection, Query log, Search the query log and Blocked queries
 - **Notifications** from AdCtrl's own background checks: protection turned off, paused for longer than you expect, a server that can't be reached, filter lists that stop updating and AdGuard Home updates
+- **Push through ntfy** (UnifiedPush, optional): anything that posts to AdCtrl's push address, such as a cron job on your router, makes AdCtrl check your servers right away instead of waiting for the next background check
 - **Several servers**, such as a primary and a secondary, with "apply to all servers" for rule changes and pausing
 - **App lock** with its own PIN and optional fingerprint unlock; your server passwords stay encrypted while the app is locked, and **Confirm changes** can ask for the PIN or fingerprint before anything changes on a server
 - **Safe by design**: a read-only mode, confirmation before changes, certificate pinning, optional **Hide in screenshots** and **Hide in recent apps**, and passwords encrypted with the Android Keystore
@@ -54,7 +57,7 @@ If the Obtainium button doesn't open the app, add `https://github.com/VoidedKN0X
 3. If AdGuard Home uses a self-signed certificate, compare the fingerprint AdCtrl shows with your certificate's (on the server: `openssl x509 -in cert.pem -noout -fingerprint -sha256`), then tap **Trust**.
 4. Check the version and protection state AdCtrl shows, choose whether to use **read-only mode**, and tap **Continue**.
 
-Your servers, **Settings** and **About** are on the **You** page: tap your profile picture at the top right of any tab. Add a second server, such as a secondary AdGuard Home, there under **Servers**.
+Your servers, **Upstream DNS**, **Query log and statistics**, **Settings** and **About** are on the **You** page: tap your profile picture at the top right of any tab. Add a second server, such as a secondary AdGuard Home, there under **Servers**.
 
 ## Recommended AdGuard Home setup
 
@@ -80,6 +83,14 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 
 **Hide in screenshots** and **Hide in recent apps** (the last two switches in the same section, also without the app lock, both off by default): the first keeps AdCtrl out of screenshots and screen recordings (and blanks its recent-apps preview), the second shows a blank card for AdCtrl in the recent-apps view while screenshots still work. With the app lock on, the recent-apps view always shows a blank card. Server setup, the lock screen and the PIN screens are always kept out of screenshots.
 
+## Upstream DNS, query log and statistics
+
+Both are on the **You** page (tap your profile picture) and change the server you have selected.
+
+- **Upstream DNS:** one server per line, as in AdGuard Home's web interface (`9.9.9.9`, `tls://dns.quad9.net`, `https://dns.quad9.net/dns-query`, `[/lan/]192.168.1.1` for one domain; lines starting with `#` are comments). AdCtrl checks every line before sending it and marks the first one that doesn't look like a DNS server. **Test upstreams** asks AdGuard Home to try the servers as typed, without saving them, and shows **Works** or AdGuard Home's error for each. **Save changes** asks first, because AdGuard Home restarts its DNS server to apply them. The upstream mode and the cache (size, minimum and maximum TTL, optimistic caching) are on the same page.
+- **Query log and statistics:** switch either off, pick how long they're kept (6 hours to 90 days for the query log, 1 to 90 days for statistics), and anonymise client IP addresses. These apply as soon as you pick them; the domains you told AdGuard Home to ignore stay as they are. **Clear query log** and **Reset statistics** each ask before anything is removed, and can't be undone.
+- In **read-only mode** you can look at everything and run **Test upstreams**, but not change anything.
+
 ## Widget, shortcuts and notifications
 
 - **Widget:** add **AdGuard protection** from your home screen's widget list. It shows the server you have selected in AdCtrl: protection on, paused with a live countdown, or off, and the DNS queries and blocked share of the last 24 hours. Tap it to open AdCtrl. It refreshes when you use the app, with every background check and at least every 30 minutes, and never changes anything itself.
@@ -93,9 +104,29 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 
   The checks only read from your own servers. On the lock screen, notifications only say that something needs a look. On ColorOS and other phones that close background apps, allow AdCtrl to run in the background (the Battery row on the same page opens the right settings).
 
+### Push through ntfy (optional)
+
+Android runs background checks at most every 15 minutes, often later. With [ntfy](https://f-droid.org/packages/io.heckel.ntfy/) (UnifiedPush) a push can start the check straight away. AdGuard Home can't send anything itself, so a push is only a wake-up call: AdCtrl ignores what it says, checks your servers as usual and notifies about what it finds, at most once a minute. The regular background checks keep running too.
+
+1. Install ntfy and connect it to your ntfy server (or ntfy.sh).
+2. In AdCtrl: tap your profile picture › **Settings › Notifications**, turn on **Check in the background** and **Check when ntfy pushes**, then tap **Push address** to copy it. Treat it like a password.
+3. Let something on your network post to that address. On an OpenWrt router running AdGuard Home, one cron line does it (every 5 minutes here). Add it with **System › Scheduled Tasks** in LuCI, or to `/etc/crontabs/root` followed by `/etc/init.d/cron restart`:
+
+   ```sh
+   */5 * * * * uclient-fetch -q -O /dev/null --post-data=check 'https://ntfy.example.com/upAbC123?up=1'
+   ```
+
+   With curl installed, `curl -fsS -d check 'https://ntfy.example.com/upAbC123?up=1' >/dev/null` does the same. To also check as soon as the router's internet connection comes back, put the same command in a hotplug script, `/etc/hotplug.d/iface/99-adctrl`:
+
+   ```sh
+   [ "$ACTION" = ifup ] && [ "$INTERFACE" = wan ] && uclient-fetch -q -O /dev/null --post-data=check 'https://ntfy.example.com/upAbC123?up=1'
+   ```
+
+Allow ntfy to run unrestricted in the background (AdCtrl shows a row for it under **Battery** when it isn't). Turning push off removes AdCtrl's registration in ntfy, so the old address stops working.
+
 ## Privacy
 
-**Telemetry-free.** AdCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the AdGuard Home servers you add, and refuses to connect anywhere else. Your query log shows what everyone on your network visits, so it never leaves your phone except to and from your own server. See [PRIVACY.md](PRIVACY.md).
+**Telemetry-free.** AdCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the AdGuard Home servers you add, and refuses to connect anywhere else. With push turned on, the ntfy app on your phone delivers wake-up calls to AdCtrl; AdCtrl itself never connects to your ntfy server. Your query log shows what everyone on your network visits, so it never leaves your phone except to and from your own server. See [PRIVACY.md](PRIVACY.md).
 
 - **Links:** the Support, Report a bug, Source code and Licence rows in About open in your browser; the app itself doesn't contact GitHub.
 

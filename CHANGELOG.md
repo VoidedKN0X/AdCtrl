@@ -4,6 +4,28 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.12.0 (2026-10-25)
+
+### New
+
+- **Push through ntfy (UnifiedPush)**: tap your profile picture › **Settings › Notifications › Check when ntfy pushes** (off by default). AdCtrl registers with the ntfy app only (no push library, nothing Google) and shows its **Push address**; tap it to copy (copied as sensitive, so it stays out of clipboard previews and keyboard history). AdGuard Home can't send anything itself, so a push is a wake-up call: whatever posts to the address makes AdCtrl run its background check right away (protection off, paused too long, server unreachable, filter lists not updating, AdGuard Home updates) and post the same notifications as always. What the message says is ignored and never shown. The check runs at most once a minute however often something posts, only reads from your servers, and needs **Check in the background** on, whose regular checks stay the fallback. The page explains when ntfy isn't installed (with an Install ntfy button), while it waits for ntfy, when ntfy refused the registration (with Retry), when ntfy's server is temporarily unreachable, and when **Check in the background** is off. A **ntfy is battery-restricted** row under Battery opens ntfy's app info when Android may cut its connection. AdCtrl registers again at every start (same address), and turning push off removes the registration from ntfy so the old address stops working.
+- **Upstream DNS** page (profile picture › **Upstream DNS**): view and edit the server's upstream DNS servers, fallback DNS servers, bootstrap DNS servers and private reverse DNS servers (one per line, `#` comments and `[/domain/]` lines kept as AdGuard Home has them), the upstream mode (load balancing, parallel requests, fastest IP address), **Use private reverse DNS resolvers**, and the DNS cache (on or off, size in bytes, minimum and maximum TTL, optimistic caching). It shows AdGuard Home's default private reverse DNS servers, and says so when the upstreams come from a file on the server.
+  - **Checks before sending**: every server line is checked (known schemes `udp`, `tcp`, `tls`, `https`, `quic`, `h3`, `sdns`, plain addresses with an optional port, `[/domain/]` lines for upstream, fallback and private reverse DNS), the first bad line is named, the upstream list can't be empty, the cache needs a size above 0 when it's on, TTLs must be whole numbers and the minimum can't be above the maximum. Comments in bootstrap servers are only allowed from AdGuard Home v0.107.79, as AdGuard Home requires.
+  - **Test upstreams**: asks AdGuard Home (POST /control/test_upstream_dns) to try the servers as typed, before saving, and lists each one with **Works** or AdGuard Home's error. Testing changes nothing, so it also works in read-only mode and doesn't ask for **Confirm changes**.
+  - **Save changes** asks first ("Apply DNS settings?"), because AdGuard Home restarts its DNS server, then sends only the fields on this page (POST /control/dns_config), so blocking mode, rate limits and every other DNS setting stay as they are. Load balancing is sent as `load_balance`, or as the empty string AdGuard Home used before v0.107.44; before v0.107.64 the cache is turned off with a size of 0, as those versions expect. After saving, the page and the Overview's upstreams and cache reload.
+- **Query log and statistics** page (profile picture › **Query log and statistics**): turn the query log and statistics on or off, choose how long they're kept (6 hours, 1, 7, 30 or 90 days for the query log; 1, 7, 30 or 90 days for statistics, plus the server's own value when it's set to something else), and **Anonymise client IP addresses**. Changes apply at once (PUT /control/querylog/config/update and /control/stats/config/update); AdCtrl reads the current configuration first and sends it back with only that field changed, so the ignored domains stay exactly as they are.
+- **Clear query log** and **Reset statistics** on the same page (POST /control/querylog_clear and /control/stats_reset), each behind a confirmation that names the server and says it can't be undone. The Queries tab and the Overview reload afterwards.
+- Both pages follow the selected server, respect **read-only mode** (you can look, and test upstreams, but nothing can be changed) and **Confirm changes**, and use the Ctrl / Signal look in dark and light mode.
+
+### Changed
+
+- The Notifications page's introduction and the Settings row mention push through ntfy.
+- README: new feature lines, an **Upstream DNS, query log and statistics** section, and a **Push through ntfy** section with a one-line OpenWrt cron job (`uclient-fetch` or `curl`) and an optional hotplug script that pushes when the WAN connection comes back. PRIVACY.md describes push.
+
+### Removed
+
+- The unused `TabPlaceholder` component and its two strings (dead code since every tab was built).
+
 ## v0.11.0 (2026-10-25)
 
 ### New

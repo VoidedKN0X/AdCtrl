@@ -9,6 +9,14 @@
     <!-- Notifications from the background checks; asked for only when you turn them on. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- ntfy, the only push app AdCtrl uses (UnifiedPush), to wake the background check. -->
+    <queries>
+        <package android:name="io.heckel.ntfy" />
+        <intent>
+            <action android:name="org.unifiedpush.android.distributor.REGISTER" />
+        </intent>
+    </queries>
+
     <application
         android:name=".AdCtrlApp"
         android:allowBackup="false"
@@ -40,6 +48,31 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
+
+        <!-- Push from ntfy: the push address and wake-up messages. Exported because ntfy is another app;
+             every broadcast must carry the secret token of AdCtrl's registration or it's ignored. A message
+             only starts the background check; its content is never used. -->
+        <receiver
+            android:name=".data.notify.PushReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="org.unifiedpush.android.connector.MESSAGE" />
+                <action android:name="org.unifiedpush.android.connector.UNREGISTERED" />
+                <action android:name="org.unifiedpush.android.connector.NEW_ENDPOINT" />
+                <action android:name="org.unifiedpush.android.connector.REGISTRATION_FAILED" />
+                <action android:name="org.unifiedpush.android.connector.TEMP_UNAVAILABLE" />
+            </intent-filter>
+        </receiver>
+        <!-- ntfy binds to this for a few seconds before delivering a message, so AdCtrl can check at once.
+             It does nothing else. -->
+        <service
+            android:name=".data.notify.RaiseToForegroundService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="org.unifiedpush.android.connector.RAISE_TO_FOREGROUND" />
+            </intent-filter>
+        </service>
 
         <!-- Home screen widget: protection state with a pause countdown, and the last 24 hours. -->
         <receiver

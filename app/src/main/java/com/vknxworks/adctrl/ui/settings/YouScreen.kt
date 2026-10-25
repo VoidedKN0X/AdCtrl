@@ -52,6 +52,10 @@ import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.container
 import com.vknxworks.adctrl.ui.components.GroupSwitch
 import com.vknxworks.adctrl.ui.nav.ServersRoute
+import com.vknxworks.adctrl.ui.nav.DnsSettingsRoute
+import com.vknxworks.adctrl.ui.nav.LogsStatsRoute
+import androidx.compose.material.icons.outlined.CloudSync
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.getValue
@@ -148,6 +152,23 @@ fun YouScreen() {
                         checked = server.readOnly,
                         icon = Icons.Outlined.Visibility,
                     ) { c.sessions.setReadOnly(server.id, it) }
+                }
+                // This server's DNS: upstream servers and cache, query log and statistics.
+                Group {
+                    GroupRow(
+                        stringResource(R.string.dns_settings),
+                        stringResource(R.string.dns_settings_subtitle),
+                        icon = Icons.Outlined.CloudSync,
+                        showChevron = true,
+                        onClick = { nav.navigate(DnsSettingsRoute) },
+                    )
+                    GroupRow(
+                        stringResource(R.string.logs_stats),
+                        stringResource(R.string.logs_stats_subtitle),
+                        icon = Icons.Outlined.History,
+                        showChevron = true,
+                        onClick = { nav.navigate(LogsStatsRoute) },
+                    )
                 }
             }
 

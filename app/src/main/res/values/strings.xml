@@ -12,8 +12,6 @@
     <string name="tab_queries_hint">The live query log, with one-tap block and unblock.</string>
     <string name="tab_filters_hint">Blocklists, allowlists, custom rules, blocked services and DNS rewrites.</string>
     <string name="tab_clients_hint">Every device on your network, with its statistics and settings.</string>
-    <string name="tab_coming_title">Coming in the next updates</string>
-    <string name="tab_coming_body">Connected to %1$s. This tab is filled in as AdCtrl is built, one part at a time.</string>
 
     <!-- Common -->
     <string name="back">Back</string>
@@ -664,9 +662,9 @@
     <!-- Notifications: AdCtrl's own background checks (AdGuard Home can't push) -->
     <string name="group_notifications">Notifications</string>
     <string name="notifications">Notifications</string>
-    <string name="notifications_subtitle">Background checks and what to notify about</string>
+    <string name="notifications_subtitle">Background checks, push through ntfy, what to notify about</string>
     <string name="notifications_subtitle_blocked">Notifications are blocked: tap to allow them</string>
-    <string name="notif_intro">AdGuard Home can\'t send notifications itself, so AdCtrl checks your servers in the background and tells you when protection is off or paused for too long, a server can\'t be reached, filter lists stop updating or a new version is out. The checks only read; nothing changes on your servers.</string>
+    <string name="notif_intro">AdGuard Home can\'t send notifications itself, so AdCtrl checks your servers in the background and tells you when protection is off or paused for too long, a server can\'t be reached, filter lists stop updating or a new version is out. Push through ntfy can start that check at once. The checks only read; nothing changes on your servers.</string>
     <string name="notif_permission_off">Notifications are blocked for AdCtrl, so the background checks can\'t tell you anything.</string>
     <string name="notif_permission_allow">Allow notifications</string>
     <string name="group_polling">Background checks</string>
@@ -753,4 +751,103 @@
     <string name="value_ms">%1$s ms</string>
     <string name="time_zone_local">Local</string>
     <string name="dot_pair">%1$s · %2$s</string>
+
+    <!-- Push through ntfy (UnifiedPush): wakes the background check -->
+    <string name="copy">Copy</string>
+    <string name="copied">Copied</string>
+    <string name="group_push">Push through ntfy</string>
+    <string name="push_title">Check when ntfy pushes</string>
+    <string name="push_subtitle">Runs the background check right away whenever something posts to AdCtrl\'s push address</string>
+    <string name="push_footer">AdGuard Home can\'t push anything itself. Turn this on, copy the push address and let something on your network post to it, like a cron job on your router (the README has a one-line example). Every push makes AdCtrl check your servers at once, at most once a minute; what the message says is ignored. The regular background checks keep running as well.</string>
+    <string name="push_no_ntfy">ntfy isn\'t installed. Push comes only through the ntfy app: install it, connect it to your ntfy server, then come back here. Background checks work without it.</string>
+    <string name="push_install_ntfy">Install ntfy</string>
+    <string name="push_needs_polling">Turn on Check in the background too: a push only starts that check.</string>
+    <string name="push_registering">Waiting for ntfy…</string>
+    <string name="push_failed">ntfy couldn\'t register AdCtrl (%1$s). Open ntfy once, then try again.</string>
+    <string name="push_unavailable">ntfy temporarily unavailable: its server can\'t be reached. The push address stays the same and background checks keep running.</string>
+    <string name="push_endpoint">Push address</string>
+    <string name="push_endpoint_note">Tap to copy. Treat this address like a password: anyone who has it can make AdCtrl check your servers (it never changes anything on them).</string>
+    <string name="battery_ntfy_restricted">ntfy is battery-restricted</string>
+    <string name="battery_ntfy_restricted_body">Android can cut ntfy\'s connection while the phone sleeps, so pushes arrive late. Tap to open ntfy\'s app info and set Battery to Unrestricted.</string>
+
+    <!-- Upstream DNS -->
+    <string name="dns_settings">Upstream DNS</string>
+    <string name="dns_settings_subtitle">Upstream, fallback, bootstrap and private reverse DNS servers, mode and cache</string>
+    <string name="dns_intro">Where AdGuard Home sends the queries it doesn\'t block. One server per line; lines starting with # are comments.</string>
+    <string name="dns_upstreams">Upstream DNS servers</string>
+    <string name="dns_upstreams_hint">Like 9.9.9.9, tls://dns.quad9.net or https://dns.quad9.net/dns-query. [/example.lan/]192.168.1.1 sends one domain to its own server.</string>
+    <string name="dns_upstreams_file">AdGuard Home reads its upstream servers from %1$s on the server, so this list isn\'t used.</string>
+    <string name="dns_upstreams_empty">Add at least one upstream server.</string>
+    <string name="dns_mode">Upstream mode</string>
+    <string name="dns_mode_load_balance">Load balancing</string>
+    <string name="dns_mode_load_balance_sub">One server at a time, the fastest ones more often</string>
+    <string name="dns_mode_parallel">Parallel requests</string>
+    <string name="dns_mode_parallel_sub">Ask every server at once and use the first answer</string>
+    <string name="dns_mode_fastest">Fastest IP address</string>
+    <string name="dns_mode_fastest_sub">Ask every server and pick the address that answers fastest; slower answers</string>
+    <string name="dns_fallback">Fallback DNS servers</string>
+    <string name="dns_fallback_hint">Used only when the upstream servers don\'t answer. Can be empty.</string>
+    <string name="dns_bootstrap">Bootstrap DNS servers</string>
+    <string name="dns_bootstrap_hint">Plain IP addresses that look up the names of encrypted upstreams (like dns.quad9.net). Empty uses AdGuard Home\'s defaults.</string>
+    <string name="dns_private">Private reverse DNS servers</string>
+    <string name="dns_private_use">Use private reverse DNS resolvers</string>
+    <string name="dns_private_use_sub">Look up names of devices on your network (PTR queries for private addresses)</string>
+    <string name="dns_private_hint">Empty uses the default: %1$s</string>
+    <string name="dns_private_hint_none">Empty uses your system\'s resolvers.</string>
+    <string name="dns_cache">Cache</string>
+    <string name="dns_cache_enabled">DNS cache</string>
+    <string name="dns_cache_enabled_sub">Answer repeated queries from memory</string>
+    <string name="dns_cache_size">Cache size (bytes)</string>
+    <string name="dns_cache_size_hint">4194304 is 4 MB, AdGuard Home\'s default.</string>
+    <string name="dns_cache_size_zero">Give the cache a size above 0, or turn it off.</string>
+    <string name="dns_ttl_min">Minimum TTL (seconds)</string>
+    <string name="dns_ttl_max">Maximum TTL (seconds)</string>
+    <string name="dns_ttl_hint">0 keeps the TTL the upstream gave.</string>
+    <string name="dns_ttl_order">The minimum TTL can\'t be above the maximum.</string>
+    <string name="dns_number_bad">Enter a whole number from 0 to 4294967295.</string>
+    <string name="dns_optimistic">Optimistic caching</string>
+    <string name="dns_optimistic_sub">Answer from the cache even after an entry expired, and refresh it in the background</string>
+    <string name="dns_bad_line">Line %1$d doesn\'t look like a DNS server address.</string>
+    <string name="dns_test">Test upstreams</string>
+    <string name="dns_testing">Testing…</string>
+    <string name="dns_test_title">Test results</string>
+    <string name="dns_test_intro">AdGuard Home tried each server with the settings as typed above (not saved yet).</string>
+    <string name="dns_test_ok">Works</string>
+    <string name="dns_test_none">AdGuard Home didn\'t test any server.</string>
+    <string name="dns_apply_title">Apply DNS settings?</string>
+    <string name="dns_apply_body">AdGuard Home on %1$s restarts its DNS server with these settings. DNS can stop for a moment while it does, and every device on your network uses the new servers.</string>
+    <string name="dns_apply">Apply</string>
+    <string name="dns_saved">DNS settings saved</string>
+    <string name="dns_read_only">This server is in read-only mode: you can look and test, but not change anything.</string>
+    <string name="dns_load_failed">Couldn\'t load the DNS settings</string>
+
+    <!-- Query log and statistics -->
+    <string name="logs_stats">Query log and statistics</string>
+    <string name="logs_stats_subtitle">How long they\'re kept, and clearing them</string>
+    <string name="group_querylog">Query log</string>
+    <string name="querylog_enabled">Keep a query log</string>
+    <string name="querylog_enabled_sub">Record every DNS query, for the Queries tab</string>
+    <string name="querylog_retention">Keep queries for</string>
+    <string name="querylog_anonymize">Anonymise client IP addresses</string>
+    <string name="querylog_anonymize_sub">Store only part of each address in the log and statistics</string>
+    <string name="querylog_clear">Clear query log</string>
+    <string name="querylog_clear_sub">Remove every entry from the server\'s query log</string>
+    <string name="querylog_clear_title">Clear the query log?</string>
+    <string name="querylog_clear_body">Every query AdGuard Home on %1$s logged so far is removed for good. Logging carries on.</string>
+    <string name="querylog_cleared">Query log cleared</string>
+    <string name="group_stats">Statistics</string>
+    <string name="stats_enabled">Keep statistics</string>
+    <string name="stats_enabled_sub">Count queries and blocks, for the Overview</string>
+    <string name="stats_retention">Keep statistics for</string>
+    <string name="stats_reset">Reset statistics</string>
+    <string name="stats_reset_sub">Set every number and top list on the server back to zero</string>
+    <string name="stats_reset_title">Reset statistics?</string>
+    <string name="stats_reset_body">All statistics of AdGuard Home on %1$s go back to zero for good, including the top domains and clients.</string>
+    <string name="stats_was_reset">Statistics reset</string>
+    <string name="logs_stats_footer">Changes apply right away. A shorter time removes older entries.</string>
+    <string name="logs_saved">Saved</string>
+    <plurals name="duration_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
 </resources>
