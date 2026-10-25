@@ -125,7 +125,7 @@ In the app, the **About** section at the bottom of the **You** page (tap your pr
 
 ## The Ctrl series
 
-Native Android apps for self-hosted services and everyday tools, all with the same Material You design.
+Native Android apps for self-hosted services and everyday tools, all with the same dark "Ctrl / Signal" design.
 
 | App | What it's for |
 | --- | --- |
@@ -150,6 +150,6 @@ Native Android apps for self-hosted services and everyday tools, all with the sa
 
 AdCtrl is licensed under the [GNU General Public License v3.0](LICENSE). © VKNXWorks
 
-The Manrope font is licensed under the SIL Open Font License; see `FONT-LICENSE-Manrope.txt`.
+The bundled fonts are licensed under the SIL Open Font License 1.1: [Space Grotesk](https://github.com/floriankarsten/space-grotesk) (see `FONT-LICENSE-SpaceGrotesk.txt`) and [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) (see `FONT-LICENSE-JetBrainsMono.txt`).
 
 AdCtrl is not affiliated with or endorsed by AdGuard. AdGuard is a trademark of its owner.

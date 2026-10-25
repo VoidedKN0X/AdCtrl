@@ -1,6 +1,10 @@
 package com.vknxworks.adctrl.ui.queries
 
+import com.vknxworks.adctrl.ui.theme.JetBrainsMono
 import androidx.compose.foundation.background
+import com.vknxworks.adctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.adctrl.ui.components.CtrlSwitch
+import com.vknxworks.adctrl.ui.components.CtrlTextButton
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,16 +17,13 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.vknxworks.adctrl.R
 import android.content.Context
@@ -78,9 +78,9 @@ fun RuleDialog(
     val rule = RuleBuilder.build(block, host, scope, if (onlyClient) client else null)
     val cs = MaterialTheme.colorScheme
 
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
-        icon = { Icon(if (block) Icons.Filled.Block else Icons.Filled.Verified, null, tint = if (block) Health.critical else Health.ok) },
+        icon = { Icon(if (block) Icons.Outlined.Block else Icons.Outlined.Verified, null, tint = if (block) Health.critical else Health.ok) },
         title = { Text(stringResource(if (block) R.string.rule_block_title else R.string.rule_unblock_title, host)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -97,7 +97,7 @@ fun RuleDialog(
                     removing.forEach { r ->
                         Text(
                             r,
-                            fontFamily = FontFamily.Monospace,
+                            fontFamily = JetBrainsMono,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(cs.errorContainer).padding(10.dp),
                             color = cs.onErrorContainer,
@@ -134,7 +134,7 @@ fun RuleDialog(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(stringResource(R.string.rule_only_client, clientLabel ?: client), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-                        Switch(onlyClient, onCheckedChange = { onlyClient = it })
+                        CtrlSwitch(onlyClient, onCheckedChange = { onlyClient = it })
                     }
                 }
                 if (writableServers > 1) {
@@ -143,7 +143,7 @@ fun RuleDialog(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(stringResource(R.string.rule_all_servers, writableServers), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-                        Switch(all, onCheckedChange = { all = it })
+                        CtrlSwitch(all, onCheckedChange = { all = it })
                     }
                 }
                 Text(
@@ -154,7 +154,7 @@ fun RuleDialog(
                 )
                 Text(
                     rule,
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = JetBrainsMono,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(cs.surfaceContainerHighest).padding(10.dp),
                 )
@@ -166,11 +166,11 @@ fun RuleDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(rule, all) }, enabled = opposing != null) {
+            CtrlTextButton(onClick = { onSave(rule, all) }, enabled = opposing != null) {
                 Text(stringResource(if (block) R.string.rule_block_save else R.string.rule_unblock_save), color = if (block) cs.error else cs.primary)
             }
         },
-        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel)) } },
+        dismissButton = { CtrlTextButton(onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 

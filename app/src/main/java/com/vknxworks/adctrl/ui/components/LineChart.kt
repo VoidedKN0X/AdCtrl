@@ -46,8 +46,9 @@ import java.util.Date
  * A single-series chart uses the first one.
  */
 object ChartColors {
-    val darkSeries = listOf(Color(0xFFC8702A), Color(0xFF3A9BD4))
-    val lightSeries = listOf(Color(0xFFB85C14), Color(0xFF1F78B4))
+    // Ctrl / Signal: all queries in off-white, blocked in the accent.
+    val darkSeries = listOf(Color(0xFFF4F4F2), Color(0xFFB48CFF))
+    val lightSeries = darkSeries
 
     @Composable
     fun series(): List<Color> = if (MaterialTheme.colorScheme.background.luminanceIsDark()) darkSeries else lightSeries

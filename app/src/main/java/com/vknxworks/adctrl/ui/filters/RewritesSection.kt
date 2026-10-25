@@ -1,6 +1,10 @@
 package com.vknxworks.adctrl.ui.filters
 
 import androidx.compose.foundation.clickable
+import com.vknxworks.adctrl.ui.components.CtrlSheet
+import com.vknxworks.adctrl.ui.components.CtrlSwitch
+import com.vknxworks.adctrl.ui.components.CtrlTextButton
+import com.vknxworks.adctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,18 +23,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -85,9 +85,9 @@ fun RewritesSection(
             item(key = "all") {
                 Group {
                     if (readOnly) {
-                        GroupRow(stringResource(if (allEnabled) R.string.rewrites_on else R.string.rewrites_off), icon = Icons.Filled.SwapHoriz)
+                        GroupRow(stringResource(if (allEnabled) R.string.rewrites_on else R.string.rewrites_off), icon = Icons.Outlined.SwapHoriz)
                     } else {
-                        GroupSwitch(stringResource(R.string.rewrites_enabled), stringResource(R.string.rewrites_enabled_subtitle), checked = allEnabled, icon = Icons.Filled.SwapHoriz) {
+                        GroupSwitch(stringResource(R.string.rewrites_enabled), stringResource(R.string.rewrites_enabled_subtitle), checked = allEnabled, icon = Icons.Outlined.SwapHoriz) {
                             actions.setAllEnabled(it)
                         }
                     }
@@ -96,13 +96,13 @@ fun RewritesSection(
         }
         item(key = "bar") {
             Row(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
+                CtrlTextField(
                     value = search,
                     onValueChange = { search = it },
                     placeholder = { Text(stringResource(R.string.rewrites_search)) },
-                    leadingIcon = { Icon(Icons.Filled.Search, null) },
+                    leadingIcon = { Icon(Icons.Outlined.Search, null) },
                     trailingIcon = if (search.isNotEmpty()) {
-                        { IconButton(onClick = { search = "" }) { Icon(Icons.Filled.Clear, stringResource(R.string.clear)) } }
+                        { IconButton(onClick = { search = "" }) { Icon(Icons.Outlined.Clear, stringResource(R.string.clear)) } }
                     } else {
                         null
                     },
@@ -111,8 +111,8 @@ fun RewritesSection(
                 )
                 if (!readOnly) {
                     Spacer(Modifier.width(8.dp))
-                    TextButton(onClick = { edit = RewriteEdit.New }) {
-                        Icon(Icons.Filled.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp)); Text(stringResource(R.string.rewrite_add))
+                    CtrlTextButton(onClick = { edit = RewriteEdit.New }) {
+                        Icon(Icons.Outlined.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp)); Text(stringResource(R.string.rewrite_add))
                     }
                 }
             }
@@ -138,7 +138,7 @@ fun RewritesSection(
                             trailing = if (readOnly || !canToggle) {
                                 null
                             } else {
-                                { Switch(checked = r.enabled, onCheckedChange = { on -> actions.update(r, r.copy(enabled = on)) }) }
+                                { CtrlSwitch(checked = r.enabled, onCheckedChange = { on -> actions.update(r, r.copy(enabled = on)) }) }
                             },
                         )
                     }
@@ -196,10 +196,10 @@ private fun RewriteSheet(existing: Rewrite?, taken: Set<String>, onDismiss: () -
     val domainOk = d.isNotEmpty() && DOMAIN.matches(d)
     val answerOk = a.isNotEmpty() && validAnswer(a)
     val duplicate = "$d\u0000$a" in taken
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(Modifier.verticalScroll(rememberScrollState()).imePadding().navigationBarsPadding().padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(stringResource(if (existing == null) R.string.rewrite_add else R.string.rewrite_edit), style = MaterialTheme.typography.titleLarge)
-            OutlinedTextField(
+            CtrlTextField(
                 domain,
                 { domain = it.trim() },
                 label = { Text(stringResource(R.string.rewrite_domain)) },
@@ -210,7 +210,7 @@ private fun RewriteSheet(existing: Rewrite?, taken: Set<String>, onDismiss: () -
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, autoCorrectEnabled = false),
                 modifier = Modifier.fillMaxWidth(),
             )
-            OutlinedTextField(
+            CtrlTextField(
                 answer,
                 { answer = it.trim() },
                 label = { Text(stringResource(R.string.rewrite_answer)) },
@@ -227,7 +227,7 @@ private fun RewriteSheet(existing: Rewrite?, taken: Set<String>, onDismiss: () -
                 enabled = domainOk && answerOk && !duplicate && (existing == null || existing.domain != d || existing.answer != a),
                 modifier = Modifier.fillMaxWidth(),
             )
-            if (existing != null) TextButton(onClick = onDelete) { Text(stringResource(R.string.rewrite_delete), color = MaterialTheme.colorScheme.error) }
+            if (existing != null) CtrlTextButton(onClick = onDelete) { Text(stringResource(R.string.rewrite_delete), color = MaterialTheme.colorScheme.error) }
         }
     }
 }

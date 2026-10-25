@@ -1,5 +1,7 @@
 package com.vknxworks.adctrl.ui.clients
 
+import com.vknxworks.adctrl.ui.theme.CtrlType
+import com.vknxworks.adctrl.ui.theme.JetBrainsMono
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,24 +17,25 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.vknxworks.adctrl.ui.theme.CtrlColors
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.ChildCare
-import androidx.compose.material.icons.filled.CloudSync
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.GppBad
-import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.filled.QueryStats
+import androidx.compose.material.icons.automirrored.outlined.List
+import androidx.compose.material.icons.outlined.Apps
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.outlined.ChildCare
+import androidx.compose.material.icons.outlined.CloudSync
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.FilterAlt
+import androidx.compose.material.icons.outlined.GppBad
+import androidx.compose.material.icons.outlined.PersonAdd
+import androidx.compose.material.icons.outlined.Public
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material.icons.outlined.QueryStats
 import androidx.compose.material.icons.outlined.Devices
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,7 +56,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -171,10 +173,10 @@ fun ClientScreen(key: String, persistent: Boolean) {
                 // Who it is.
                 Column(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Box(
-                        Modifier.size(72.dp).clip(CircleShape).background(if (blocked) Health.critical.copy(alpha = 0.16f) else MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
+                        Modifier.size(68.dp).clip(RoundedCornerShape(22.dp)).background(if (blocked) Health.critical.copy(alpha = 0.16f) else CtrlColors.Accent),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text(name.take(1).uppercase(), style = MaterialTheme.typography.headlineMedium, color = if (blocked) Health.critical else MaterialTheme.colorScheme.primary)
+                        Text(name.take(1).uppercase(), style = MaterialTheme.typography.headlineMedium, color = if (blocked) Health.critical else CtrlColors.OnAccent)
                     }
                     Spacer(Modifier.height(8.dp))
                     Text(
@@ -183,7 +185,7 @@ fun ClientScreen(key: String, persistent: Boolean) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally), modifier = Modifier.padding(top = 8.dp)) {
-                        ids.forEach { AssistChip(onClick = {}, label = { Text(it, fontFamily = FontFamily.Monospace) }) }
+                        ids.forEach { AssistChip(onClick = {}, label = { Text(it, fontFamily = JetBrainsMono) }) }
                         pc?.fields?.tags.orEmpty().forEach { AssistChip(onClick = {}, label = { Text("#$it") }) }
                     }
                     whois?.let { w ->
@@ -207,13 +209,13 @@ fun ClientScreen(key: String, persistent: Boolean) {
                     GroupRow(
                         queries?.let { formatCount(it) } ?: "—",
                         stringResource(R.string.client_queries_in, stringResource(rangeLabel(overview.range))),
-                        icon = Icons.Filled.QueryStats,
+                        icon = Icons.Outlined.QueryStats,
                     )
                     sample?.let { s ->
                         GroupRow(
                             pluralStringResource(R.plurals.client_sample_blocked, s.blocked, s.blocked, if (s.total > 0) percent(s.blocked.toDouble() / s.total) else 0),
                             pluralStringResource(R.plurals.client_sample_of, s.total, s.total),
-                            icon = Icons.Filled.Block,
+                            icon = Icons.Outlined.Block,
                             iconTint = Health.critical,
                         )
                     }
@@ -221,7 +223,7 @@ fun ClientScreen(key: String, persistent: Boolean) {
                         GroupRow(
                             stringResource(R.string.client_recent_queries),
                             stringResource(R.string.client_recent_queries_subtitle),
-                            icon = Icons.AutoMirrored.Filled.List,
+                            icon = Icons.AutoMirrored.Outlined.List,
                             showChevron = true,
                             onClick = {
                                 c.appScope.launch { c.queries.setSearch(QuerySearch(client = sampleId)) }
@@ -232,12 +234,12 @@ fun ClientScreen(key: String, persistent: Boolean) {
                 }
                 sample?.takeIf { it.topDomains.isNotEmpty() }?.let { s ->
                     Group(stringResource(R.string.client_top_domains)) {
-                        s.topDomains.forEach { (d, n) -> GroupRow(d, null, trailing = { Text(formatCount(n.toLong()), style = MaterialTheme.typography.labelLarge) }) }
+                        s.topDomains.forEach { (d, n) -> GroupRow(d, null, trailing = { Text(formatCount(n.toLong()), style = CtrlType.Data, color = CtrlColors.Muted) }) }
                     }
                 }
                 sample?.takeIf { it.topBlocked.isNotEmpty() }?.let { s ->
                     Group(stringResource(R.string.client_top_blocked)) {
-                        s.topBlocked.forEach { (d, n) -> GroupRow(d, null, titleColor = Health.critical, trailing = { Text(formatCount(n.toLong()), style = MaterialTheme.typography.labelLarge) }) }
+                        s.topBlocked.forEach { (d, n) -> GroupRow(d, null, titleColor = Health.critical, trailing = { Text(formatCount(n.toLong()), style = CtrlType.Data, color = CtrlColors.Muted) }) }
                     }
                 }
 
@@ -246,19 +248,19 @@ fun ClientScreen(key: String, persistent: Boolean) {
                     val f = pc.fields
                     Group(stringResource(R.string.client_settings)) {
                         if (readOnly) {
-                            GroupRow(stringResource(R.string.client_global_settings), stringResource(if (f.useGlobalSettings) R.string.state_on else R.string.state_off), icon = Icons.Filled.Settings)
+                            GroupRow(stringResource(R.string.client_global_settings), stringResource(if (f.useGlobalSettings) R.string.state_on else R.string.state_off), icon = Icons.Outlined.Settings)
                         } else {
-                            GroupSwitch(stringResource(R.string.client_global_settings), stringResource(R.string.client_global_settings_subtitle), f.useGlobalSettings, Icons.Filled.Settings) { on ->
+                            GroupSwitch(stringResource(R.string.client_global_settings), stringResource(R.string.client_global_settings_subtitle), f.useGlobalSettings, Icons.Outlined.Settings) { on ->
                                 update { it.copy(useGlobalSettings = on) }
                             }
                         }
                         if (!f.useGlobalSettings) {
                             val safeSearchOn = f.safeSearch?.enabled == true
                             listOf(
-                                Triple(R.string.filtering_enabled, f.filteringEnabled, Icons.Filled.FilterAlt) to { on: Boolean -> update { it.copy(filteringEnabled = on) } },
-                                Triple(R.string.safe_browsing, f.safeBrowsingEnabled, Icons.Filled.GppBad) to { on: Boolean -> update { it.copy(safeBrowsingEnabled = on) } },
-                                Triple(R.string.parental, f.parentalEnabled, Icons.Filled.ChildCare) to { on: Boolean -> update { it.copy(parentalEnabled = on) } },
-                                Triple(R.string.safe_search, safeSearchOn, Icons.Filled.Search) to { on: Boolean ->
+                                Triple(R.string.filtering_enabled, f.filteringEnabled, Icons.Outlined.FilterAlt) to { on: Boolean -> update { it.copy(filteringEnabled = on) } },
+                                Triple(R.string.safe_browsing, f.safeBrowsingEnabled, Icons.Outlined.GppBad) to { on: Boolean -> update { it.copy(safeBrowsingEnabled = on) } },
+                                Triple(R.string.parental, f.parentalEnabled, Icons.Outlined.ChildCare) to { on: Boolean -> update { it.copy(parentalEnabled = on) } },
+                                Triple(R.string.safe_search, safeSearchOn, Icons.Outlined.Search) to { on: Boolean ->
                                     update { it.copy(safeSearch = (it.safeSearch ?: SafeSearch()).copy(enabled = on)) }
                                 },
                             ).forEach { (t, set) ->
@@ -270,9 +272,9 @@ fun ClientScreen(key: String, persistent: Boolean) {
                     }
                     Group(stringResource(R.string.client_services)) {
                         if (readOnly) {
-                            GroupRow(stringResource(R.string.client_global_services), stringResource(if (f.useGlobalBlockedServices) R.string.state_on else R.string.state_off), icon = Icons.Filled.Apps)
+                            GroupRow(stringResource(R.string.client_global_services), stringResource(if (f.useGlobalBlockedServices) R.string.state_on else R.string.state_off), icon = Icons.Outlined.Apps)
                         } else {
-                            GroupSwitch(stringResource(R.string.client_global_services), stringResource(R.string.client_global_services_subtitle), f.useGlobalBlockedServices, Icons.Filled.Apps) { on ->
+                            GroupSwitch(stringResource(R.string.client_global_services), stringResource(R.string.client_global_services_subtitle), f.useGlobalBlockedServices, Icons.Outlined.Apps) { on ->
                                 update { it.copy(useGlobalBlockedServices = on) }
                             }
                         }
@@ -281,7 +283,7 @@ fun ClientScreen(key: String, persistent: Boolean) {
                             GroupRow(
                                 pluralStringResource(R.plurals.client_services_blocked, names.size, names.size),
                                 names.take(6).joinToString(", ").ifBlank { stringResource(R.string.client_services_none) },
-                                icon = Icons.Filled.Block,
+                                icon = Icons.Outlined.Block,
                                 showChevron = !readOnly,
                                 onClick = if (readOnly) null else { { sheet = Sheet.SERVICES } },
                             )
@@ -291,18 +293,18 @@ fun ClientScreen(key: String, persistent: Boolean) {
                         GroupRow(
                             stringResource(R.string.client_upstreams),
                             f.upstreams.orEmpty().takeIf { it.isNotEmpty() }?.joinToString("\n") ?: stringResource(R.string.client_upstreams_global),
-                            icon = Icons.Filled.CloudSync,
+                            icon = Icons.Outlined.CloudSync,
                             showChevron = !readOnly,
                             onClick = if (readOnly) null else { { sheet = Sheet.UPSTREAMS } },
                         )
                         if (readOnly) {
-                            GroupRow(stringResource(R.string.client_ignore_querylog), stringResource(if (f.ignoreQuerylog == true) R.string.yes else R.string.no), icon = Icons.Filled.VisibilityOff)
-                            GroupRow(stringResource(R.string.client_ignore_stats), stringResource(if (f.ignoreStatistics == true) R.string.yes else R.string.no), icon = Icons.Filled.QueryStats)
+                            GroupRow(stringResource(R.string.client_ignore_querylog), stringResource(if (f.ignoreQuerylog == true) R.string.yes else R.string.no), icon = Icons.Outlined.VisibilityOff)
+                            GroupRow(stringResource(R.string.client_ignore_stats), stringResource(if (f.ignoreStatistics == true) R.string.yes else R.string.no), icon = Icons.Outlined.QueryStats)
                         } else {
-                            GroupSwitch(stringResource(R.string.client_ignore_querylog), stringResource(R.string.client_ignore_querylog_subtitle), f.ignoreQuerylog == true, Icons.Filled.VisibilityOff) { on ->
+                            GroupSwitch(stringResource(R.string.client_ignore_querylog), stringResource(R.string.client_ignore_querylog_subtitle), f.ignoreQuerylog == true, Icons.Outlined.VisibilityOff) { on ->
                                 update { it.copy(ignoreQuerylog = on) }
                             }
-                            GroupSwitch(stringResource(R.string.client_ignore_stats), stringResource(R.string.client_ignore_stats_subtitle), f.ignoreStatistics == true, Icons.Filled.QueryStats) { on ->
+                            GroupSwitch(stringResource(R.string.client_ignore_stats), stringResource(R.string.client_ignore_stats_subtitle), f.ignoreStatistics == true, Icons.Outlined.QueryStats) { on ->
                                 update { it.copy(ignoreStatistics = on) }
                             }
                         }
@@ -313,9 +315,9 @@ fun ClientScreen(key: String, persistent: Boolean) {
                 if (!readOnly) {
                     Group {
                         if (pc == null) {
-                            GroupRow(stringResource(R.string.client_make_persistent), stringResource(R.string.client_make_persistent_subtitle), icon = Icons.Filled.PersonAdd, showChevron = true, onClick = { sheet = Sheet.ADD_PERSISTENT })
+                            GroupRow(stringResource(R.string.client_make_persistent), stringResource(R.string.client_make_persistent_subtitle), icon = Icons.Outlined.PersonAdd, showChevron = true, onClick = { sheet = Sheet.ADD_PERSISTENT })
                         } else {
-                            GroupRow(stringResource(R.string.client_edit), stringResource(R.string.client_edit_subtitle), icon = Icons.Filled.Edit, showChevron = true, onClick = { sheet = Sheet.EDIT })
+                            GroupRow(stringResource(R.string.client_edit), stringResource(R.string.client_edit_subtitle), icon = Icons.Outlined.Edit, showChevron = true, onClick = { sheet = Sheet.EDIT })
                         }
                         val canBlock = ClientIds.blockable(ids).isNotEmpty()
                         GroupRow(
@@ -327,7 +329,7 @@ fun ClientScreen(key: String, persistent: Boolean) {
                                     else -> R.string.client_block_subtitle
                                 },
                             ),
-                            icon = if (blocked) Icons.Filled.Public else Icons.Filled.Block,
+                            icon = if (blocked) Icons.Outlined.Public else Icons.Outlined.Block,
                             iconTint = if (blocked) Health.ok else Health.critical,
                             titleColor = if (blocked) MaterialTheme.colorScheme.onSurface else Health.critical,
                             onClick = if (!canBlock || busy) null else { { confirm = if (blocked) Confirm.UNBLOCK else Confirm.BLOCK } },
@@ -335,7 +337,7 @@ fun ClientScreen(key: String, persistent: Boolean) {
                         if (pc != null) {
                             GroupRow(
                                 stringResource(R.string.client_delete),
-                                icon = Icons.Filled.Delete,
+                                icon = Icons.Outlined.Delete,
                                 iconTint = MaterialTheme.colorScheme.error,
                                 titleColor = MaterialTheme.colorScheme.error,
                                 onClick = { confirm = Confirm.DELETE },
@@ -431,7 +433,7 @@ fun ClientScreen(key: String, persistent: Boolean) {
                     info = runCatching { c.clients.find(ids) }.getOrDefault(info)
                 }
             },
-            icon = Icons.Filled.Block,
+            icon = Icons.Outlined.Block,
         )
         Confirm.UNBLOCK -> ConfirmDialog(
             title = stringResource(R.string.client_unblock_title, name),
@@ -446,7 +448,7 @@ fun ClientScreen(key: String, persistent: Boolean) {
                 }
             },
             danger = false,
-            icon = Icons.Filled.Public,
+            icon = Icons.Outlined.Public,
         )
         Confirm.DELETE -> ConfirmDialog(
             title = stringResource(R.string.client_delete_title, name),
@@ -460,7 +462,7 @@ fun ClientScreen(key: String, persistent: Boolean) {
                     if (ok) nav.back()
                 }
             },
-            icon = Icons.Filled.Delete,
+            icon = Icons.Outlined.Delete,
         )
         null -> Unit
     }

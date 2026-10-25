@@ -1,6 +1,6 @@
 # AdCtrl
 
-Android app for a self-hosted AdGuard Home DNS server. Part of the VKNXWorks Ctrl series: same look, structure and libraries as ProxCtrl, NaviCtrl and the other Ctrl apps (Kotlin, Compose, Material 3, manual `AppContainer` DI, OkHttp + kotlinx.serialization, haze glass tab bar). Google-free and telemetry-free (no Aptabase either): no Google Play services, Firebase, ML Kit, Play Core, Tink or WebView. It must build for F-Droid, for arm64-v8a only.
+Android app for a self-hosted AdGuard Home DNS server. Part of the VKNXWorks Ctrl series: same look, structure and libraries as ProxCtrl, NaviCtrl and the other Ctrl apps (Kotlin, Compose, Material 3, manual `AppContainer` DI, OkHttp + kotlinx.serialization, the shared "Ctrl / Signal" look in `ui/theme` and `ui/components/Ctrl.kt`). Google-free and telemetry-free (no Aptabase either): no Google Play services, Firebase, ML Kit, Play Core, Tink or WebView. It must build for F-Droid, for arm64-v8a only.
 
 ## Working on this repo
 

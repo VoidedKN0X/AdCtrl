@@ -1,6 +1,9 @@
 package com.vknxworks.adctrl.ui.queries
 
+import com.vknxworks.adctrl.ui.theme.JetBrainsMono
 import androidx.compose.foundation.background
+import com.vknxworks.adctrl.ui.components.CtrlSecondaryButton
+import com.vknxworks.adctrl.ui.components.CtrlSheet
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -16,15 +19,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.automirrored.filled.FactCheck
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.automirrored.outlined.FactCheck
+import androidx.compose.material.icons.outlined.FilterList
+import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.data.api.DnsAnswer
@@ -54,7 +53,7 @@ fun QueryDetailSheet(
     val context = LocalContext.current
     val kind = item.kind
     val cs = MaterialTheme.colorScheme
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = cs.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 24.dp).padding(bottom = 24.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(kindIcon(kind), null, Modifier.size(20.dp), tint = kindColor(kind))
@@ -73,12 +72,12 @@ fun QueryDetailSheet(
                 Spacer(Modifier.height(14.dp))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (kind.isBlocked) {
-                        FilledTonalButton(onClick = { onRule(false) }) {
-                            Icon(Icons.Filled.Verified, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_unblock))
+                        CtrlSecondaryButton(onClick = { onRule(false) }) {
+                            Icon(Icons.Outlined.Verified, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_unblock))
                         }
                     } else {
-                        FilledTonalButton(onClick = { onRule(true) }) {
-                            Icon(Icons.Filled.Block, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_block))
+                        CtrlSecondaryButton(onClick = { onRule(true) }) {
+                            Icon(Icons.Outlined.Block, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_block))
                         }
                     }
                 }
@@ -127,12 +126,12 @@ fun QueryDetailSheet(
             Spacer(Modifier.height(16.dp))
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (item.client.isNotBlank() || item.clientId.isNotBlank()) {
-                    OutlinedButton(onClick = onClientQueries) {
-                        Icon(Icons.Filled.FilterList, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_client_queries))
+                    CtrlSecondaryButton(onClick = onClientQueries) {
+                        Icon(Icons.Outlined.FilterList, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_client_queries))
                     }
                 }
-                OutlinedButton(onClick = onCheckHost) {
-                    Icon(Icons.AutoMirrored.Filled.FactCheck, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_check_host))
+                CtrlSecondaryButton(onClick = onCheckHost) {
+                    Icon(Icons.AutoMirrored.Outlined.FactCheck, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_check_host))
                 }
             }
         }
@@ -161,7 +160,7 @@ private fun Line(label: String, value: String) {
 private fun Code(text: String) {
     Text(
         text,
-        fontFamily = FontFamily.Monospace,
+        fontFamily = JetBrainsMono,
         style = MaterialTheme.typography.bodyMedium,
         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.surfaceContainerHighest).padding(10.dp),
     )
@@ -171,7 +170,7 @@ private fun Code(text: String) {
 private fun AnswerLine(a: DnsAnswer) {
     Row(Modifier.fillMaxWidth().padding(vertical = 3.dp), verticalAlignment = Alignment.Top) {
         Text(a.type, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(64.dp))
-        Text(a.value, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        Text(a.value, fontFamily = JetBrainsMono, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
         if (a.ttl > 0) Text(stringResource(R.string.detail_ttl, a.ttl), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

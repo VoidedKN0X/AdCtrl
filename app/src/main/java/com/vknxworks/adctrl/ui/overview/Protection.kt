@@ -1,6 +1,16 @@
 package com.vknxworks.adctrl.ui.overview
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.PaddingValues
+import com.vknxworks.adctrl.ui.components.CtrlCard
+import com.vknxworks.adctrl.ui.components.CtrlDot
+import com.vknxworks.adctrl.ui.components.CtrlLabel
+import com.vknxworks.adctrl.ui.components.CtrlSecondaryButton
+import com.vknxworks.adctrl.ui.theme.CtrlColors
+import com.vknxworks.adctrl.ui.theme.CtrlType
+import com.vknxworks.adctrl.ui.components.CtrlSheet
+import com.vknxworks.adctrl.ui.components.CtrlSwitch
+import com.vknxworks.adctrl.ui.components.CtrlTextButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,21 +21,16 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.GppBad
-import androidx.compose.material.icons.filled.GppMaybe
-import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.outlined.GppBad
+import androidx.compose.material.icons.outlined.GppMaybe
+import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material.icons.outlined.Timer
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,60 +70,69 @@ fun ProtectionCard(
 ) {
     val on = state is ProtectionState.On
     val (icon, tint) = when (state) {
-        ProtectionState.On -> Icons.Filled.Shield to Health.ok
-        is ProtectionState.Paused -> Icons.Filled.GppMaybe to Health.warn
-        ProtectionState.Off -> Icons.Filled.GppBad to Health.critical
-        ProtectionState.Unknown -> Icons.Filled.Shield to Health.idle
+        ProtectionState.On -> Icons.Outlined.Shield to Health.ok
+        is ProtectionState.Paused -> Icons.Outlined.GppMaybe to Health.warn
+        ProtectionState.Off -> Icons.Outlined.GppBad to Health.critical
+        ProtectionState.Unknown -> Icons.Outlined.Shield to Health.idle
     }
-    Surface(
-        shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp),
-    ) {
-        Column(Modifier.padding(20.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Surface(shape = CircleShape, color = tint.copy(alpha = 0.16f), modifier = Modifier.size(56.dp)) {
-                    Icon(icon, null, Modifier.padding(14.dp), tint = tint)
-                }
-                Spacer(Modifier.width(16.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        stringResource(
-                            when (state) {
-                                ProtectionState.On -> R.string.protection_on
-                                is ProtectionState.Paused -> R.string.protection_paused
-                                ProtectionState.Off -> R.string.protection_off
-                                ProtectionState.Unknown -> R.string.protection_unknown
-                            },
-                        ),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                    Text(
+    val stateWord = stringResource(
+        when (state) {
+            ProtectionState.On -> R.string.state_on
+            is ProtectionState.Paused -> R.string.state_paused
+            ProtectionState.Off -> R.string.state_off
+            ProtectionState.Unknown -> R.string.state_waiting
+        },
+    )
+    CtrlCard(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 6.dp), contentPadding = PaddingValues(18.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, null, Modifier.size(18.dp), tint = tint)
+            Spacer(Modifier.width(8.dp))
+            CtrlLabel(stringResource(R.string.protection_label), Modifier.weight(1f))
+            Text(stateWord.uppercase(), style = CtrlType.Status, color = tint)
+            Spacer(Modifier.width(8.dp))
+            CtrlDot(tint)
+        }
+        Spacer(Modifier.height(14.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    stringResource(
                         when (state) {
-                            ProtectionState.On -> stringResource(R.string.protection_on_body, serverName)
-                            is ProtectionState.Paused -> stringResource(R.string.protection_paused_body, formatCountdown(state.leftMs))
-                            ProtectionState.Off -> stringResource(R.string.protection_off_body)
-                            ProtectionState.Unknown -> stringResource(R.string.protection_unknown_body)
+                            ProtectionState.On -> R.string.protection_on
+                            is ProtectionState.Paused -> R.string.protection_paused
+                            ProtectionState.Off -> R.string.protection_off
+                            ProtectionState.Unknown -> R.string.protection_unknown
                         },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                if (!readOnly && state != ProtectionState.Unknown) {
-                    Switch(
-                        checked = on,
-                        enabled = !busy,
-                        onCheckedChange = { if (it) onResume() else onPause() },
-                    )
-                }
+                    ),
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    when (state) {
+                        ProtectionState.On -> stringResource(R.string.protection_on_body, serverName)
+                        is ProtectionState.Paused -> stringResource(R.string.protection_paused_body, formatCountdown(state.leftMs))
+                        ProtectionState.Off -> stringResource(R.string.protection_off_body)
+                        ProtectionState.Unknown -> stringResource(R.string.protection_unknown_body)
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = CtrlColors.Muted,
+                )
             }
-            if (!readOnly && (state is ProtectionState.Paused || state == ProtectionState.Off)) {
-                Spacer(Modifier.height(14.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilledTonalButton(onClick = onResume, enabled = !busy) { Text(stringResource(R.string.resume_now)) }
-                    if (state is ProtectionState.Paused) {
-                        TextButton(onClick = onPause, enabled = !busy) { Text(stringResource(R.string.pause_change)) }
-                    }
+            if (!readOnly && state != ProtectionState.Unknown) {
+                Spacer(Modifier.width(12.dp))
+                CtrlSwitch(
+                    checked = on,
+                    enabled = !busy,
+                    onCheckedChange = { if (it) onResume() else onPause() },
+                )
+            }
+        }
+        if (!readOnly && (state is ProtectionState.Paused || state == ProtectionState.Off)) {
+            Spacer(Modifier.height(14.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                CtrlSecondaryButton(onClick = onResume, enabled = !busy) { Text(stringResource(R.string.resume_now)) }
+                if (state is ProtectionState.Paused) {
+                    CtrlTextButton(onClick = onPause, enabled = !busy) { Text(stringResource(R.string.pause_change)) }
                 }
             }
         }
@@ -136,7 +150,7 @@ fun PauseSheet(
     onPick: (PauseDuration, allServers: Boolean) -> Unit,
 ) {
     var all by remember { mutableStateOf(false) }
-    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss) {
         Column(Modifier.navigationBarsPadding().padding(bottom = 16.dp)) {
             Text(stringResource(R.string.pause_title), style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp))
             Text(
@@ -151,13 +165,13 @@ fun PauseSheet(
                     Modifier.fillMaxWidth().clickable { onPick(d, all) }.padding(horizontal = 24.dp, vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(Icons.Outlined.Timer, null, tint = if (d == PauseDuration.UNTIL_ON) Health.critical else MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Outlined.Timer, null, Modifier.size(20.dp), tint = if (d == PauseDuration.UNTIL_ON) Health.critical else CtrlColors.Accent)
                     Spacer(Modifier.width(16.dp))
                     Text(stringResource(pauseLabel(d)), style = MaterialTheme.typography.bodyLarge)
                 }
             }
             if (writableServers > 1) {
-                HorizontalDivider(Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                HorizontalDivider(Modifier.padding(vertical = 8.dp), color = CtrlColors.Divider)
                 Row(
                     Modifier.fillMaxWidth().clickable { all = !all }.padding(horizontal = 24.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -170,7 +184,7 @@ fun PauseSheet(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    Switch(checked = all, onCheckedChange = { all = it })
+                    CtrlSwitch(checked = all, onCheckedChange = { all = it })
                 }
             }
         }

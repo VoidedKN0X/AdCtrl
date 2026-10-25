@@ -1,6 +1,11 @@
 package com.vknxworks.adctrl.ui.filters
 
+import com.vknxworks.adctrl.ui.theme.JetBrainsMono
+import com.vknxworks.adctrl.ui.components.CardBorder
 import androidx.activity.compose.BackHandler
+import com.vknxworks.adctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.adctrl.ui.components.CtrlTextButton
+import com.vknxworks.adctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -24,21 +29,18 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.Lightbulb
+import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.automirrored.outlined.Undo
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -59,7 +61,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
@@ -198,20 +199,20 @@ fun RulesEditor(
                 color = if (dirty) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f).padding(start = 8.dp),
             )
-            IconButton(onClick = { searchOpen = !searchOpen; if (!searchOpen) search = "" }) { Icon(Icons.Filled.Search, stringResource(R.string.rules_search)) }
+            IconButton(onClick = { searchOpen = !searchOpen; if (!searchOpen) search = "" }) { Icon(Icons.Outlined.Search, stringResource(R.string.rules_search)) }
             if (hints.isNotEmpty()) {
-                IconButton(onClick = { hintsOpen = !hintsOpen }) { Icon(Icons.Filled.Lightbulb, stringResource(R.string.rules_hints), tint = Health.warn) }
+                IconButton(onClick = { hintsOpen = !hintsOpen }) { Icon(Icons.Outlined.Lightbulb, stringResource(R.string.rules_hints), tint = Health.warn) }
             }
             if (!readOnly && dirty) {
-                IconButton(onClick = { value = TextFieldValue(savedText); onDraft(null) }) { Icon(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.rules_discard)) }
+                IconButton(onClick = { value = TextFieldValue(savedText); onDraft(null) }) { Icon(Icons.AutoMirrored.Outlined.Undo, stringResource(R.string.rules_discard)) }
                 IconButton(onClick = { confirm = RulesSyntax.diff(saved, RulesSyntax.lines(text)) }, enabled = !saving) {
-                    Icon(Icons.Filled.Save, stringResource(R.string.rules_save), tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Outlined.Save, stringResource(R.string.rules_save), tint = MaterialTheme.colorScheme.primary)
                 }
             }
         }
         if (searchOpen) {
             Row(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
+                CtrlTextField(
                     value = search,
                     onValueChange = { search = it; matchIndex = 0 },
                     singleLine = true,
@@ -222,7 +223,7 @@ fun RulesEditor(
                         null
                     },
                     trailingIcon = if (search.isNotEmpty()) {
-                        { IconButton(onClick = { search = "" }) { Icon(Icons.Filled.Clear, stringResource(R.string.clear)) } }
+                        { IconButton(onClick = { search = "" }) { Icon(Icons.Outlined.Clear, stringResource(R.string.clear)) } }
                     } else {
                         null
                     },
@@ -231,10 +232,10 @@ fun RulesEditor(
                 )
                 IconButton(onClick = {
                     if (matches.isNotEmpty()) { matchIndex = (matchIndex - 1 + matches.size) % matches.size; goTo(matches[matchIndex], search.length) }
-                }, enabled = matches.isNotEmpty()) { Icon(Icons.Filled.KeyboardArrowUp, stringResource(R.string.rules_prev)) }
+                }, enabled = matches.isNotEmpty()) { Icon(Icons.Outlined.KeyboardArrowUp, stringResource(R.string.rules_prev)) }
                 IconButton(onClick = {
                     if (matches.isNotEmpty()) { matchIndex = (matchIndex + 1) % matches.size; goTo(matches[matchIndex], search.length) }
-                }, enabled = matches.isNotEmpty()) { Icon(Icons.Filled.KeyboardArrowDown, stringResource(R.string.rules_next)) }
+                }, enabled = matches.isNotEmpty()) { Icon(Icons.Outlined.KeyboardArrowDown, stringResource(R.string.rules_next)) }
             }
         }
         if (hintsOpen && hints.isNotEmpty()) {
@@ -254,10 +255,10 @@ fun RulesEditor(
 
         // Line numbers and text scroll together; long lines scroll sideways instead of wrapping,
         // so every number stays next to its line.
-        val codeStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = CODE_SIZE, lineHeight = LINE_HEIGHT, color = MaterialTheme.colorScheme.onSurface)
+        val codeStyle = TextStyle(fontFamily = JetBrainsMono, fontSize = CODE_SIZE, lineHeight = LINE_HEIGHT, color = MaterialTheme.colorScheme.onSurface)
         Surface(
             shape = MaterialTheme.shapes.large,
-            color = MaterialTheme.colorScheme.surfaceContainer,
+            color = MaterialTheme.colorScheme.surfaceContainer, border = CardBorder,
             modifier = Modifier.fillMaxWidth().weight(1f).padding(start = Gutter, end = Gutter, top = 4.dp, bottom = LocalBottomClearance.current + 8.dp),
         ) {
             BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -321,16 +322,16 @@ fun RulesEditor(
         )
     }
     if (leaving) {
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { leaving = false },
             title = { Text(stringResource(R.string.rules_leave_title)) },
             text = { Text(stringResource(R.string.rules_leave_body)) },
             confirmButton = {
-                TextButton(onClick = { leaving = false; value = TextFieldValue(savedText); onDraft(null) }) {
+                CtrlTextButton(onClick = { leaving = false; value = TextFieldValue(savedText); onDraft(null) }) {
                     Text(stringResource(R.string.rules_discard), color = MaterialTheme.colorScheme.error)
                 }
             },
-            dismissButton = { TextButton(onClick = { leaving = false }) { Text(stringResource(R.string.rules_keep_editing)) } },
+            dismissButton = { CtrlTextButton(onClick = { leaving = false }) { Text(stringResource(R.string.rules_keep_editing)) } },
         )
     }
 }
@@ -339,7 +340,7 @@ fun RulesEditor(
 private fun HintsCard(hints: List<RuleHint>, readOnly: Boolean, onPick: (RuleHint, fix: String?) -> Unit) {
     Surface(
         shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh, border = CardBorder,
         modifier = Modifier.fillMaxWidth().heightIn(max = 260.dp).padding(horizontal = Gutter, vertical = 4.dp),
     ) {
         LazyColumn(Modifier.padding(vertical = 6.dp)) {
@@ -348,8 +349,8 @@ private fun HintsCard(hints: List<RuleHint>, readOnly: Boolean, onPick: (RuleHin
                 Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 6.dp)) {
                     Text(stringResource(R.string.rules_hint_line, h.line, hintText(h)), style = MaterialTheme.typography.bodyMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        TextButton(onClick = { onPick(h, null) }) { Text(stringResource(R.string.rules_hint_show)) }
-                        if (fix != null) TextButton(onClick = { onPick(h, fix) }) { Text(stringResource(R.string.rules_hint_fix, fix), maxLines = 1, overflow = TextOverflow.Ellipsis) }
+                        CtrlTextButton(onClick = { onPick(h, null) }) { Text(stringResource(R.string.rules_hint_show)) }
+                        if (fix != null) CtrlTextButton(onClick = { onPick(h, fix) }) { Text(stringResource(R.string.rules_hint_fix, fix), maxLines = 1, overflow = TextOverflow.Ellipsis) }
                     }
                 }
             }
@@ -373,9 +374,9 @@ private fun hintText(h: RuleHint): String = when (h.kind) {
 @Composable
 private fun SaveRulesDialog(diff: List<DiffLine>, hintCount: Int, onDismiss: () -> Unit, onSave: () -> Unit) {
     val cs = MaterialTheme.colorScheme
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
-        icon = { Icon(Icons.Filled.Save, null) },
+        icon = { Icon(Icons.Outlined.Save, null) },
         title = { Text(stringResource(R.string.rules_save_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -388,7 +389,7 @@ private fun SaveRulesDialog(diff: List<DiffLine>, hintCount: Int, onDismiss: () 
                         items(diff) { d ->
                             Text(
                                 (if (d.added) "+ " else "− ") + d.text,
-                                fontFamily = FontFamily.Monospace,
+                                fontFamily = JetBrainsMono,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = if (d.added) Health.ok else Health.critical,
                                 maxLines = 2,
@@ -402,7 +403,7 @@ private fun SaveRulesDialog(diff: List<DiffLine>, hintCount: Int, onDismiss: () 
                 }
             }
         },
-        confirmButton = { TextButton(onSave) { Text(stringResource(R.string.rules_save)) } },
-        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel)) } },
+        confirmButton = { CtrlTextButton(onSave) { Text(stringResource(R.string.rules_save)) } },
+        dismissButton = { CtrlTextButton(onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }

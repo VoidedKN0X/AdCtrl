@@ -1,6 +1,9 @@
 package com.vknxworks.adctrl.ui.setup
 
+import com.vknxworks.adctrl.ui.theme.JetBrainsMono
 import androidx.compose.foundation.background
+import com.vknxworks.adctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.adctrl.ui.components.CtrlTextButton
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,16 +12,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.data.server.Tls
@@ -39,7 +39,7 @@ suspend fun fetchCertInfo(url: HttpUrl): CertInfo = withContext(Dispatchers.IO) 
 @Composable
 fun CertTrustDialog(cert: CertInfo, changed: Boolean, onTrust: () -> Unit, onCancel: () -> Unit) {
     val cs = MaterialTheme.colorScheme
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onCancel,
         icon = { Icon(Icons.Outlined.VerifiedUser, null) },
         title = { Text(stringResource(if (changed) R.string.cert_changed_title else R.string.cert_title)) },
@@ -53,7 +53,7 @@ fun CertTrustDialog(cert: CertInfo, changed: Boolean, onTrust: () -> Unit, onCan
                 Text(stringResource(R.string.cert_check))
                 Text(
                     cert.fingerprint,
-                    fontFamily = FontFamily.Monospace,
+                    fontFamily = JetBrainsMono,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(cs.surfaceContainerHighest).padding(10.dp),
                 )
@@ -63,20 +63,20 @@ fun CertTrustDialog(cert: CertInfo, changed: Boolean, onTrust: () -> Unit, onCan
                 Text(stringResource(R.string.cert_pin_note), style = MaterialTheme.typography.bodySmall, color = cs.onSurfaceVariant)
             }
         },
-        confirmButton = { TextButton(onTrust) { Text(stringResource(R.string.cert_trust)) } },
-        dismissButton = { TextButton(onCancel) { Text(stringResource(R.string.cancel)) } },
+        confirmButton = { CtrlTextButton(onTrust) { Text(stringResource(R.string.cert_trust)) } },
+        dismissButton = { CtrlTextButton(onCancel) { Text(stringResource(R.string.cancel)) } },
     )
 }
 
 /** Confirms switching on plain HTTP for one server on the user's own network. */
 @Composable
 fun HttpWarningDialog(host: String, onAllow: () -> Unit, onCancel: () -> Unit) {
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onCancel,
         icon = { Icon(Icons.Outlined.Warning, null, tint = MaterialTheme.colorScheme.error) },
         title = { Text(stringResource(R.string.http_warning_title)) },
         text = { Text(stringResource(R.string.http_warning_body, host)) },
-        confirmButton = { TextButton(onAllow) { Text(stringResource(R.string.http_allow), color = MaterialTheme.colorScheme.error) } },
-        dismissButton = { TextButton(onCancel) { Text(stringResource(R.string.cancel)) } },
+        confirmButton = { CtrlTextButton(onAllow) { Text(stringResource(R.string.http_allow), color = MaterialTheme.colorScheme.error) } },
+        dismissButton = { CtrlTextButton(onCancel) { Text(stringResource(R.string.cancel)) } },
     )
 }

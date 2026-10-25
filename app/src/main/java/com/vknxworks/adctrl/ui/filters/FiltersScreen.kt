@@ -1,5 +1,8 @@
 package com.vknxworks.adctrl.ui.filters
 
+import com.vknxworks.adctrl.ui.theme.CtrlColors
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -94,9 +97,21 @@ fun FiltersScreen() {
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
             TabTitle(stringResource(R.string.tab_filters))
             if (connection.error != null) ConnectionBanner()
-            PrimaryScrollableTabRow(selectedTabIndex = section.ordinal, edgePadding = 12.dp, containerColor = MaterialTheme.colorScheme.background) {
+            PrimaryScrollableTabRow(
+                selectedTabIndex = section.ordinal,
+                edgePadding = 12.dp,
+                containerColor = CtrlColors.Background,
+                contentColor = CtrlColors.Accent,
+                divider = { HorizontalDivider(color = CtrlColors.Divider) },
+            ) {
                 Section.entries.forEach { s ->
-                    Tab(selected = section == s, onClick = { section = s }, text = { Text(stringResource(s.label)) })
+                    Tab(
+                        selected = section == s,
+                        onClick = { section = s },
+                        selectedContentColor = CtrlColors.Text,
+                        unselectedContentColor = CtrlColors.Muted,
+                        text = { Text(stringResource(s.label), fontWeight = FontWeight.SemiBold) },
+                    )
                 }
             }
             PullToRefreshBox(

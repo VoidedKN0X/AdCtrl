@@ -1,6 +1,7 @@
 package com.vknxworks.adctrl.ui.overview
 
 import androidx.compose.foundation.background
+import com.vknxworks.adctrl.ui.components.CtrlFilterChip
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -17,10 +18,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.FilterChip
+import androidx.compose.material.icons.outlined.Error
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -41,6 +41,21 @@ import com.vknxworks.adctrl.data.api.TopEntry
 import com.vknxworks.adctrl.data.overview.AttentionItem
 import com.vknxworks.adctrl.data.overview.Severity
 import com.vknxworks.adctrl.data.overview.StatsRange
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
+import com.vknxworks.adctrl.ui.components.CardBorder
+import com.vknxworks.adctrl.ui.components.CtrlCard
+import com.vknxworks.adctrl.ui.components.CtrlHeroCard
+import com.vknxworks.adctrl.ui.components.CtrlLabel
+import com.vknxworks.adctrl.ui.components.CtrlProgress
+import com.vknxworks.adctrl.ui.theme.CtrlColors
+import com.vknxworks.adctrl.ui.theme.CtrlShapes
+import com.vknxworks.adctrl.ui.theme.CtrlType
 import com.vknxworks.adctrl.ui.components.ChartSeries
 import com.vknxworks.adctrl.ui.components.LineChart
 import com.vknxworks.adctrl.ui.components.formatCount
@@ -50,19 +65,14 @@ import com.vknxworks.adctrl.ui.components.percent
 import com.vknxworks.adctrl.ui.theme.Gutter
 import com.vknxworks.adctrl.ui.theme.Health
 
-/** A rounded card with a small heading above it, like the settings groups. */
+/** A Ctrl card with a mono label above it, like the settings groups. */
 @Composable
 fun OverviewCard(title: String?, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Column(modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp)) {
+    Column(modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 6.dp)) {
         if (title != null) {
-            Text(
-                title,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
-            )
+            CtrlLabel(title, Modifier.padding(start = 4.dp, bottom = 8.dp))
         }
-        Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
+        Surface(shape = CtrlShapes.Card, color = CtrlColors.Surface, border = CardBorder, modifier = Modifier.fillMaxWidth()) {
             content()
         }
     }
@@ -75,7 +85,7 @@ fun AttentionCard(items: List<AttentionItem>, now: Long) {
     OverviewCard(stringResource(R.string.attention_title)) {
         Column(Modifier.padding(vertical = 4.dp)) {
             items.forEachIndexed { i, item ->
-                if (i > 0) HorizontalDivider(Modifier.padding(start = 52.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                if (i > 0) HorizontalDivider(color = CtrlColors.Outline)
                 Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.Top) {
                     SeverityIcon(item.severity)
                     Spacer(Modifier.width(14.dp))
@@ -115,11 +125,11 @@ private fun attentionDetail(item: AttentionItem): String? = when (item) {
 @Composable
 private fun SeverityIcon(severity: Severity) {
     val (icon, tint, label) = when (severity) {
-        Severity.CRITICAL -> Triple(Icons.Filled.Error, Health.critical, R.string.sev_critical)
-        Severity.WARNING -> Triple(Icons.Filled.Warning, Health.warn, R.string.sev_warning)
-        Severity.INFO -> Triple(Icons.Filled.Info, MaterialTheme.colorScheme.onSurfaceVariant, R.string.sev_info)
+        Severity.CRITICAL -> Triple(Icons.Outlined.Error, Health.critical, R.string.sev_critical)
+        Severity.WARNING -> Triple(Icons.Outlined.Warning, Health.warn, R.string.sev_warning)
+        Severity.INFO -> Triple(Icons.Outlined.Info, CtrlColors.Muted, R.string.sev_info)
     }
-    Icon(icon, stringResource(label), Modifier.size(22.dp), tint = tint)
+    Icon(icon, stringResource(label), Modifier.size(20.dp), tint = tint)
 }
 
 // ---------- Range ----------
@@ -131,10 +141,10 @@ fun RangeChips(available: List<StatsRange>, selected: StatsRange, wholeRetention
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         if (available.isEmpty() && wholeRetentionLabel != null) {
-            FilterChip(selected = true, onClick = {}, label = { Text(wholeRetentionLabel) })
+            CtrlFilterChip(selected = true, onClick = {}, label = { Text(wholeRetentionLabel) })
         }
         available.forEach { r ->
-            FilterChip(selected = r == selected, onClick = { onPick(r) }, label = { Text(stringResource(rangeLabel(r))) })
+            CtrlFilterChip(selected = r == selected, onClick = { onPick(r) }, label = { Text(stringResource(rangeLabel(r))) })
         }
     }
 }
@@ -148,37 +158,78 @@ fun rangeLabel(r: StatsRange): Int = when (r) {
 
 // ---------- Numbers ----------
 
+/**
+ * The hero card: the share of queries blocked by filters as one giant number, with a bar per hour (or day)
+ * of the period underneath. Each bar is that period's queries; the solid part at its foot is what was blocked.
+ */
+@Composable
+fun BlockedHeroCard(stats: Stats, rangeLabel: String?) {
+    val total = stats.numDnsQueries
+    val blocked = stats.numBlockedFiltering
+    val pct = if (total > 0) percent(blocked.toDouble() / total) else 0
+    val queries = stats.dnsQueries.takeLast(HERO_BARS)
+    val blockedSeries = stats.blockedFiltering.takeLast(HERO_BARS)
+    CtrlHeroCard(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 6.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.hero_blocked).uppercase(), style = CtrlType.Label.copy(fontWeight = FontWeight.SemiBold), modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (rangeLabel != null) Text(rangeLabel.uppercase(), style = CtrlType.Label.copy(fontWeight = FontWeight.SemiBold, letterSpacing = 0.04.em), maxLines = 1)
+        }
+        Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.semantics(mergeDescendants = true) {}) {
+            Text(pct.toString(), style = CtrlType.Hero)
+            Text("%", style = CtrlType.Hero.copy(fontSize = 28.sp, letterSpacing = 0.em), modifier = Modifier.padding(bottom = 6.dp))
+            Spacer(Modifier.weight(1f))
+            Text(
+                stringResource(R.string.hero_blocked_of, formatCount(blocked), formatCount(total)),
+                style = CtrlType.Data,
+                textAlign = TextAlign.End,
+                modifier = Modifier.padding(bottom = 6.dp, start = 12.dp),
+            )
+        }
+        if (queries.size >= 2) {
+            val max = queries.maxOrNull()?.takeIf { it > 0 } ?: 1L
+            Row(
+                Modifier.fillMaxWidth().height(34.dp).clearAndSetSemantics { },
+                horizontalArrangement = Arrangement.spacedBy(3.dp),
+                verticalAlignment = Alignment.Bottom,
+            ) {
+                queries.forEachIndexed { i, q ->
+                    val h = (q.toFloat() / max).coerceIn(0.06f, 1f)
+                    val b = blockedSeries.getOrNull(i)?.let { if (q > 0) (it.toFloat() / q).coerceIn(0f, 1f) else 0f } ?: 0f
+                    Box(
+                        Modifier.weight(1f).fillMaxHeight(h).clip(RoundedCornerShape(2.dp)).background(CtrlColors.OnAccent.copy(alpha = 0.30f)),
+                        contentAlignment = Alignment.BottomCenter,
+                    ) {
+                        if (b > 0f) Box(Modifier.fillMaxWidth().fillMaxHeight(b.coerceAtLeast(0.08f)).background(CtrlColors.OnAccent))
+                    }
+                }
+            }
+        }
+    }
+}
+
+private const val HERO_BARS = 24
+
+/** The other numbers, two cards per row: big Space Grotesk value, mono label. */
 @Composable
 fun StatsGrid(stats: Stats) {
     val context = LocalContext.current
-    val total = stats.numDnsQueries
-    val blockedPct = if (total > 0) percent(stats.numBlockedFiltering.toDouble() / total) else 0
     val tiles = listOf(
-        Triple(stringResource(R.string.stat_queries), formatCount(total), null),
-        Triple(stringResource(R.string.stat_blocked), formatCount(stats.numBlockedFiltering), stringResource(R.string.stat_percent, blockedPct)),
-        Triple(stringResource(R.string.stat_safebrowsing), formatCount(stats.numReplacedSafebrowsing), null),
-        Triple(stringResource(R.string.stat_parental), formatCount(stats.numReplacedParental), null),
-        Triple(stringResource(R.string.stat_safesearch), formatCount(stats.numReplacedSafesearch), null),
-        Triple(stringResource(R.string.stat_avg_time), formatMs(context, stats.avgProcessingTime), null),
+        stringResource(R.string.stat_queries) to formatCount(stats.numDnsQueries),
+        stringResource(R.string.stat_avg_time) to formatMs(context, stats.avgProcessingTime),
+        stringResource(R.string.stat_safebrowsing) to formatCount(stats.numReplacedSafebrowsing),
+        stringResource(R.string.stat_parental) to formatCount(stats.numReplacedParental),
+        stringResource(R.string.stat_safesearch) to formatCount(stats.numReplacedSafesearch),
     )
-    Column(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 6.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         tiles.chunked(2).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                row.forEach { (label, value, extra) ->
-                    Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.weight(1f)) {
-                        Column(Modifier.padding(16.dp)) {
-                            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Spacer(Modifier.height(4.dp))
-                            Row(verticalAlignment = Alignment.Bottom) {
-                                Text(value, style = MaterialTheme.typography.headlineSmall, maxLines = 1)
-                                if (extra != null) {
-                                    Spacer(Modifier.width(6.dp))
-                                    Text(extra, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(bottom = 3.dp))
-                                }
-                            }
-                        }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.height(IntrinsicSize.Min)) {
+                row.forEach { (label, value) ->
+                    CtrlCard(Modifier.weight(1f).fillMaxHeight().semantics(mergeDescendants = true) {}, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CtrlLabel(label)
+                        Text(value, style = CtrlType.Metric, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
+                if (row.size == 1) Spacer(Modifier.weight(1f))
             }
         }
     }
@@ -221,27 +272,23 @@ fun TopListCard(
     OverviewCard(title) {
         Column(Modifier.padding(vertical = 6.dp)) {
             if (entries.isEmpty()) {
-                Text(empty, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(16.dp))
+                Text(empty, style = MaterialTheme.typography.bodyMedium, color = CtrlColors.Muted, modifier = Modifier.padding(16.dp))
             }
             val max = entries.maxOfOrNull { it.value }?.takeIf { it > 0 } ?: 1.0
-            entries.forEach { e ->
+            entries.forEachIndexed { i, e ->
                 Column(
                     Modifier.fillMaxWidth()
                         .then(if (onClick != null) Modifier.clickable { onClick(e) } else Modifier)
-                        .padding(horizontal = 16.dp, vertical = 7.dp),
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(label(e), style = MaterialTheme.typography.bodyMedium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                        Text((i + 1).toString().padStart(2, '0'), style = CtrlType.Data, color = CtrlColors.Muted, modifier = Modifier.width(28.dp))
+                        Text(label(e), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                         Spacer(Modifier.width(12.dp))
-                        Text(format(e), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(format(e), style = CtrlType.Data, color = CtrlColors.Muted)
                     }
-                    Spacer(Modifier.height(4.dp))
-                    Box(Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)).background(MaterialTheme.colorScheme.surfaceContainerHighest)) {
-                        Box(
-                            Modifier.fillMaxWidth((e.value / max).toFloat().coerceIn(0.02f, 1f)).fillMaxHeight()
-                                .clip(RoundedCornerShape(2.dp)).background(MaterialTheme.colorScheme.primary),
-                        )
-                    }
+                    Spacer(Modifier.height(6.dp))
+                    CtrlProgress((e.value / max).toFloat().coerceIn(0.02f, 1f), Modifier.padding(start = 28.dp), color = if (i == 0) CtrlColors.Accent else CtrlColors.Text)
                 }
             }
         }

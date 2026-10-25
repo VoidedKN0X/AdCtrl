@@ -1,6 +1,11 @@
 package com.vknxworks.adctrl.ui.queries
 
+import com.vknxworks.adctrl.ui.theme.JetBrainsMono
+import com.vknxworks.adctrl.ui.components.CardBorder
 import androidx.compose.foundation.background
+import com.vknxworks.adctrl.ui.components.CtrlFilterChip
+import com.vknxworks.adctrl.ui.components.CtrlSecondaryButton
+import com.vknxworks.adctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,14 +26,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.outlined.Verified
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -46,7 +48,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -119,7 +120,7 @@ fun CheckHostScreen(initialHost: String, initialClient: String) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(stringResource(R.string.check_host_intro), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            OutlinedTextField(
+            CtrlTextField(
                 value = host,
                 onValueChange = { host = it.trim() },
                 label = { Text(stringResource(R.string.check_host_domain)) },
@@ -130,7 +131,7 @@ fun CheckHostScreen(initialHost: String, initialClient: String) {
                 modifier = Modifier.fillMaxWidth(),
             )
             if (clientParams) {
-                OutlinedTextField(
+                CtrlTextField(
                     value = client,
                     onValueChange = { client = it.trim() },
                     label = { Text(stringResource(R.string.check_host_client)) },
@@ -141,7 +142,7 @@ fun CheckHostScreen(initialHost: String, initialClient: String) {
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    QTYPES.forEach { t -> FilterChip(selected = qtype == t, onClick = { qtype = t }, label = { Text(t) }) }
+                    QTYPES.forEach { t -> CtrlFilterChip(selected = qtype == t, onClick = { qtype = t }, label = { Text(t) }) }
                 }
             }
             PillButton(
@@ -184,7 +185,7 @@ fun CheckHostScreen(initialHost: String, initialClient: String) {
 private fun CheckResultCard(host: String, r: CheckHostResult, names: Map<Long, String>, readOnly: Boolean, onRule: (block: Boolean) -> Unit) {
     val kind = r.kind
     val cs = MaterialTheme.colorScheme
-    Surface(shape = MaterialTheme.shapes.large, color = cs.surfaceContainer, modifier = Modifier.fillMaxWidth()) {
+    Surface(shape = MaterialTheme.shapes.large, color = cs.surfaceContainer, border = CardBorder, modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(kindIcon(kind), null, Modifier.size(22.dp), tint = kindColor(kind))
@@ -209,7 +210,7 @@ private fun CheckResultCard(host: String, r: CheckHostResult, names: Map<Long, S
                 if (rule.text.isNotBlank()) {
                     Text(
                         rule.text,
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = JetBrainsMono,
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).background(cs.surfaceContainerHighest).padding(10.dp),
                     )
@@ -221,12 +222,12 @@ private fun CheckResultCard(host: String, r: CheckHostResult, names: Map<Long, S
             if (!readOnly) {
                 Spacer(Modifier.height(4.dp))
                 if (kind.isBlocked) {
-                    FilledTonalButton(onClick = { onRule(false) }) {
-                        Icon(Icons.Filled.Verified, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_unblock))
+                    CtrlSecondaryButton(onClick = { onRule(false) }) {
+                        Icon(Icons.Outlined.Verified, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_unblock))
                     }
                 } else {
-                    FilledTonalButton(onClick = { onRule(true) }) {
-                        Icon(Icons.Filled.Block, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_block))
+                    CtrlSecondaryButton(onClick = { onRule(true) }) {
+                        Icon(Icons.Outlined.Block, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_block))
                     }
                 }
             }

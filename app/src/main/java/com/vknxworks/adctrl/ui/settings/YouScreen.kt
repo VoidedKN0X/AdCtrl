@@ -15,17 +15,27 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
+import com.vknxworks.adctrl.ui.components.CtrlButton
+import com.vknxworks.adctrl.ui.theme.CtrlColors
+import com.vknxworks.adctrl.ui.theme.CtrlType
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Dns
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Gavel
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.Dns
+import androidx.compose.material.icons.outlined.Gavel
+import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,8 +52,8 @@ import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.container
 import com.vknxworks.adctrl.ui.components.GroupSwitch
 import com.vknxworks.adctrl.ui.nav.ServersRoute
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.outlined.SwapHoriz
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.ui.components.Group
@@ -82,36 +92,45 @@ fun YouScreen() {
     Column(Modifier.fillMaxSize()) {
         ScreenTopBar(stringResource(R.string.you_title))
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 24.dp)) {
-            Column(
-                Modifier.fillMaxWidth().padding(start = Gutter, end = Gutter, top = 8.dp, bottom = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+            Row(
+                Modifier.fillMaxWidth().padding(start = Gutter, end = Gutter, top = 8.dp, bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
-                    Modifier.size(96.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
+                    Modifier.size(68.dp).clip(RoundedCornerShape(22.dp)).background(CtrlColors.Accent),
                     contentAlignment = Alignment.Center,
                 ) {
                     val initial = server?.initial
                     when {
-                        server == null -> Icon(Icons.Filled.Dns, null, Modifier.size(44.dp), tint = MaterialTheme.colorScheme.primary)
-                        initial == null -> Icon(Icons.Filled.AccountCircle, null, Modifier.size(56.dp), tint = MaterialTheme.colorScheme.primary)
-                        else -> Text(initial, style = MaterialTheme.typography.displaySmall, color = MaterialTheme.colorScheme.primary)
+                        server == null -> Icon(Icons.Outlined.Dns, null, Modifier.size(30.dp), tint = CtrlColors.OnAccent)
+                        initial == null -> Icon(Icons.Outlined.AccountCircle, null, Modifier.size(34.dp), tint = CtrlColors.OnAccent)
+                        else -> Text(initial, fontSize = 24.sp, fontWeight = FontWeight.Bold, color = CtrlColors.OnAccent)
                     }
                 }
-                Spacer(Modifier.height(14.dp))
-                Text(server?.name ?: stringResource(R.string.you_not_connected), style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
-                Text(
+                Spacer(Modifier.width(16.dp))
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        server?.name ?: stringResource(R.string.you_not_connected),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (-0.02).em,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                     if (server == null) {
-                        stringResource(R.string.you_not_connected_body)
+                        Text(stringResource(R.string.you_not_connected_body), style = MaterialTheme.typography.bodyMedium, color = CtrlColors.Muted)
                     } else {
-                        listOfNotNull(
-                            (connection.status?.version ?: server.version).takeIf { it.isNotBlank() }?.let { stringResource(R.string.agh_version, it) },
-                            stringResource(R.string.signed_in_as, server.username),
-                        ).joinToString("\n")
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                )
+                        Text(server.displayUrl, style = CtrlType.Data, color = CtrlColors.Muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(
+                            listOfNotNull(
+                                (connection.status?.version ?: server.version).takeIf { it.isNotBlank() }?.let { stringResource(R.string.agh_version, it) },
+                                stringResource(R.string.signed_in_as, server.username),
+                            ).joinToString(" · "),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = CtrlColors.Muted,
+                        )
+                    }
+                }
             }
 
             if (server != null) {
@@ -119,7 +138,7 @@ fun YouScreen() {
                     GroupRow(
                         stringResource(R.string.servers_title),
                         stringResource(R.string.servers_subtitle),
-                        icon = Icons.Filled.SwapHoriz,
+                        icon = Icons.Outlined.SwapHoriz,
                         showChevron = true,
                         onClick = { nav.navigate(ServersRoute) },
                     )
@@ -127,7 +146,7 @@ fun YouScreen() {
                         stringResource(R.string.read_only_mode),
                         stringResource(R.string.read_only_mode_subtitle),
                         checked = server.readOnly,
-                        icon = Icons.Filled.Visibility,
+                        icon = Icons.Outlined.Visibility,
                     ) { c.sessions.setReadOnly(server.id, it) }
                 }
             }
@@ -136,7 +155,7 @@ fun YouScreen() {
                 GroupRow(
                     stringResource(R.string.settings),
                     stringResource(R.string.settings_subtitle),
-                    icon = Icons.Filled.Settings,
+                    icon = Icons.Outlined.Tune,
                     showChevron = true,
                     onClick = { nav.navigate(SettingsRoute) },
                 )
@@ -144,40 +163,56 @@ fun YouScreen() {
 
             Group(stringResource(R.string.group_about)) {
                 GroupRow(
-                    stringResource(R.string.support_title),
-                    stringResource(R.string.support_subtitle),
-                    icon = Icons.Filled.Favorite,
-                    showChevron = true,
-                    onClick = { open(SPONSOR_URL) },
-                )
-                GroupRow(
                     stringResource(R.string.bugs_title),
                     stringResource(R.string.bugs_subtitle),
-                    icon = Icons.Filled.BugReport,
+                    icon = Icons.Outlined.BugReport,
                     showChevron = true,
                     onClick = { open(ISSUES_URL) },
                 )
                 GroupRow(
                     stringResource(R.string.source_title),
                     stringResource(R.string.source_subtitle),
-                    icon = Icons.Filled.Code,
+                    icon = Icons.Outlined.Code,
                     showChevron = true,
                     onClick = { open(REPO_URL) },
                 )
                 GroupRow(
                     stringResource(R.string.licence_title),
                     stringResource(R.string.licence_subtitle),
-                    icon = Icons.Filled.Gavel,
+                    icon = Icons.Outlined.Gavel,
                     showChevron = true,
                     onClick = { open(LICENCE_URL) },
                 )
             }
 
+            // Support: the one accent button on this page.
+            Column(Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp)) {
+                CtrlButton(
+                    stringResource(R.string.support_title),
+                    onClick = { open(SPONSOR_URL) },
+                    icon = Icons.Outlined.FavoriteBorder,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Text(
+                    stringResource(R.string.support_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = CtrlColors.Muted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                )
+            }
+            Text(
+                stringResource(R.string.you_footer_badges),
+                style = CtrlType.Label.copy(letterSpacing = 0.12.em),
+                color = CtrlColors.Muted,
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                textAlign = TextAlign.Center,
+            )
             Text(
                 stringResource(R.string.about_footer, stringResource(R.string.app_name), BuildConfig.VERSION_NAME, stringResource(R.string.vendor)),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                style = CtrlType.Data,
+                color = CtrlColors.Muted,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
                 textAlign = TextAlign.Center,
             )
         }

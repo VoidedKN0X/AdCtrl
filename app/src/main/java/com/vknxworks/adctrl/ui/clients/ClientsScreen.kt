@@ -1,6 +1,9 @@
 package com.vknxworks.adctrl.ui.clients
 
+import com.vknxworks.adctrl.ui.components.CtrlSquareButton
 import androidx.compose.foundation.background
+import com.vknxworks.adctrl.ui.components.CtrlFilterChip
+import com.vknxworks.adctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -18,20 +21,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.border
+import androidx.compose.ui.graphics.Color
+import com.vknxworks.adctrl.ui.theme.CtrlColors
+import com.vknxworks.adctrl.ui.theme.CtrlType
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Devices
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -156,16 +161,16 @@ fun ClientsScreen() {
     Box(Modifier.fillMaxSize()) {
     Column(Modifier.fillMaxSize().statusBarsPadding()) {
         TabTitle(stringResource(R.string.tab_clients), trailing = {
-            if (!readOnly) IconButton(onClick = { adding = true }) { Icon(Icons.Filled.Add, stringResource(R.string.client_add)) }
+            if (!readOnly) CtrlSquareButton(Icons.Outlined.Add, stringResource(R.string.client_add), onClick = { adding = true })
         })
         if (connection.error != null) ConnectionBanner()
-        OutlinedTextField(
+        CtrlTextField(
             value = search,
             onValueChange = { search = it },
             placeholder = { Text(stringResource(R.string.clients_search)) },
-            leadingIcon = { Icon(Icons.Filled.Search, null) },
+            leadingIcon = { Icon(Icons.Outlined.Search, null) },
             trailingIcon = if (search.isNotEmpty()) {
-                { IconButton(onClick = { search = "" }) { Icon(Icons.Filled.Clear, stringResource(R.string.clear)) } }
+                { IconButton(onClick = { search = "" }) { Icon(Icons.Outlined.Clear, stringResource(R.string.clear)) } }
             } else {
                 null
             },
@@ -180,7 +185,7 @@ fun ClientsScreen() {
                     ClientFilter.RUNTIME -> rows.count { !it.persistent }
                     ClientFilter.BLOCKED -> rows.count { it.blocked }
                 }
-                FilterChip(selected = filter == f, onClick = { filter = f }, label = { Text(stringResource(filterLabel(f), n)) })
+                CtrlFilterChip(selected = filter == f, onClick = { filter = f }, label = { Text(stringResource(filterLabel(f), n)) })
             }
         }
         if (state.access?.allowlistMode == true) {
@@ -228,7 +233,7 @@ fun ClientsScreen() {
                     }
                     items(shown, key = { it.key }) { row ->
                         ClientRowView(row) { nav.navigate(ClientRoute(key = if (row.persistent) row.name else row.ids.first(), persistent = row.persistent)) }
-                        HorizontalDivider(Modifier.padding(start = Gutter + 52.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                        HorizontalDivider(Modifier.padding(horizontal = Gutter), color = CtrlColors.Divider)
                     }
                 }
             }
@@ -264,11 +269,11 @@ private fun ClientRowView(row: ClientItem, onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Row(Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = Gutter, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(
-            Modifier.size(40.dp).clip(CircleShape).background(if (row.blocked) Health.critical.copy(alpha = 0.16f) else cs.primary.copy(alpha = if (row.persistent) 0.18f else 0.08f)),
+            Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(if (row.blocked) Health.critical.copy(alpha = 0.16f) else CtrlColors.Surface).border(1.dp, if (row.blocked) Color.Transparent else CtrlColors.ControlOutline, RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center,
         ) {
-            if (row.blocked) Icon(Icons.Filled.Block, stringResource(R.string.client_blocked), Modifier.size(20.dp), tint = Health.critical)
-            else Text(row.name.take(1).uppercase(), style = MaterialTheme.typography.titleMedium, color = cs.primary)
+            if (row.blocked) Icon(Icons.Outlined.Block, stringResource(R.string.client_blocked), Modifier.size(20.dp), tint = Health.critical)
+            else Text(row.name.take(1).uppercase(), style = MaterialTheme.typography.titleMedium, color = if (row.persistent) CtrlColors.Accent else CtrlColors.Muted)
         }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
@@ -287,7 +292,7 @@ private fun ClientRowView(row: ClientItem, onClick: () -> Unit) {
         }
         row.queries?.let {
             Spacer(Modifier.width(8.dp))
-            Text(formatCount(it), style = MaterialTheme.typography.labelLarge, color = cs.onSurfaceVariant)
+            Text(formatCount(it), style = CtrlType.Data, color = CtrlColors.Muted)
         }
     }
 }

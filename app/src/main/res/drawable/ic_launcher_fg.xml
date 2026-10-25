@@ -7,31 +7,31 @@
     android:viewportHeight="108">
     <!-- Keycap body -->
     <path
-        android:fillColor="#FF2B3038"
+        android:fillColor="#FF1C1C21"
         android:pathData="M37,31 H71 A13,13 0 0 1 84,44 V65 A13,13 0 0 1 71,78 H37 A13,13 0 0 1 24,65 V44 A13,13 0 0 1 37,31 Z" />
     <!-- Key face -->
     <path
-        android:fillColor="#FF1A1D23"
-        android:strokeColor="#FF7EDC9C"
+        android:fillColor="#FF141417"
+        android:strokeColor="#FFB48CFF"
         android:strokeWidth="3"
         android:pathData="M37,32 H71 A9,9 0 0 1 80,41 V57 A9,9 0 0 1 71,66 H37 A9,9 0 0 1 28,57 V41 A9,9 0 0 1 37,32 Z" />
     <!-- Shield -->
     <path
-        android:fillColor="#FF2B3038"
-        android:strokeColor="#FF7EDC9C"
+        android:fillColor="#FF1C1C21"
+        android:strokeColor="#FFB48CFF"
         android:strokeWidth="1.8"
         android:strokeLineJoin="round"
         android:pathData="M54,36.5 L65,40.5 V47.5 C65,54 60.5,58.5 54,61.5 C47.5,58.5 43,54 43,47.5 V40.5 Z" />
     <!-- Check mark -->
     <path
-        android:strokeColor="#FF7EDC9C"
+        android:strokeColor="#FFB48CFF"
         android:strokeWidth="2.4"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:pathData="M48.5,48.5 L52.5,52.5 L59.5,45.5" />
     <!-- Bar on the front of the key -->
     <path
-        android:strokeColor="#FF5A616C"
+        android:strokeColor="#FF2A2A2F"
         android:strokeWidth="3"
         android:strokeLineCap="round"
         android:pathData="M47,72.5 H61" />

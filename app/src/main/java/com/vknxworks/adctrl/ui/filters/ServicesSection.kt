@@ -1,6 +1,18 @@
 package com.vknxworks.adctrl.ui.filters
 
+import com.vknxworks.adctrl.ui.components.CtrlLabel
+import com.vknxworks.adctrl.ui.theme.CtrlColors
+import com.vknxworks.adctrl.ui.theme.CtrlShapes
+import androidx.compose.foundation.BorderStroke
+import com.vknxworks.adctrl.ui.components.CardBorder
 import androidx.compose.foundation.background
+import com.vknxworks.adctrl.ui.components.CtrlAlertDialog
+import com.vknxworks.adctrl.ui.components.CtrlFilterChip
+import com.vknxworks.adctrl.ui.components.CtrlSecondaryButton
+import com.vknxworks.adctrl.ui.components.CtrlSheet
+import com.vknxworks.adctrl.ui.components.CtrlSwitch
+import com.vknxworks.adctrl.ui.components.CtrlTextButton
+import com.vknxworks.adctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,24 +31,17 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.EventBusy
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilterChip
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.EventBusy
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
@@ -96,11 +101,11 @@ fun ServicesSection(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item(span = { GridItemSpan(maxLineSpan) }, key = "schedule") {
-            Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
+            Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer, border = CardBorder, modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
                 GroupRow(
                     stringResource(R.string.services_schedule),
                     if (config.schedule.isEmpty) stringResource(R.string.services_schedule_none) else scheduleSummary(config.schedule),
-                    icon = Icons.Filled.EventBusy,
+                    icon = Icons.Outlined.EventBusy,
                     showChevron = true,
                     onClick = { scheduleOpen = true },
                 )
@@ -108,13 +113,13 @@ fun ServicesSection(
         }
         item(span = { GridItemSpan(maxLineSpan) }, key = "search") {
             Column {
-                OutlinedTextField(
+                CtrlTextField(
                     value = search,
                     onValueChange = { search = it },
                     placeholder = { Text(stringResource(R.string.services_search)) },
-                    leadingIcon = { Icon(Icons.Filled.Search, null) },
+                    leadingIcon = { Icon(Icons.Outlined.Search, null) },
                     trailingIcon = if (search.isNotEmpty()) {
-                        { IconButton(onClick = { search = "" }) { Icon(Icons.Filled.Clear, stringResource(R.string.clear)) } }
+                        { IconButton(onClick = { search = "" }) { Icon(Icons.Outlined.Clear, stringResource(R.string.clear)) } }
                     } else {
                         null
                     },
@@ -122,39 +127,35 @@ fun ServicesSection(
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
-                    FilterChip(selected = !blockedOnly, onClick = { blockedOnly = false }, label = { Text(stringResource(R.string.services_all, services.size)) })
-                    FilterChip(selected = blockedOnly, onClick = { blockedOnly = true }, label = { Text(stringResource(R.string.services_blocked, blocked.size)) })
+                    CtrlFilterChip(selected = !blockedOnly, onClick = { blockedOnly = false }, label = { Text(stringResource(R.string.services_all, services.size)) })
+                    CtrlFilterChip(selected = blockedOnly, onClick = { blockedOnly = true }, label = { Text(stringResource(R.string.services_blocked, blocked.size)) })
                 }
             }
         }
         groups.forEach { (group, list) ->
             if (groups.size > 1 || group.isNotBlank()) {
                 item(span = { GridItemSpan(maxLineSpan) }, key = "group-$group") {
-                    Text(
-                        groupLabel(group),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 4.dp, top = 8.dp),
-                    )
+                    CtrlLabel(groupLabel(group), Modifier.padding(start = 4.dp, top = 8.dp))
                 }
             }
             items(list, key = { it.id }) { s ->
                 val on = s.id in blocked
                 Surface(
-                    shape = MaterialTheme.shapes.medium,
-                    color = if (on) Health.critical.copy(alpha = 0.10f) else MaterialTheme.colorScheme.surfaceContainer,
+                    shape = CtrlShapes.Control,
+                    color = if (on) Health.critical.copy(alpha = 0.10f) else CtrlColors.Surface,
+                    border = if (on) BorderStroke(1.dp, Health.critical.copy(alpha = 0.4f)) else CardBorder,
                     modifier = Modifier.fillMaxWidth().clickable(enabled = !readOnly) { onToggle(s.id, !on) },
                 ) {
                     Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(
-                            Modifier.size(32.dp).clip(CircleShape).background(if (on) Health.critical.copy(alpha = 0.18f) else MaterialTheme.colorScheme.surfaceContainerHighest),
+                            Modifier.size(32.dp).clip(RoundedCornerShape(10.dp)).background(if (on) Health.critical.copy(alpha = 0.18f) else MaterialTheme.colorScheme.surfaceContainerHighest),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(s.name.take(1).uppercase(), style = MaterialTheme.typography.titleSmall, color = if (on) Health.critical else MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Spacer(Modifier.width(10.dp))
                         Text(s.name, style = MaterialTheme.typography.bodyMedium, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                        if (!readOnly) Switch(checked = on, onCheckedChange = { onToggle(s.id, it) })
+                        if (!readOnly) CtrlSwitch(checked = on, onCheckedChange = { onToggle(s.id, it) })
                     }
                 }
             }
@@ -201,7 +202,7 @@ private fun scheduleSummary(s: PauseSchedule): String =
 private fun ScheduleSheet(initial: PauseSchedule, readOnly: Boolean, onDismiss: () -> Unit, onSave: (PauseSchedule) -> Unit) {
     var schedule by remember { mutableStateOf(initial) }
     var picking by remember { mutableStateOf<Pair<Weekday, Boolean>?>(null) }
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(stringResource(R.string.services_schedule), style = MaterialTheme.typography.titleLarge)
             Text(
@@ -214,11 +215,11 @@ private fun ScheduleSheet(initial: PauseSchedule, readOnly: Boolean, onDismiss: 
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Text(dayName(day), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
                     if (on) {
-                        TextButton(onClick = { picking = day to true }, enabled = !readOnly) { Text(clock(range!!.start)) }
+                        CtrlTextButton(onClick = { picking = day to true }, enabled = !readOnly) { Text(clock(range!!.start)) }
                         Text("–")
-                        TextButton(onClick = { picking = day to false }, enabled = !readOnly) { Text(clock(range!!.end)) }
+                        CtrlTextButton(onClick = { picking = day to false }, enabled = !readOnly) { Text(clock(range!!.end)) }
                     }
-                    Switch(
+                    CtrlSwitch(
                         checked = on,
                         enabled = !readOnly,
                         onCheckedChange = { schedule = schedule.with(day, if (it) DayRange(0, DAY_MS) else null) },
@@ -229,7 +230,7 @@ private fun ScheduleSheet(initial: PauseSchedule, readOnly: Boolean, onDismiss: 
             val invalid = schedule.days().any { (_, r) -> r != null && r.end <= r.start }
             if (invalid) Text(stringResource(R.string.schedule_invalid), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
             if (!readOnly) {
-                OutlinedButton(onClick = { schedule = PauseSchedule(timeZone = schedule.timeZone) }) { Text(stringResource(R.string.schedule_clear)) }
+                CtrlSecondaryButton(onClick = { schedule = PauseSchedule(timeZone = schedule.timeZone) }) { Text(stringResource(R.string.schedule_clear)) }
                 PillButton(stringResource(R.string.save_changes), onClick = { onSave(schedule) }, enabled = schedule != initial && !invalid, modifier = Modifier.fillMaxWidth())
             }
         }
@@ -238,7 +239,7 @@ private fun ScheduleSheet(initial: PauseSchedule, readOnly: Boolean, onDismiss: 
         val range = schedule.days().first { it.first == day }.second ?: DayRange(0, DAY_MS)
         val ms = if (isStart) range.start else range.end
         val state = rememberTimePickerState(initialHour = ((ms / 3_600_000) % 24).toInt(), initialMinute = ((ms / 60_000) % 60).toInt(), is24Hour = android.text.format.DateFormat.is24HourFormat(LocalContext.current))
-        AlertDialog(
+        CtrlAlertDialog(
             onDismissRequest = { picking = null },
             title = { Text(stringResource(if (isStart) R.string.schedule_from else R.string.schedule_until)) },
             text = {
@@ -248,7 +249,7 @@ private fun ScheduleSheet(initial: PauseSchedule, readOnly: Boolean, onDismiss: 
                 }
             },
             confirmButton = {
-                TextButton(onClick = {
+                CtrlTextButton(onClick = {
                     var picked = state.hour * 3_600_000L + state.minute * 60_000L
                     // 00:00 as an end time means the end of the day.
                     if (!isStart && picked == 0L) picked = DAY_MS
@@ -257,7 +258,7 @@ private fun ScheduleSheet(initial: PauseSchedule, readOnly: Boolean, onDismiss: 
                     picking = null
                 }) { Text(stringResource(R.string.ok)) }
             },
-            dismissButton = { TextButton(onClick = { picking = null }) { Text(stringResource(R.string.cancel)) } },
+            dismissButton = { CtrlTextButton(onClick = { picking = null }) { Text(stringResource(R.string.cancel)) } },
         )
     }
 }

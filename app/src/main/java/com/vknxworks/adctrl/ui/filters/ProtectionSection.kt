@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChildCare
-import androidx.compose.material.icons.filled.GppBad
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.ChildCare
+import androidx.compose.material.icons.outlined.GppBad
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -34,13 +34,13 @@ fun ProtectionSection(
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = LocalBottomClearance.current + 16.dp)) {
         Group(footer = stringResource(R.string.protection_footer)) {
             if (readOnly) {
-                GroupRow(stringResource(R.string.safe_browsing), stateText(safeBrowsing), icon = Icons.Filled.GppBad)
-                GroupRow(stringResource(R.string.parental), stateText(parental), icon = Icons.Filled.ChildCare)
-                GroupRow(stringResource(R.string.safe_search), stateText(safeSearch.enabled), icon = Icons.Filled.Search)
+                GroupRow(stringResource(R.string.safe_browsing), stateText(safeBrowsing), icon = Icons.Outlined.GppBad)
+                GroupRow(stringResource(R.string.parental), stateText(parental), icon = Icons.Outlined.ChildCare)
+                GroupRow(stringResource(R.string.safe_search), stateText(safeSearch.enabled), icon = Icons.Outlined.Search)
             } else {
-                GroupSwitch(stringResource(R.string.safe_browsing), stringResource(R.string.safe_browsing_subtitle), checked = safeBrowsing, icon = Icons.Filled.GppBad, onChange = onSafeBrowsing)
-                GroupSwitch(stringResource(R.string.parental), stringResource(R.string.parental_subtitle), checked = parental, icon = Icons.Filled.ChildCare, onChange = onParental)
-                GroupSwitch(stringResource(R.string.safe_search), stringResource(R.string.safe_search_subtitle), checked = safeSearch.enabled, icon = Icons.Filled.Search) {
+                GroupSwitch(stringResource(R.string.safe_browsing), stringResource(R.string.safe_browsing_subtitle), checked = safeBrowsing, icon = Icons.Outlined.GppBad, onChange = onSafeBrowsing)
+                GroupSwitch(stringResource(R.string.parental), stringResource(R.string.parental_subtitle), checked = parental, icon = Icons.Outlined.ChildCare, onChange = onParental)
+                GroupSwitch(stringResource(R.string.safe_search), stringResource(R.string.safe_search_subtitle), checked = safeSearch.enabled, icon = Icons.Outlined.Search) {
                     onSafeSearch(safeSearch.copy(enabled = it))
                 }
             }

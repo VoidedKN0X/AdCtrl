@@ -18,10 +18,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Dashboard
-import androidx.compose.material.icons.filled.Devices
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.outlined.Dashboard
 import androidx.compose.material.icons.outlined.Devices
 import androidx.compose.material.icons.outlined.FilterAlt
@@ -30,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,8 +52,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.vknxworks.adctrl.R
+import com.vknxworks.adctrl.ui.components.CtrlBottomBar
 import com.vknxworks.adctrl.ui.components.LocalBottomClearance
-import com.vknxworks.adctrl.ui.components.LocalHazeState
+import com.vknxworks.adctrl.ui.components.TabItem
+import com.vknxworks.adctrl.ui.theme.CtrlColors
 import com.vknxworks.adctrl.ui.components.rememberNotificationAccess
 import com.vknxworks.adctrl.ui.clients.ClientScreen
 import com.vknxworks.adctrl.ui.clients.ClientsScreen
@@ -75,8 +74,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.toRoute
 import com.vknxworks.adctrl.ui.settings.YouScreen
-import dev.chrisbanes.haze.hazeSource
-import dev.chrisbanes.haze.rememberHazeState
 
 @Composable
 fun AppRoot() {
@@ -97,15 +94,14 @@ private data class TopDest(
     @StringRes val label: Int,
     @StringRes val hint: Int,
     val icon: ImageVector,
-    val selectedIcon: ImageVector,
 )
 
 /** The four tabs. Overview is the only summary screen; account and settings open from the profile picture. */
 private val topDestinations = listOf(
-    TopDest(OverviewRoute, R.string.tab_overview, R.string.tab_overview_hint, Icons.Outlined.Dashboard, Icons.Filled.Dashboard),
-    TopDest(QueriesRoute, R.string.tab_queries, R.string.tab_queries_hint, Icons.Outlined.Language, Icons.Filled.Language),
-    TopDest(FiltersRoute, R.string.tab_filters, R.string.tab_filters_hint, Icons.Outlined.FilterAlt, Icons.Filled.FilterAlt),
-    TopDest(ClientsRoute, R.string.tab_clients, R.string.tab_clients_hint, Icons.Outlined.Devices, Icons.Filled.Devices),
+    TopDest(OverviewRoute, R.string.tab_overview, R.string.tab_overview_hint, Icons.Outlined.Dashboard),
+    TopDest(QueriesRoute, R.string.tab_queries, R.string.tab_queries_hint, Icons.Outlined.Language),
+    TopDest(FiltersRoute, R.string.tab_filters, R.string.tab_filters_hint, Icons.Outlined.FilterAlt),
+    TopDest(ClientsRoute, R.string.tab_clients, R.string.tab_clients_hint, Icons.Outlined.Devices),
 )
 
 @Composable
@@ -115,7 +111,7 @@ private fun MainScaffold() {
     val backStack by navController.currentBackStackEntryAsState()
     val dest = backStack?.destination
     val selectedIndex = topDestinations.indexOfFirst { top -> dest?.hierarchy?.any { it.hasRoute(top.route::class) } == true }
-    val tabs = topDestinations.map { TabItem(stringResource(it.label), it.icon, it.selectedIcon) }
+    val tabs = topDestinations.map { TabItem(stringResource(it.label), it.icon) }
 
     fun selectTab(i: Int) {
         navController.navigate(topDestinations[i].route) {
@@ -159,8 +155,15 @@ private fun MainScaffold() {
                             NavigationRailItem(
                                 selected = selected,
                                 onClick = { selectTab(i) },
-                                icon = { Icon(if (selected) tab.selectedIcon else tab.icon, contentDescription = tab.label) },
+                                icon = { Icon(tab.icon, contentDescription = tab.label) },
                                 label = { Text(tab.label) },
+                                colors = NavigationRailItemDefaults.colors(
+                                    selectedIconColor = CtrlColors.OnAccent,
+                                    selectedTextColor = CtrlColors.Text,
+                                    indicatorColor = CtrlColors.Accent,
+                                    unselectedIconColor = CtrlColors.Muted,
+                                    unselectedTextColor = CtrlColors.Muted,
+                                ),
                             )
                         }
                         Spacer(Modifier.weight(1f))
@@ -181,8 +184,8 @@ private fun MainScaffold() {
 }
 
 /**
- * Phones: content runs edge to edge and scrolls under a floating glass island.
- * The island shows on the main tabs; pushed screens get the full height.
+ * Phones: content runs edge to edge and scrolls under the floating Ctrl tab bar.
+ * The bar shows on the main tabs; pushed screens get the full height.
  */
 @Composable
 private fun PhoneLayout(
@@ -192,16 +195,14 @@ private fun PhoneLayout(
     selectedIndex: Int,
     onSelect: (Int) -> Unit,
 ) {
-    val hazeState = rememberHazeState()
     val density = LocalDensity.current
     var overlayHeight by remember { mutableStateOf(0.dp) }
 
     CompositionLocalProvider(
-        LocalHazeState provides hazeState,
         LocalBottomClearance provides if (showTabs) overlayHeight else 0.dp,
     ) {
         Box(Modifier.fillMaxSize()) {
-            Box(Modifier.fillMaxSize().hazeSource(hazeState)) {
+            Box(Modifier.fillMaxSize()) {
                 AppNavHost(navController)
             }
             Box(
@@ -210,7 +211,7 @@ private fun PhoneLayout(
                     .fillMaxWidth()
                     .onSizeChanged { overlayHeight = with(density) { it.height.toDp() } }
                     .navigationBarsPadding()
-                    .padding(bottom = 12.dp),
+                    .padding(bottom = 28.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 AnimatedVisibility(
@@ -218,7 +219,7 @@ private fun PhoneLayout(
                     enter = fadeIn() + slideInVertically { it / 2 },
                     exit = fadeOut() + slideOutVertically { it / 2 },
                 ) {
-                    GlassTabBar(items = tabs, selectedIndex = selectedIndex, onSelect = onSelect)
+                    CtrlBottomBar(items = tabs, selectedIndex = selectedIndex, onSelect = onSelect)
                 }
             }
         }

@@ -1,10 +1,8 @@
 package com.vknxworks.adctrl.ui.components
 
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -21,7 +19,7 @@ fun ConfirmDialog(
     danger: Boolean = true,
     icon: ImageVector? = null,
 ) {
-    AlertDialog(
+    CtrlAlertDialog(
         onDismissRequest = onDismiss,
         icon = if (icon != null) {
             { Icon(icon, null, tint = if (danger) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary) }
@@ -31,10 +29,10 @@ fun ConfirmDialog(
         title = { Text(title) },
         text = { Text(body, color = MaterialTheme.colorScheme.onSurfaceVariant) },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            CtrlTextButton(onClick = onConfirm) {
                 Text(confirmLabel, color = if (danger) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)
             }
         },
-        dismissButton = { TextButton(onDismiss) { Text(stringResource(R.string.cancel)) } },
+        dismissButton = { CtrlTextButton(onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }

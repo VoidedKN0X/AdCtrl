@@ -1,6 +1,17 @@
 package com.vknxworks.adctrl.ui.queries
 
+import com.vknxworks.adctrl.ui.components.CtrlSquareButton
 import androidx.compose.foundation.clickable
+import com.vknxworks.adctrl.ui.components.CtrlFilterChip
+import com.vknxworks.adctrl.ui.components.CtrlDot
+import com.vknxworks.adctrl.ui.theme.CtrlColors
+import com.vknxworks.adctrl.ui.theme.CtrlType
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.InputChipDefaults
+import androidx.compose.ui.text.font.FontWeight
+import com.vknxworks.adctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,21 +32,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.FactCheck
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.automirrored.outlined.FactCheck
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Pause
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -154,24 +163,23 @@ fun QueriesScreen() {
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
             TabTitle(stringResource(R.string.tab_queries), trailing = {
-                IconButton(onClick = { nav.navigate(CheckHostRoute()) }) {
-                    Icon(Icons.AutoMirrored.Filled.FactCheck, stringResource(R.string.check_host_title))
-                }
-                IconButton(onClick = { c.appScope.launch { c.settings.update { it.copy(queriesLive = !it.queriesLive) } } }) {
-                    Icon(
-                        if (settings.queriesLive) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                        stringResource(if (settings.queriesLive) R.string.live_pause else R.string.live_resume),
-                    )
-                }
+                CtrlSquareButton(Icons.AutoMirrored.Outlined.FactCheck, stringResource(R.string.check_host_title), onClick = { nav.navigate(CheckHostRoute()) })
+                Spacer(Modifier.width(8.dp))
+                CtrlSquareButton(
+                    if (settings.queriesLive) Icons.Outlined.Pause else Icons.Outlined.PlayArrow,
+                    stringResource(if (settings.queriesLive) R.string.live_pause else R.string.live_resume),
+                    onClick = { c.appScope.launch { c.settings.update { it.copy(queriesLive = !it.queriesLive) } } },
+                    tint = if (settings.queriesLive) CtrlColors.Accent else CtrlColors.Text,
+                )
             })
             if (connection.error != null) ConnectionBanner()
-            OutlinedTextField(
+            CtrlTextField(
                 value = text,
                 onValueChange = { text = it },
                 placeholder = { Text(stringResource(if (search.client.isNotBlank()) R.string.queries_search_domain else R.string.queries_search)) },
-                leadingIcon = { Icon(Icons.Filled.Search, null) },
+                leadingIcon = { Icon(Icons.Outlined.Search, null) },
                 trailingIcon = if (text.isNotEmpty()) {
-                    { IconButton(onClick = { text = "" }) { Icon(Icons.Filled.Clear, stringResource(R.string.clear)) } }
+                    { IconButton(onClick = { text = "" }) { Icon(Icons.Outlined.Clear, stringResource(R.string.clear)) } }
                 } else {
                     null
                 },
@@ -187,13 +195,19 @@ fun QueriesScreen() {
                 if (search.client.isNotBlank()) {
                     InputChip(
                         selected = true,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = InputChipDefaults.inputChipColors(
+                            selectedContainerColor = CtrlColors.Accent,
+                            selectedLabelColor = CtrlColors.OnAccent,
+                            selectedTrailingIconColor = CtrlColors.OnAccent,
+                        ),
                         onClick = { scope.launch { c.queries.setSearch(search.copy(client = "")) } },
                         label = { Text(stringResource(R.string.queries_client_chip, search.client)) },
-                        trailingIcon = { Icon(Icons.Filled.Close, stringResource(R.string.clear), Modifier.size(18.dp)) },
+                        trailingIcon = { Icon(Icons.Outlined.Close, stringResource(R.string.clear), Modifier.size(18.dp)) },
                     )
                 }
                 QueryFilter.entries.forEach { f ->
-                    FilterChip(
+                    CtrlFilterChip(
                         selected = search.filter == f,
                         onClick = { scope.launch { c.queries.setSearch(search.copy(filter = f)) } },
                         label = { Text(stringResource(filterLabel(f))) },
@@ -232,7 +246,7 @@ fun QueriesScreen() {
                     ) {
                         items(state.items, key = { it.key }) { item ->
                             QueryRow(item, state.listNames) { selected = item }
-                            HorizontalDivider(Modifier.padding(start = Gutter + 32.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                            HorizontalDivider(Modifier.padding(horizontal = Gutter), color = CtrlColors.Divider)
                         }
                         if (state.loadingMore) {
                             item(key = "more") {
@@ -296,38 +310,51 @@ fun QueriesScreen() {
     }
 }
 
-/** One query: time, domain, type, client, what happened, response time and upstream. */
+/**
+ * One query, as a Ctrl list row: the time in mono on the left, the domain, a mono line with what
+ * happened, and the type, client, response time and upstream underneath; a square dot in the
+ * kind's colour on the right.
+ */
 @Composable
 private fun QueryRow(item: QueryLogItem, listNames: Map<Long, String>, onClick: () -> Unit) {
     val context = LocalContext.current
     val kind = item.kind
-    val cs = MaterialTheme.colorScheme
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = Gutter, vertical = 10.dp),
+        Modifier.fillMaxWidth().heightIn(min = 52.dp).clickable(onClick = onClick).padding(horizontal = Gutter, vertical = 10.dp),
         verticalAlignment = Alignment.Top,
     ) {
-        Icon(kindIcon(kind), stringResource(kindLabel(kind)), Modifier.size(20.dp).padding(top = 2.dp), tint = kindColor(kind))
-        Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(item.domain, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
-                Spacer(Modifier.width(8.dp))
-                Text(queryTime(item.time), style = MaterialTheme.typography.labelMedium, color = cs.onSurfaceVariant)
+                Text(queryTime(item.time), style = CtrlType.Data, color = CtrlColors.Muted)
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    item.domain,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
             }
+            Spacer(Modifier.height(2.dp))
             val what = buildString {
                 append(stringResource(kindLabel(kind)))
                 if (kind == QueryKind.BLOCKED_SERVICE && item.serviceName.isNotBlank()) append(" · ").append(item.serviceName)
                 item.rules.firstOrNull()?.takeIf { kind.isBlocked || kind == QueryKind.ALLOWED }?.let { append(" · ").append(ruleSource(it, listNames)) }
                 if (item.cached) append(" · ").append(stringResource(R.string.kind_cached))
             }
-            Text(what, style = MaterialTheme.typography.bodySmall, color = kindColor(kind), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(what.uppercase(), style = CtrlType.Status, color = kindColor(kind), maxLines = 1, overflow = TextOverflow.Ellipsis)
             val meta = listOfNotNull(
                 item.question.type.takeIf { it.isNotBlank() },
                 item.clientLabel.takeIf { it.isNotBlank() },
                 item.elapsed?.let { formatMs(context, it / 1000) },
                 item.upstream.takeIf { it.isNotBlank() }?.let(::shortUpstream),
             ).joinToString(" · ")
-            Text(meta, style = MaterialTheme.typography.bodySmall, color = cs.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(meta, style = CtrlType.Data, color = CtrlColors.Muted, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
+        Spacer(Modifier.width(12.dp))
+        Icon(kindIcon(kind), stringResource(kindLabel(kind)), Modifier.padding(top = 2.dp).size(18.dp), tint = kindColor(kind))
+        Spacer(Modifier.width(8.dp))
+        CtrlDot(kindColor(kind), Modifier.padding(top = 7.dp))
     }
 }
