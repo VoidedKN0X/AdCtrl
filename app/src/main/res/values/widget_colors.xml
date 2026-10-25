@@ -6,6 +6,4 @@
     <color name="widget_border">#FFDEDED7</color>
     <color name="widget_text">#FF0B0B0D</color>
     <color name="widget_text_dim">#FF5C5C64</color>
-    <color name="widget_accent">#FF6A3BDB</color>
-    <color name="widget_track">#FFE2E2DC</color>
 </resources>

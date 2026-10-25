@@ -63,8 +63,13 @@ fun retentionLabel(context: Context, ms: Long): String {
 }
 
 /** The choices, plus the server's own value when it was set to something else (in its config file, say). */
-private fun choices(context: Context, base: List<Long>, current: Long): List<Pair<Long, String>> =
-    (if (current > 0 && current !in base) (base + current).sorted() else base).map { it to retentionLabel(context, it) }
+private fun choices(context: Context, base: List<Long>, current: Long): List<Pair<Long, String>> {
+    val options = (if (current > 0 && current !in base) (base + current).sorted() else base).map { it to retentionLabel(context, it) }
+    // A server value that isn't whole hours (say 24 h 30 min) reads like one of the choices ("1 day"): keep
+    // only the server's own value under that name, so the list never shows the same label twice.
+    val currentLabel = options.firstOrNull { it.first == current }?.second
+    return options.filter { it.first == current || it.second != currentLabel }
+}
 
 /**
  * The active server's query log and statistics: on or off, how long they're kept, IP anonymising, and
