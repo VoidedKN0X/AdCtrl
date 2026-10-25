@@ -47,6 +47,7 @@ import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -82,10 +83,10 @@ import com.vknxworks.adctrl.ui.theme.CtrlType
 // the switch, buttons, text fields, dialogs and sheets.
 
 /** The 1dp border of cards. */
-val CardBorder = BorderStroke(1.dp, CtrlColors.Outline)
+val CardBorder: BorderStroke @Composable @ReadOnlyComposable get() = BorderStroke(1.dp, CtrlColors.Outline)
 
 /** The 1dp border of controls (avatar, square buttons, secondary buttons, the tab bar). */
-val ControlBorder = BorderStroke(1.dp, CtrlColors.ControlOutline)
+val ControlBorder: BorderStroke @Composable @ReadOnlyComposable get() = BorderStroke(1.dp, CtrlColors.ControlOutline)
 
 // ---------- Type helpers ----------
 
@@ -96,7 +97,7 @@ fun CtrlWordmark(modifier: Modifier = Modifier) {
     Text(
         buildAnnotatedString {
             append(name)
-            withStyle(SpanStyle(color = CtrlColors.Accent)) { append("/") }
+            withStyle(SpanStyle(color = CtrlColors.AccentText)) { append("/") }
             append("CTRL")
         },
         style = CtrlType.Wordmark,
@@ -154,13 +155,14 @@ fun Modifier.hideFirstDivider(): Modifier = layout { measurable, constraints ->
 }
 
 /** Draws the 1dp list divider above a row. */
+@Composable
 fun Modifier.topDivider(color: Color = CtrlColors.Outline): Modifier = drawBehind {
     drawRect(color, Offset.Zero, Size(size.width, 1.dp.toPx()))
 }
 
 /** A 6dp progress bar. */
 @Composable
-fun CtrlProgress(fraction: Float, modifier: Modifier = Modifier, color: Color = CtrlColors.Text) {
+fun CtrlProgress(fraction: Float, modifier: Modifier = Modifier, color: Color = CtrlColors.TrackFill) {
     Box(modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)).background(CtrlColors.Track)) {
         Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).fillMaxHeight().clip(RoundedCornerShape(3.dp)).background(color))
     }
@@ -180,7 +182,7 @@ fun CtrlSwitch(
     enabled: Boolean = true,
 ) {
     val track by animateColorAsState(if (checked) CtrlColors.Accent else CtrlColors.SwitchOff, label = "switch-track")
-    val knob by animateColorAsState(if (checked) CtrlColors.OnAccent else CtrlColors.Disabled, label = "switch-knob")
+    val knob by animateColorAsState(if (checked) CtrlColors.OnAccent else CtrlColors.SwitchOffKnob, label = "switch-knob")
     val x by animateDpAsState(if (checked) 20.dp else 0.dp, label = "switch-x")
     val toggle = if (onCheckedChange != null) {
         Modifier.toggleable(
@@ -372,11 +374,11 @@ fun CtrlTextField(
             unfocusedContainerColor = CtrlColors.Surface,
             disabledContainerColor = CtrlColors.Surface,
             errorContainerColor = CtrlColors.Surface,
-            focusedBorderColor = CtrlColors.Accent,
+            focusedBorderColor = CtrlColors.AccentText,
             unfocusedBorderColor = CtrlColors.ControlOutline,
             disabledBorderColor = CtrlColors.Outline,
-            cursorColor = CtrlColors.Accent,
-            focusedLabelColor = CtrlColors.Accent,
+            cursorColor = CtrlColors.AccentText,
+            focusedLabelColor = CtrlColors.AccentText,
             unfocusedLabelColor = CtrlColors.Muted,
             focusedLeadingIconColor = CtrlColors.Muted,
             unfocusedLeadingIconColor = CtrlColors.Muted,
@@ -411,7 +413,7 @@ fun CtrlAlertDialog(
         text = text,
         shape = CtrlShapes.Hero,
         containerColor = CtrlColors.Surface,
-        iconContentColor = CtrlColors.Accent,
+        iconContentColor = CtrlColors.AccentText,
         titleContentColor = CtrlColors.Text,
         textContentColor = CtrlColors.Muted,
         tonalElevation = 0.dp,

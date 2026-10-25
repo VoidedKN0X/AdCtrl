@@ -165,7 +165,7 @@ fun ListsSection(
                             failing -> Health.warn
                             !list.enabled -> MaterialTheme.colorScheme.onSurfaceVariant
                             allow -> Health.ok
-                            else -> CtrlColors.Accent
+                            else -> CtrlColors.AccentText
                         },
                         onClick = if (readOnly) null else { { edit = EditTarget(list, allow) } },
                         trailing = if (readOnly) {

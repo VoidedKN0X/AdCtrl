@@ -71,11 +71,13 @@ object Notifier {
         // On a locked phone only this redacted version shows: no server names, domains or lists.
         val redacted = NotificationCompat.Builder(context, channel)
             .setSmallIcon(R.drawable.ic_notification)
+            .setColor(context.getColor(R.color.notification_accent))
             .setContentTitle(context.getString(R.string.app_name))
             .setContentText(context.getString(R.string.nt_public_text))
             .build()
         val n = NotificationCompat.Builder(context, channel)
             .setSmallIcon(R.drawable.ic_notification)
+            .setColor(context.getColor(R.color.notification_accent))
             .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setPublicVersion(redacted)
             .setContentTitle(alert.title)

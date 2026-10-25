@@ -8,7 +8,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import android.graphics.drawable.ColorDrawable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.graphics.toArgb
+import com.vknxworks.adctrl.ui.theme.CtrlColors
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -28,12 +33,8 @@ class MainActivity : ComponentActivity() {
         // Blank Recents card and no screenshots until the settings have been read; the switches below lift it.
         setRecentsScreenshotEnabled(false)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        // Ctrl / Signal is dark only: edge to edge, light status and navigation bar icons on the dark background.
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
-        )
-        window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(WINDOW_BG))
+        // Edge to edge; the bar icons are set to match the theme below, once it is known.
+        enableEdgeToEdge()
         val c = container
         if (savedInstanceState == null) handleIntent(intent)
         setContent {
@@ -49,8 +50,18 @@ class MainActivity : ComponentActivity() {
                 else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                 setRecentsScreenshotEnabled(!blankRecents)
             }
+            // Ctrl / Signal follows the device: light status and navigation bar icons on the dark background,
+            // dark icons on the light one. The window behind the app gets the theme's background too.
+            val dark = isSystemInDarkTheme()
+            DisposableEffect(dark) {
+                val style = if (dark) SystemBarStyle.dark(Color.TRANSPARENT)
+                else SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+                enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+                window.setBackgroundDrawable(ColorDrawable((if (dark) CtrlColors.Dark else CtrlColors.Light).background.toArgb()))
+                onDispose { }
+            }
             val covered = lockCovering(c.vault)
-            AdCtrlTheme {
+            AdCtrlTheme(dark) {
                 Box(Modifier.fillMaxSize()) {
                     // The app stays underneath (so nothing you typed is lost), hidden from TalkBack too.
                     Box(if (covered) Modifier.fillMaxSize().clearAndSetSemantics { } else Modifier.fillMaxSize()) { AppRoot() }
@@ -84,8 +95,5 @@ class MainActivity : ComponentActivity() {
         const val ACTION_QUERIES = "com.vknxworks.adctrl.QUERIES"
         const val ACTION_SEARCH = "com.vknxworks.adctrl.SEARCH"
         const val ACTION_BLOCKED = "com.vknxworks.adctrl.BLOCKED"
-
-        /** The Ctrl / Signal background (#08080A), also behind the status and navigation bars. */
-        private const val WINDOW_BG = 0xFF08080A.toInt()
     }
 }

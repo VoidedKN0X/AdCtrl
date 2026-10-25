@@ -101,7 +101,7 @@ fun FiltersScreen() {
                 selectedTabIndex = section.ordinal,
                 edgePadding = 12.dp,
                 containerColor = CtrlColors.Background,
-                contentColor = CtrlColors.Accent,
+                contentColor = CtrlColors.AccentText,
                 divider = { HorizontalDivider(color = CtrlColors.Divider) },
             ) {
                 Section.entries.forEach { s ->

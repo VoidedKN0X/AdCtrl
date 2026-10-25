@@ -279,7 +279,7 @@ fun <T> ChoiceSheet(
                         color = if (isSel) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f),
                     )
-                    if (isSel) Icon(Icons.Outlined.Check, stringResource(R.string.selected), tint = CtrlColors.Accent)
+                    if (isSel) Icon(Icons.Outlined.Check, stringResource(R.string.selected), tint = CtrlColors.AccentText)
                 }
             }
         }
@@ -319,7 +319,7 @@ fun EmptyState(
         Box(
             Modifier.size(72.dp).clip(RoundedCornerShape(24.dp)).background(CtrlColors.Surface).border(CardBorder, RoundedCornerShape(24.dp)),
             contentAlignment = Alignment.Center,
-        ) { Icon(icon, null, Modifier.size(30.dp), tint = CtrlColors.Accent) }
+        ) { Icon(icon, null, Modifier.size(30.dp), tint = CtrlColors.AccentText) }
         Spacer(Modifier.height(16.dp))
         Text(title, style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
         Spacer(Modifier.height(6.dp))

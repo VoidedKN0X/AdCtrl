@@ -165,7 +165,7 @@ fun PauseSheet(
                     Modifier.fillMaxWidth().clickable { onPick(d, all) }.padding(horizontal = 24.dp, vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(Icons.Outlined.Timer, null, Modifier.size(20.dp), tint = if (d == PauseDuration.UNTIL_ON) Health.critical else CtrlColors.Accent)
+                    Icon(Icons.Outlined.Timer, null, Modifier.size(20.dp), tint = if (d == PauseDuration.UNTIL_ON) Health.critical else CtrlColors.AccentText)
                     Spacer(Modifier.width(16.dp))
                     Text(stringResource(pauseLabel(d)), style = MaterialTheme.typography.bodyLarge)
                 }

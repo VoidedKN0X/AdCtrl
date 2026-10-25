@@ -125,7 +125,7 @@ In the app, the **About** section at the bottom of the **You** page (tap your pr
 
 ## The Ctrl series
 
-Native Android apps for self-hosted services and everyday tools, all with the same dark "Ctrl / Signal" design.
+Native Android apps for self-hosted services and everyday tools, all with the same "Ctrl / Signal" design, dark or light with your phone.
 
 | App | What it's for |
 | --- | --- |

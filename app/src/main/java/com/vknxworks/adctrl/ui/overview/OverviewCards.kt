@@ -288,7 +288,7 @@ fun TopListCard(
                         Text(format(e), style = CtrlType.Data, color = CtrlColors.Muted)
                     }
                     Spacer(Modifier.height(6.dp))
-                    CtrlProgress((e.value / max).toFloat().coerceIn(0.02f, 1f), Modifier.padding(start = 28.dp), color = if (i == 0) CtrlColors.Accent else CtrlColors.Text)
+                    CtrlProgress((e.value / max).toFloat().coerceIn(0.02f, 1f), Modifier.padding(start = 28.dp), color = if (i == 0) CtrlColors.Accent else CtrlColors.TrackFill)
                 }
             }
         }
