@@ -1,6 +1,8 @@
 package com.vknxworks.adctrl.ui.settings
 
+import androidx.compose.foundation.BorderStroke
 import android.content.Intent
+import com.vknxworks.adctrl.ui.components.CtrlTextButton
 import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
@@ -13,16 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BatteryAlert
-import androidx.compose.material.icons.filled.BatteryFull
-import androidx.compose.material.icons.filled.HourglassBottom
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.outlined.BatteryAlert
+import androidx.compose.material.icons.outlined.BatteryFull
+import androidx.compose.material.icons.outlined.HourglassBottom
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -105,11 +106,12 @@ fun NotificationsScreen() {
                 Surface(
                     shape = MaterialTheme.shapes.large,
                     color = MaterialTheme.colorScheme.errorContainer,
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.35f)),
                     modifier = Modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp),
                 ) {
                     Column(Modifier.padding(16.dp)) {
                         Text(stringResource(R.string.notif_permission_off), color = MaterialTheme.colorScheme.onErrorContainer)
-                        TextButton(onClick = { access.fix() }) { Text(stringResource(R.string.notif_permission_allow)) }
+                        CtrlTextButton(onClick = { access.fix() }) { Text(stringResource(R.string.notif_permission_allow)) }
                     }
                 }
             }
@@ -121,7 +123,7 @@ fun NotificationsScreen() {
                     stringResource(R.string.polling_subtitle),
                     // Shown off while notifications are blocked: the checks can't tell you anything then.
                     checked = settings.polling && canPost,
-                    icon = Icons.Filled.Schedule,
+                    icon = Icons.Outlined.Schedule,
                 ) { on ->
                     if (on) ensurePermission()
                     update { it.copy(polling = on) }
@@ -131,7 +133,7 @@ fun NotificationsScreen() {
                         stringResource(R.string.polling_interval),
                         NotifySettings.INTERVALS.map { it to pluralStringResource(R.plurals.polling_interval_value, it, it) },
                         settings.intervalMinutes,
-                        icon = Icons.Filled.Timer,
+                        icon = Icons.Outlined.Timer,
                     ) { m -> update { it.copy(intervalMinutes = m) } }
                 }
                 servers.forEach { server ->
@@ -145,7 +147,7 @@ fun NotificationsScreen() {
                 }
                 GroupRow(
                     stringResource(R.string.check_now),
-                    icon = Icons.Filled.Refresh,
+                    icon = Icons.Outlined.Refresh,
                     onClick = {
                         access.askIfPossible()
                         NotifyWorker.runNow(context)
@@ -170,7 +172,7 @@ fun NotificationsScreen() {
                             stringResource(R.string.pause_limit),
                             NotifySettings.PAUSE_LIMITS.map { it to Checker.durationLabel(context, it) },
                             settings.pauseLimitMinutes,
-                            icon = Icons.Filled.HourglassBottom,
+                            icon = Icons.Outlined.HourglassBottom,
                         ) { m -> update { it.copy(pauseLimitMinutes = m) } }
                     }
                 }
@@ -180,7 +182,7 @@ fun NotificationsScreen() {
             Group(stringResource(R.string.group_battery), footer = stringResource(R.string.battery_footer)) {
                 GroupRow(
                     stringResource(if (unrestricted) R.string.battery_unrestricted else R.string.battery_restricted),
-                    icon = if (unrestricted) Icons.Filled.BatteryFull else Icons.Filled.BatteryAlert,
+                    icon = if (unrestricted) Icons.Outlined.BatteryFull else Icons.Outlined.BatteryAlert,
                     iconTint = if (unrestricted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                 )
                 GroupRow(

@@ -18,12 +18,12 @@ import com.vknxworks.adctrl.data.widget.WidgetStore
 import com.vknxworks.adctrl.ui.components.formatCount
 import com.vknxworks.adctrl.ui.components.percent
 
-/** Health colours as on the Overview (see ui.theme.Health). */
+/** Health colours as on the Overview (see ui.theme.Health): Ctrl / Signal accent, warning, error and stopped. */
 private object WidgetColors {
-    const val OK = 0xFF6FCF97.toInt()
+    const val OK = 0xFFB48CFF.toInt()
     const val WARN = 0xFFF2C94C.toInt()
-    const val CRITICAL = 0xFFFF8A80.toInt()
-    const val IDLE = 0xFF9AA1AD.toInt()
+    const val CRITICAL = 0xFFFF6B6B.toInt()
+    const val IDLE = 0xFF8C8C94.toInt()
 }
 
 /**

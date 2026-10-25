@@ -1,15 +1,15 @@
 package com.vknxworks.adctrl.ui.queries
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.ChildCare
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.GppBad
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.ChildCare
+import androidx.compose.material.icons.outlined.Error
+import androidx.compose.material.icons.outlined.GppBad
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.SwapHoriz
+import androidx.compose.material.icons.outlined.Verified
+import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -40,15 +40,15 @@ fun kindLabel(kind: QueryKind): Int = when (kind) {
 
 /** Shape as well as colour tells the kinds apart. */
 fun kindIcon(kind: QueryKind): ImageVector = when (kind) {
-    QueryKind.BLOCKED -> Icons.Filled.Block
-    QueryKind.BLOCKED_SERVICE -> Icons.Filled.Apps
-    QueryKind.SAFE_BROWSING -> Icons.Filled.GppBad
-    QueryKind.PARENTAL -> Icons.Filled.ChildCare
-    QueryKind.SAFE_SEARCH -> Icons.Filled.Search
-    QueryKind.ALLOWED -> Icons.Filled.Verified
-    QueryKind.REWRITTEN -> Icons.Filled.SwapHoriz
-    QueryKind.PROCESSED -> Icons.Filled.CheckCircle
-    QueryKind.ERROR -> Icons.Filled.Error
+    QueryKind.BLOCKED -> Icons.Outlined.Block
+    QueryKind.BLOCKED_SERVICE -> Icons.Outlined.Apps
+    QueryKind.SAFE_BROWSING -> Icons.Outlined.GppBad
+    QueryKind.PARENTAL -> Icons.Outlined.ChildCare
+    QueryKind.SAFE_SEARCH -> Icons.Outlined.Search
+    QueryKind.ALLOWED -> Icons.Outlined.Verified
+    QueryKind.REWRITTEN -> Icons.Outlined.SwapHoriz
+    QueryKind.PROCESSED -> Icons.Outlined.CheckCircle
+    QueryKind.ERROR -> Icons.Outlined.Error
 }
 
 @Composable

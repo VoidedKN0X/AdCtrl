@@ -1,6 +1,13 @@
 package com.vknxworks.adctrl.ui.filters
 
+import com.vknxworks.adctrl.ui.components.CtrlLabel
+import com.vknxworks.adctrl.ui.theme.CtrlColors
 import androidx.compose.foundation.clickable
+import com.vknxworks.adctrl.ui.components.CtrlFilterChip
+import com.vknxworks.adctrl.ui.components.CtrlSheet
+import com.vknxworks.adctrl.ui.components.CtrlSwitch
+import com.vknxworks.adctrl.ui.components.CtrlTextButton
+import com.vknxworks.adctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,22 +27,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Block
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.FilterChip
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Block
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.FilterAlt
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.outlined.Verified
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -92,25 +94,25 @@ fun ListsSection(
                         stringResource(R.string.filtering_enabled),
                         stringResource(R.string.filtering_enabled_subtitle),
                         checked = status.enabled,
-                        icon = Icons.Filled.FilterAlt,
+                        icon = Icons.Outlined.FilterAlt,
                     ) { on -> if (on) act({ actions.setFiltering(true, status.interval) }, null) else confirmFilteringOff = true }
                     GroupChoice(
                         stringResource(R.string.filtering_interval),
                         INTERVALS.map { it to intervalLabel(it) },
                         status.interval,
-                        icon = Icons.Filled.Schedule,
+                        icon = Icons.Outlined.Schedule,
                     ) { h -> act({ actions.setFiltering(status.enabled, h) }, null) }
                     GroupRow(
                         stringResource(R.string.lists_refresh),
                         stringResource(R.string.lists_refresh_subtitle),
-                        icon = Icons.Filled.Refresh,
+                        icon = Icons.Outlined.Refresh,
                         onClick = if (busy) null else { { act({ actions.refresh() }, null) } },
                     )
                 } else {
                     GroupRow(
                         stringResource(if (status.enabled) R.string.filtering_on else R.string.filtering_off),
                         intervalLabel(status.interval),
-                        icon = Icons.Filled.FilterAlt,
+                        icon = Icons.Outlined.FilterAlt,
                     )
                 }
             }
@@ -118,15 +120,13 @@ fun ListsSection(
         listOf(false to status.filters, true to status.whitelistFilters).forEach { (allow, lists) ->
             item(key = "head-$allow") {
                 Row(Modifier.fillMaxWidth().padding(start = Gutter + 4.dp, end = Gutter, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(
+                    CtrlLabel(
                         stringResource(R.string.dot_pair, stringResource(if (allow) R.string.allowlists else R.string.blocklists), lists.size.toString()),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.weight(1f),
+                        Modifier.weight(1f),
                     )
                     if (!readOnly) {
-                        TextButton(onClick = { edit = EditTarget(null, allow) }) {
-                            Icon(Icons.Filled.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp))
+                        CtrlTextButton(onClick = { edit = EditTarget(null, allow) }) {
+                            Icon(Icons.Outlined.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(4.dp))
                             Text(stringResource(if (allow) R.string.add_allowlist else R.string.add_blocklist))
                         }
                     }
@@ -157,22 +157,22 @@ fun ListsSection(
                             ),
                         ).joinToString("\n"),
                         icon = when {
-                            failing -> Icons.Filled.Warning
-                            allow -> Icons.Filled.Verified
-                            else -> Icons.Filled.Block
+                            failing -> Icons.Outlined.Warning
+                            allow -> Icons.Outlined.Verified
+                            else -> Icons.Outlined.Block
                         },
                         iconTint = when {
                             failing -> Health.warn
                             !list.enabled -> MaterialTheme.colorScheme.onSurfaceVariant
                             allow -> Health.ok
-                            else -> MaterialTheme.colorScheme.primary
+                            else -> CtrlColors.Accent
                         },
                         onClick = if (readOnly) null else { { edit = EditTarget(list, allow) } },
                         trailing = if (readOnly) {
                             null
                         } else {
                             {
-                                Switch(
+                                CtrlSwitch(
                                     checked = list.enabled,
                                     enabled = !busy,
                                     onCheckedChange = { on -> act({ actions.setList(list.url, allow, on, list.name, list.url) }, null) },
@@ -262,7 +262,7 @@ private fun ListSheet(
     var category by remember { mutableStateOf(KnownLists.Category.GENERAL) }
     val urlOk = url.trim().let { it.startsWith("https://") || it.startsWith("http://") || it.startsWith("/") }
     val duplicate = list == null && url.trim() in existingUrls
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = MaterialTheme.colorScheme.surfaceContainer) {
+    CtrlSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(Modifier.verticalScroll(rememberScrollState()).imePadding().navigationBarsPadding().padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
                 stringResource(
@@ -274,8 +274,8 @@ private fun ListSheet(
                 ),
                 style = MaterialTheme.typography.titleLarge,
             )
-            OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.list_name)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(
+            CtrlTextField(name, { name = it }, label = { Text(stringResource(R.string.list_name)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+            CtrlTextField(
                 url,
                 { url = it.trim() },
                 label = { Text(stringResource(R.string.list_url)) },
@@ -293,7 +293,7 @@ private fun ListSheet(
             if (list != null) {
                 Row(Modifier.fillMaxWidth().clickable { enabled = !enabled }, verticalAlignment = Alignment.CenterVertically) {
                     Text(stringResource(R.string.list_enabled), style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-                    Switch(enabled, { enabled = it })
+                    CtrlSwitch(enabled, { enabled = it })
                 }
             }
             PillButton(
@@ -303,7 +303,7 @@ private fun ListSheet(
                 modifier = Modifier.fillMaxWidth(),
             )
             if (list != null) {
-                TextButton(onClick = { onRemove(list) }) { Text(stringResource(R.string.list_remove), color = MaterialTheme.colorScheme.error) }
+                CtrlTextButton(onClick = { onRemove(list) }) { Text(stringResource(R.string.list_remove), color = MaterialTheme.colorScheme.error) }
             }
             if (list == null && !target.allowlist) {
                 Spacer(Modifier.height(4.dp))
@@ -311,7 +311,7 @@ private fun ListSheet(
                 Text(stringResource(R.string.known_lists_body), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     KnownLists.Category.entries.forEach { c ->
-                        FilterChip(selected = category == c, onClick = { category = c }, label = { Text(stringResource(categoryLabel(c))) })
+                        CtrlFilterChip(selected = category == c, onClick = { category = c }, label = { Text(stringResource(categoryLabel(c))) })
                     }
                 }
                 KnownLists.all.filter { it.category == category }.forEach { k ->
@@ -324,7 +324,7 @@ private fun ListSheet(
                             Text(k.name, style = MaterialTheme.typography.bodyLarge, color = if (added) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface)
                             Text(k.url.substringAfterLast('/'), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
-                        if (added) Icon(Icons.Filled.CheckCircle, stringResource(R.string.known_added), tint = Health.ok)
+                        if (added) Icon(Icons.Outlined.CheckCircle, stringResource(R.string.known_added), tint = Health.ok)
                     }
                 }
             }

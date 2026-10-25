@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.outlined.Fingerprint
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.Lock
@@ -35,13 +33,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.container
 import com.vknxworks.adctrl.data.overview.PauseDuration
-import com.vknxworks.adctrl.data.settings.ThemeChoice
 import com.vknxworks.adctrl.ui.overview.pauseLabel
-import androidx.compose.material.icons.filled.Dns
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Dns
+import androidx.compose.material.icons.outlined.Notifications
 import com.vknxworks.adctrl.ui.nav.LocalNavigator
 import com.vknxworks.adctrl.ui.nav.NotificationsRoute
-import androidx.compose.material.icons.filled.Timer
 import com.vknxworks.adctrl.ui.components.Group
 import com.vknxworks.adctrl.ui.components.GroupChoice
 import com.vknxworks.adctrl.ui.components.GroupSwitch
@@ -49,40 +45,28 @@ import com.vknxworks.adctrl.ui.components.ScreenTopBar
 import com.vknxworks.adctrl.ui.components.rememberNotificationAccess
 import kotlinx.coroutines.launch
 
-/** App settings, in the Ctrl series order: appearance, privacy and security (app lock), then the Quick Settings tile. */
+/**
+ * App settings, in the Ctrl series order: notifications, privacy and security (app lock), then the Quick
+ * Settings tile. Ctrl / Signal is dark only, so there is no theme or dynamic colour choice any more.
+ */
 @Composable
 fun SettingsScreen() {
     val c = LocalContext.current.container
     val nav = LocalNavigator.current
     val settings by c.settings.settings.collectAsStateWithLifecycle()
-    val themeOptions = ThemeChoice.entries.map { it to stringResource(it.label) }
     val notify by c.notifySettings.settings.collectAsStateWithLifecycle()
     val notificationAccess = rememberNotificationAccess()
 
     Column(Modifier.fillMaxSize()) {
         ScreenTopBar(stringResource(R.string.settings))
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 24.dp)) {
-            Group(stringResource(R.string.group_appearance)) {
-                GroupChoice(
-                    stringResource(R.string.theme),
-                    themeOptions,
-                    settings.theme,
-                    icon = Icons.Filled.DarkMode,
-                ) { choice -> c.appScope.launch { c.settings.update { it.copy(theme = choice) } } }
-                GroupSwitch(
-                    stringResource(R.string.dynamic_colour),
-                    stringResource(R.string.dynamic_colour_subtitle),
-                    checked = settings.dynamicColor,
-                    icon = Icons.Filled.Palette,
-                ) { on -> c.appScope.launch { c.settings.update { it.copy(dynamicColor = on) } } }
-            }
             Group(stringResource(R.string.group_notifications)) {
                 GroupRow(
                     stringResource(R.string.notifications),
                     stringResource(
                         if (notify.polling && !notificationAccess.canPost) R.string.notifications_subtitle_blocked else R.string.notifications_subtitle,
                     ),
-                    icon = Icons.Filled.Notifications,
+                    icon = Icons.Outlined.Notifications,
                     showChevron = true,
                     onClick = { nav.navigate(NotificationsRoute) },
                 )
@@ -93,13 +77,13 @@ fun SettingsScreen() {
                     stringResource(R.string.tile_pause_setting),
                     PauseDuration.entries.map { it to stringResource(pauseLabel(it)) },
                     settings.tilePause,
-                    icon = Icons.Filled.Timer,
+                    icon = Icons.Outlined.Timer,
                 ) { d -> c.appScope.launch { c.settings.update { it.copy(tilePause = d) } } }
                 GroupSwitch(
                     stringResource(R.string.tile_all_setting),
                     stringResource(R.string.tile_all_setting_subtitle),
                     checked = settings.tileAllServers,
-                    icon = Icons.Filled.Dns,
+                    icon = Icons.Outlined.Dns,
                 ) { on -> c.appScope.launch { c.settings.update { it.copy(tileAllServers = on) } } }
             }
         }

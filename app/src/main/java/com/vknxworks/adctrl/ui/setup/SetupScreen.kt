@@ -1,6 +1,14 @@
 package com.vknxworks.adctrl.ui.setup
 
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
+import com.vknxworks.adctrl.ui.theme.CtrlColors
+import com.vknxworks.adctrl.ui.components.CtrlWordmark
 import androidx.compose.foundation.layout.Arrangement
+import com.vknxworks.adctrl.ui.components.CtrlTextField
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,17 +23,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Dns
-import androidx.compose.material.icons.filled.Http
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.Dns
+import androidx.compose.material.icons.outlined.Http
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Shield
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -197,15 +204,19 @@ fun SetupScreen(editId: String? = null, onDone: () -> Unit, onCancel: (() -> Uni
             if (result == null) {
                 if (onCancel == null) {
                     Column(Modifier.padding(horizontal = Gutter, vertical = 16.dp)) {
-                        Icon(Icons.Filled.Shield, null, Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary)
-                        Spacer(Modifier.height(16.dp))
-                        Text(stringResource(R.string.setup_title), style = MaterialTheme.typography.headlineMedium)
+                        CtrlWordmark()
+                        Spacer(Modifier.height(28.dp))
+                        Box(Modifier.size(72.dp).clip(RoundedCornerShape(24.dp)).background(CtrlColors.Accent), contentAlignment = Alignment.Center) {
+                            Icon(Icons.Outlined.Shield, null, Modifier.size(32.dp), tint = CtrlColors.OnAccent)
+                        }
+                        Spacer(Modifier.height(20.dp))
+                        Text(stringResource(R.string.setup_title), style = MaterialTheme.typography.headlineLarge)
                         Spacer(Modifier.height(8.dp))
                         Text(stringResource(R.string.setup_intro), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 Column(Modifier.padding(horizontal = Gutter), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedTextField(
+                    CtrlTextField(
                         value = address,
                         onValueChange = { address = it.trim(); error = null; connected = null },
                         label = { Text(stringResource(R.string.field_address)) },
@@ -222,7 +233,7 @@ fun SetupScreen(editId: String? = null, onDone: () -> Unit, onCancel: (() -> Uni
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next, autoCorrectEnabled = false),
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    OutlinedTextField(
+                    CtrlTextField(
                         value = name,
                         onValueChange = { name = it },
                         label = { Text(stringResource(R.string.field_name)) },
@@ -230,7 +241,7 @@ fun SetupScreen(editId: String? = null, onDone: () -> Unit, onCancel: (() -> Uni
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    OutlinedTextField(
+                    CtrlTextField(
                         value = username,
                         onValueChange = { username = it.trim() },
                         label = { Text(stringResource(R.string.field_username)) },
@@ -238,7 +249,7 @@ fun SetupScreen(editId: String? = null, onDone: () -> Unit, onCancel: (() -> Uni
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next, autoCorrectEnabled = false),
                         modifier = Modifier.fillMaxWidth(),
                     )
-                    OutlinedTextField(
+                    CtrlTextField(
                         value = password,
                         onValueChange = { password = it },
                         label = { Text(stringResource(R.string.field_password)) },
@@ -257,7 +268,7 @@ fun SetupScreen(editId: String? = null, onDone: () -> Unit, onCancel: (() -> Uni
                         trailingIcon = {
                             IconButton(onClick = { showPassword = !showPassword }) {
                                 Icon(
-                                    if (showPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                    if (showPassword) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
                                     stringResource(if (showPassword) R.string.hide_password else R.string.show_password),
                                 )
                             }
@@ -272,7 +283,7 @@ fun SetupScreen(editId: String? = null, onDone: () -> Unit, onCancel: (() -> Uni
                             stringResource(R.string.http_switch),
                             stringResource(R.string.http_switch_subtitle),
                             checked = allowHttp,
-                            icon = Icons.Filled.Http,
+                            icon = Icons.Outlined.Http,
                         ) { on -> if (on) httpPrompt = true else allowHttp = false }
                     }
                 }
@@ -338,7 +349,7 @@ private fun ConnectedSummary(result: Connected, readOnly: Boolean, onReadOnly: (
     val server = result.server
     val status = result.status
     Column(Modifier.padding(horizontal = Gutter, vertical = 16.dp)) {
-        Icon(Icons.Filled.Dns, null, Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary)
+        Icon(Icons.Outlined.Dns, null, Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary)
         Spacer(Modifier.height(16.dp))
         Text(stringResource(R.string.connected_to, server.name), style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(4.dp))
@@ -355,7 +366,7 @@ private fun ConnectedSummary(result: Connected, readOnly: Boolean, onReadOnly: (
         GroupRow(
             stringResource(if (status.protectionEnabled) R.string.protection_on else R.string.protection_off),
             dnsSummary(status),
-            icon = Icons.Filled.Shield,
+            icon = Icons.Outlined.Shield,
         )
         GroupRow(
             server.displayUrl,
@@ -366,7 +377,7 @@ private fun ConnectedSummary(result: Connected, readOnly: Boolean, onReadOnly: (
                     else -> R.string.cert_system
                 },
             ),
-            icon = if (server.isHttp) Icons.Filled.Http else Icons.Filled.Lock,
+            icon = if (server.isHttp) Icons.Outlined.Http else Icons.Outlined.Lock,
         )
     }
     Group {

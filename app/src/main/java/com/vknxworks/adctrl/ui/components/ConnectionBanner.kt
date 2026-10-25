@@ -1,5 +1,6 @@
 package com.vknxworks.adctrl.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +15,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -50,6 +50,7 @@ fun ConnectionBanner(modifier: Modifier = Modifier) {
     Surface(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.errorContainer,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.35f)),
         modifier = modifier.fillMaxWidth().padding(horizontal = Gutter, vertical = 8.dp),
     ) {
         Column(Modifier.padding(start = 16.dp, end = 8.dp, top = 14.dp, bottom = 4.dp)) {
@@ -67,7 +68,7 @@ fun ConnectionBanner(modifier: Modifier = Modifier) {
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 if (needsSetup) {
-                    TextButton(onClick = { nav.navigate(EditServerRoute(server.id)) }) {
+                    CtrlTextButton(onClick = { nav.navigate(EditServerRoute(server.id)) }) {
                         Text(
                             stringResource(
                                 when (error) {
@@ -80,7 +81,7 @@ fun ConnectionBanner(modifier: Modifier = Modifier) {
                     }
                 }
                 // Also after updating an old AdGuard Home: Retry checks the version again.
-                TextButton(onClick = c.sessions::refreshStatus) { Text(stringResource(R.string.retry)) }
+                CtrlTextButton(onClick = c.sessions::refreshStatus) { Text(stringResource(R.string.retry)) }
             }
         }
     }

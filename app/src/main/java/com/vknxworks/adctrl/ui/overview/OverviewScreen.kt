@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CleaningServices
-import androidx.compose.material.icons.filled.SystemUpdate
+import androidx.compose.material.icons.outlined.CleaningServices
+import androidx.compose.material.icons.outlined.SystemUpdate
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -48,7 +48,21 @@ import com.vknxworks.adctrl.ui.components.ConnectionBanner
 import com.vknxworks.adctrl.ui.components.LocalBottomClearance
 import com.vknxworks.adctrl.ui.components.PollWhileVisible
 import com.vknxworks.adctrl.ui.components.StaleBanner
-import com.vknxworks.adctrl.ui.components.TabTitle
+import com.vknxworks.adctrl.ui.components.CtrlLabel
+import com.vknxworks.adctrl.ui.components.CtrlWordmark
+import com.vknxworks.adctrl.ui.components.ProfileButton
+import com.vknxworks.adctrl.ui.theme.CtrlColors
+import com.vknxworks.adctrl.ui.theme.CtrlType
+import com.vknxworks.adctrl.ui.theme.Gutter
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.text.style.TextOverflow
 import com.vknxworks.adctrl.ui.components.errorMessage
 import com.vknxworks.adctrl.ui.components.formatCount
 import kotlinx.coroutines.delay
@@ -167,7 +181,11 @@ fun OverviewScreen() {
 
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().statusBarsPadding()) {
-            TabTitle(stringResource(R.string.tab_overview))
+            OverviewHeader(
+                serverName = server?.name.orEmpty(),
+                online = connection.status != null && connection.error == null,
+                version = status?.version.orEmpty(),
+            )
             val err = state.error
             if (connection.error != null) {
                 ConnectionBanner()
@@ -185,7 +203,21 @@ fun OverviewScreen() {
                 },
                 modifier = Modifier.weight(1f),
             ) {
-                LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = LocalBottomClearance.current + 16.dp)) {
+                val statsVersion = status?.version?.let { AghVersion.parse(it) }
+                val interval = snap?.statsConfig?.interval ?: 0
+                val available = if (statsVersion?.statsRecent == true && interval > 0) StatsRange.entries.filter { it.ms <= interval } else emptyList()
+                val days = (interval / 86_400_000L).toInt()
+                val hours = (interval / 3_600_000L).toInt()
+                val whole = when {
+                    interval <= 0 -> null
+                    days >= 1 -> pluralStringResource(R.plurals.range_last_days, days, days)
+                    else -> pluralStringResource(R.plurals.range_last_hours, hours, hours)
+                }
+                val heroRange = if (available.isNotEmpty()) stringResource(rangeLabel(state.range)) else whole
+                LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 4.dp, bottom = LocalBottomClearance.current + 16.dp)) {
+                    snap?.stats?.let { heroStats ->
+                        item(key = "hero") { BlockedHeroCard(heroStats, heroRange) }
+                    }
                     item(key = "protection") {
                         ProtectionCard(
                             state = protection,
@@ -201,19 +233,7 @@ fun OverviewScreen() {
                     }
                     if (snap != null && snap.stats != null) {
                         val stats = snap.stats
-                        item(key = "range") {
-                            val version = status?.version?.let { AghVersion.parse(it) }
-                            val interval = snap.statsConfig?.interval ?: 0
-                            val available = if (version?.statsRecent == true && interval > 0) StatsRange.entries.filter { it.ms <= interval } else emptyList()
-                            val days = (interval / 86_400_000L).toInt()
-                            val hours = (interval / 3_600_000L).toInt()
-                            val whole = when {
-                                interval <= 0 -> null
-                                days >= 1 -> pluralStringResource(R.plurals.range_last_days, days, days)
-                                else -> pluralStringResource(R.plurals.range_last_hours, hours, hours)
-                            }
-                            RangeChips(available, state.range, whole, c.overview::setRange)
-                        }
+                        item(key = "range") { RangeChips(available, state.range, whole, c.overview::setRange) }
                         item(key = "grid") { StatsGrid(stats) }
                         item(key = "chart") { QueriesChart(stats, snap.updatedAt) }
                         item(key = "top-queried") {
@@ -293,7 +313,7 @@ fun OverviewScreen() {
             onDismiss = { pending = null },
             onConfirm = { pending = null; runAction(Pending.CLEAR_CACHE) },
             danger = false,
-            icon = Icons.Filled.CleaningServices,
+            icon = Icons.Outlined.CleaningServices,
         )
         Pending.UPDATE -> ConfirmDialog(
             title = stringResource(R.string.update_confirm_title, snap?.versionInfo?.newVersion.orEmpty()),
@@ -301,8 +321,38 @@ fun OverviewScreen() {
             confirmLabel = stringResource(R.string.update_confirm),
             onDismiss = { pending = null },
             onConfirm = { pending = null; runAction(Pending.UPDATE) },
-            icon = Icons.Filled.SystemUpdate,
+            icon = Icons.Outlined.SystemUpdate,
         )
         null -> Unit
+    }
+}
+
+/**
+ * The top of the Overview, as in every Ctrl app: the wordmark and the profile picture, then a mono
+ * status line and the server's name in display size, then the AdGuard Home version.
+ */
+@Composable
+private fun OverviewHeader(serverName: String, online: Boolean, version: String) {
+    Column(Modifier.fillMaxWidth().padding(start = Gutter, end = Gutter, top = 12.dp, bottom = 14.dp)) {
+        Row(Modifier.fillMaxWidth().heightIn(min = 44.dp), verticalAlignment = Alignment.CenterVertically) {
+            CtrlWordmark(Modifier.weight(1f))
+            ProfileButton()
+        }
+        Spacer(Modifier.height(22.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            CtrlLabel(
+                stringResource(R.string.overview_status_line, stringResource(if (online) R.string.overview_online else R.string.overview_offline)),
+                color = if (online) CtrlColors.Muted else CtrlColors.Error,
+            )
+            Text(
+                serverName.ifBlank { stringResource(R.string.tab_overview) },
+                style = MaterialTheme.typography.displayLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            if (version.isNotBlank()) {
+                Text(stringResource(R.string.agh_version, version), style = CtrlType.Data, color = CtrlColors.Muted)
+            }
+        }
     }
 }

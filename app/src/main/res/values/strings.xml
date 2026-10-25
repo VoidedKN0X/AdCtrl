@@ -37,14 +37,10 @@
     <string name="about_footer">%1$s %2$s · %3$s</string>
 
     <!-- Settings -->
-    <string name="group_appearance">Appearance</string>
-    <string name="theme">Theme</string>
     <string name="theme_system">Follow system</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_light">Light</string>
     <string name="theme_black">Pure black</string>
-    <string name="dynamic_colour">Use wallpaper colours</string>
-    <string name="dynamic_colour_subtitle">Replaces the default colours with ones from your wallpaper</string>
     <!-- Common actions -->
     <string name="cancel">Cancel</string>
     <string name="retry">Retry</string>
@@ -206,6 +202,15 @@
     <string name="info_dhcp">DHCP server</string>
     <string name="state_on">On</string>
     <string name="state_off">Off</string>
+    <string name="state_paused">Paused</string>
+    <string name="state_waiting">Waiting</string>
+    <string name="protection_label">Protection</string>
+    <string name="hero_blocked">Blocked by filters</string>
+    <string name="hero_blocked_of">%1$s of\n%2$s queries</string>
+    <string name="overview_status_line">AdGuard Home · %1$s</string>
+    <string name="overview_online">Online</string>
+    <string name="overview_offline">Offline</string>
+    <string name="you_footer_badges" translatable="false">GOOGLE-FREE · TELEMETRY-FREE · ARM64</string>
     <string name="clear_cache">Clear DNS cache</string>
     <string name="clear_cache_subtitle">Forget cached answers, so new lookups go to the upstream servers</string>
     <string name="clear_cache_confirm_title">Clear the DNS cache?</string>
@@ -605,7 +610,8 @@
     <string name="hide_screenshots_subtitle">Screenshots and screen recordings show a blank screen</string>
     <string name="hide_recents">Hide in recent apps</string>
     <string name="hide_recents_subtitle">The recent apps view shows a blank card instead of the app</string>
-    <string name="lock_title">AdCtrl is locked</string>
+    <string name="lock_title">Locked</string>
+    <string name="lock_brand" translatable="false">VKNXWORKS · CTRL</string>
     <string name="lock_prompt_title">Unlock AdCtrl</string>
     <string name="lock_prompt_subtitle">Your AdGuard Home servers</string>
     <string name="lock_use_pin">Use PIN</string>

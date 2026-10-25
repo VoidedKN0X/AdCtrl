@@ -4,6 +4,41 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.10.0 (2026-10-25)
+
+AdCtrl has a new look: "Ctrl / Signal", the design every Ctrl app is moving to. It's dark and high-contrast, with one lilac accent (#B48CFF). It only changes how AdCtrl looks: every screen, feature, setting and shortcut works the same as before.
+
+### Changed
+
+- **Dark only**: AdCtrl now always uses the near-black Ctrl / Signal colours (#08080A background, #141417 cards, off-white #F4F4F2 text, muted grey #A3A3AB for secondary text). The status and navigation bars use the same background, with light icons, edge to edge.
+- **New fonts**: Space Grotesk for all text and headings, and JetBrains Mono for numbers, times, addresses, section labels and the wordmark. Both are bundled in the app (nothing is downloaded) and are free fonts under the SIL Open Font License. They replace Manrope.
+- **New top of every tab**: an "AD/CTRL" wordmark (the slash in the accent) on the left and your profile picture on the right, as a rounded square with the first letter of the server's name. A small accent square on its corner shows you're connected. Tapping it still opens your profile, servers and settings.
+- **Overview**: the server's name is shown big at the top, with "ADGUARD HOME · ONLINE" (or OFFLINE in red) above it and the AdGuard Home version below.
+- **Blocked share as the hero card**: the first card on the Overview is an accent-coloured card with the share of queries blocked by filters as one giant number, how many queries that is, and a bar chart of the last 24 hours (or days, depending on the period you picked). Each bar is the queries in that hour or day, and the dark part at its foot is what was blocked.
+- **Protection card**: shows "PROTECTION" with a mono ON / PAUSED / OFF / WAITING status and a square status dot, and the big protection switch is the new Ctrl switch. Switching off still opens the pause menu first; Resume now and Change still appear while paused or off.
+- **Numbers as metric cards**: DNS queries, average processing time, malware and phishing, adult websites and safe search are separate cards, each with a mono label and a large number.
+- **Top lists**: every entry has its rank in mono (01, 02 …), the count in mono, and a 6dp bar; the top entry's bar is in the accent.
+- **Query log**: each row starts with the time in mono, then the domain; what happened is a mono status line in its colour, and the type, client, response time and upstream are on a mono line below. A square dot in the status colour sits on the right. Rows are separated by thin dividers.
+- **Floating tab bar**: a dark bar with rounded corners floating above the bottom of the screen. The selected tab is an accent block with its icon and name; the others show only their icon. Screens leave room at the bottom so nothing is hidden behind it. The frosted-glass effect is gone, which also removes the haze blur library from the app.
+- **Switches**: every switch in the app is the new Ctrl switch, a rounded rectangle with a square knob: accent with a dark knob when on, grey when off. TalkBack still reads them as switches.
+- **Buttons**: main buttons (Save, Connect, Support) are accent-filled with dark text and 56dp tall; secondary buttons (Resume now, Block, Unblock, Check host, Clear) are dark with a thin border. Text buttons have rounded-square corners.
+- **Text fields**: dark fields with a thin border and rounded corners; the border and cursor turn accent while you type.
+- **Cards and settings groups**: dark cards with a thin border and 22dp corners. Group titles ("PRIVACY AND SECURITY", "NOTIFICATIONS", "BLOCKLISTS" …) are small mono capitals. Rows inside a group are separated by dividers, and their icons are plain outlined icons instead of tinted circles.
+- **Dialogs and bottom sheets**: dark, with a thin border and 26dp corners.
+- **Filters tab**: the section tabs (Lists, Rules, Services, Rewrites, Protection) use an accent indicator under the selected one; blocked services are rounded tiles.
+- **Clients**: client pictures are rounded squares instead of circles; on a client's page the picture is an accent square.
+- **App lock**: new lock screen with an accent lock badge, "VKNXWORKS · CTRL", a big "Locked" title, square PIN cells (filled in the accent as you type) and a 3-column keypad of rounded keys with mono digits. The fingerprint key sits left of 0, outlined in the accent; the delete key sits right of 0. When your PIN length needs an OK, the OK key takes the fingerprint key's place while you type. How the lock works is unchanged: same PIN, same fingerprint, same timeouts, "Forgot PIN?" and Confirm changes.
+- **Profile page (tap your profile picture)**: the server is shown as an accent square with its letter, its name and its address in mono. **Support AdCtrl** is now an accent button at the bottom, above a "GOOGLE-FREE · TELEMETRY-FREE · ARM64" line and the version. The Settings row uses a sliders icon instead of a gear.
+- **Server setup**: the first-start screen shows the wordmark and an accent shield badge.
+- **Home screen widget**: always dark with the Ctrl / Signal colours (no longer follows the wallpaper colours) and a thin border; "protection on" is shown in the accent.
+- **Launcher icon and app shortcuts**: same shapes as before, recoloured from green to the new accent on the darker background.
+- **Charts**: lines are off-white for all queries and accent for blocked ones.
+- Icons across the app use the outlined style.
+
+### Removed
+
+- **Theme and Use wallpaper colours** (Settings › Appearance): Ctrl / Signal is dark only and doesn't use wallpaper (Material You) colours, so the Appearance group is gone. If you had picked Light, Follow system or Pure black, or turned wallpaper colours on, AdCtrl now uses the dark Ctrl / Signal look anyway; your other settings are untouched.
+
 ## v0.9.4 (2026-10-22)
 
 ### Fixed
