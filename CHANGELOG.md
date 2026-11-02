@@ -4,6 +4,12 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.12.2 (2026-11-02)
+
+### Fixed
+
+- **Bottom sheets no longer show a stray grey box/outline**: every sheet that slides up from the bottom (the pause menu, choice lists in Settings, the query details, adding or editing a blocklist, a DNS rewrite or a client, a client's blocked services and upstreams, and the blocked services schedule) drew its thin grey border in the wrong place: a grey rectangle cut across the sheet partway down, often through the first row, and a rounded outline showed near the top of the screen. Sheets now have no border at all, just the card colour with rounded top corners; the dimmed background already sets them apart. Dialogs keep their border, which was always drawn correctly.
+
 ## v0.12.1 (2026-10-25)
 
 ### Fixed

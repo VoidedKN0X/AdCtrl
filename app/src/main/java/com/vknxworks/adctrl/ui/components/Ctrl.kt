@@ -440,7 +440,7 @@ fun CtrlAlertDialog(
     )
 }
 
-/** A bottom sheet: surface fill, 26dp top corners, 1dp border. */
+/** A bottom sheet: surface fill and 26dp top corners, no outline (the scrim separates it; a border modifier would be drawn before the sheet's offset). */
 @Composable
 fun CtrlSheet(
     onDismissRequest: () -> Unit,
@@ -456,7 +456,6 @@ fun CtrlSheet(
         containerColor = CtrlColors.Surface,
         contentColor = CtrlColors.Text,
         tonalElevation = 0.dp,
-        modifier = Modifier.border(CardBorder, shape),
         content = content,
     )
 }
