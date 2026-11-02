@@ -154,6 +154,12 @@ class AppContainer(val context: Context) {
         ProtectionWidget.redraw(context)
     }
 
+    /**
+     * The lock timeout ran out while AdCtrl was away: lock now. For the Quick Settings tile and the
+     * widget, which work without AdCtrl on screen. Main thread only.
+     */
+    fun lockIfExpired() = AppLock.lockIfExpired(vault.enabled, settings.settings.value.lockTimeout.millis)
+
     fun onUnlocked() {
         AppLock.markUnlocked()
         locked.value = false

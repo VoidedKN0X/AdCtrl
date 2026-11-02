@@ -55,6 +55,7 @@ import com.vknxworks.adctrl.data.notify.PushStatus
 import com.vknxworks.adctrl.data.notify.UnifiedPush
 import com.vknxworks.adctrl.ui.components.CtrlSecondaryButton
 import com.vknxworks.adctrl.ui.components.copySensitive
+import com.vknxworks.adctrl.ui.components.SecureScreen
 import com.vknxworks.adctrl.ui.components.Group
 import com.vknxworks.adctrl.ui.components.GroupChoice
 import com.vknxworks.adctrl.ui.components.GroupRow
@@ -208,6 +209,8 @@ fun NotificationsScreen() {
                         }
                         is PushStatus.Unavailable -> PushNote(stringResource(R.string.push_unavailable)) {}
                         is PushStatus.Registered -> {
+                            // The push address works like a password: keep this screen out of screenshots while it shows.
+                            SecureScreen()
                             GroupRow(
                                 stringResource(R.string.push_endpoint),
                                 st.endpoint,

@@ -60,6 +60,7 @@ class ProtectionTileService : TileService() {
     private fun watch() {
         listening?.cancel()
         listening = scope.launch {
+            container.lockIfExpired()
             if (container.locked.value) {
                 render(getString(R.string.tile_locked))
                 return@launch
@@ -94,6 +95,8 @@ class ProtectionTileService : TileService() {
         super.onClick()
         val server = container.sessions.active.value?.server
         val c = container
+        // Away for longer than the lock timeout: AdCtrl counts as locked now, not only once it's opened again.
+        c.lockIfExpired()
         if (server == null || server.readOnly || c.locked.value || (c.vault.enabled && c.settings.settings.value.lockChanges)) {
             openApp()
             return

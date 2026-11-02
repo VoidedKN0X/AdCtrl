@@ -178,6 +178,17 @@ object AppLock {
         if (SystemClock.elapsedRealtime() - since >= limit) lock()
     }
 
+    /**
+     * Locks now when AdCtrl has been away for longer than the lock timeout. Leaving the app only notes
+     * the time and [onForeground] locks when it comes back on screen, so the Quick Settings tile and the
+     * widget, which work without AdCtrl on screen, call this first.
+     */
+    fun lockIfExpired(enabled: Boolean, timeoutMillis: Long) {
+        if (!enabled || !unlocked || inForeground || backgroundAt <= 0 || timeoutMillis < 0) return
+        val limit = if (exemptTrip) maxOf(timeoutMillis, EXEMPT_TRIP_MAX) else timeoutMillis
+        if (SystemClock.elapsedRealtime() - backgroundAt >= limit) lock()
+    }
+
     private const val EXEMPT_TRIP_MAX = 5 * 60_000L
 
     /** One confirmation (or unlocking) covers changes for the next minute. */

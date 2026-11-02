@@ -4,6 +4,21 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.12.3 (2026-11-02)
+
+Security fixes for the app lock with the Quick Settings tile and the widget, and a more beginner-friendly project page.
+
+### Security
+
+- **Quick Settings tile and widget respect the lock timeout**: with the app lock set to lock again after 1, 5 or 15 minutes or 1 hour, AdCtrl only noticed the time had run out once you opened it again. Until then, the Quick Settings tile could still pause or resume protection and the widget kept showing your server, even long after the timeout. Both now check the timeout first: once it has run out, AdCtrl locks straight away, the tile says AdCtrl is locked and opens the lock screen, and the widget only says AdCtrl is locked (while your passwords are sealed).
+- **Push address kept out of screenshots**: while the Notifications page shows your ntfy push address (which works like a password), the page is kept out of screenshots, screen recordings and the recent apps preview, whatever **Hide in screenshots** is set to.
+
+### Project
+
+- New **SECURITY.md**: how to report a security problem privately, what counts, and the release key's fingerprint.
+- New issue forms for bug reports and feature requests, with a reminder to remove addresses, passwords and personal info; security problems go to a private report instead.
+- README: clearer install steps (which file to tap under **Assets**), a new **Is it safe to install?** section with the signing key fingerprint and what each permission is for, a **How AdCtrl is made** section, the full Ctrl series list, and a security line under Support. The empty Screenshots section is gone.
+
 ## v0.12.2 (2026-11-02)
 
 ### Fixed

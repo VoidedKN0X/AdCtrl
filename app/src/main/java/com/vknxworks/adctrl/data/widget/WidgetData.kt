@@ -85,6 +85,8 @@ object WidgetData {
     /** Asks the active server for its protection state and last 24 hours, then redraws. */
     suspend fun refresh(context: Context) {
         val c = context.container
+        // Away for longer than the lock timeout: lock now, so sealed passwords aren't used and the widget says it's locked.
+        withContext(Dispatchers.Main) { c.lockIfExpired() }
         val server = c.sessions.active.value?.server
         if (server == null) {
             WidgetStore.clear(context)

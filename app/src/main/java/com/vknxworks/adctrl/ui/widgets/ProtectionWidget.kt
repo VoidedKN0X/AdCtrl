@@ -43,6 +43,8 @@ private fun RemoteViews.tintIcon(c: WidgetColors) = setColorInt(R.id.widget_icon
 class ProtectionWidget : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
+        // Away for longer than the lock timeout: lock first, so the widget doesn't keep showing the server.
+        runCatching { context.container.lockIfExpired() }
         draw(context, manager, ids)
         // Every 30 minutes (updatePeriodMillis) and when placed: fetch fresh numbers in the background.
         WidgetRefreshWorker.enqueue(context)
