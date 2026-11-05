@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipDescription
 import android.content.ClipboardManager
 import android.content.Context
-import android.os.Build
 import android.os.PersistableBundle
 import android.view.View
 import android.view.Window
@@ -50,12 +49,10 @@ fun SecureScreen() {
  */
 fun Window.shield(on: Boolean, sensitiveData: Boolean = false) {
     runCatching { setHideOverlayWindows(on) }
-    if (Build.VERSION.SDK_INT >= 34) {
-        runCatching {
-            decorView.setAccessibilityDataSensitive(
-                if (on && sensitiveData) View.ACCESSIBILITY_DATA_SENSITIVE_YES else View.ACCESSIBILITY_DATA_SENSITIVE_AUTO,
-            )
-        }
+    runCatching {
+        decorView.setAccessibilityDataSensitive(
+            if (on && sensitiveData) View.ACCESSIBILITY_DATA_SENSITIVE_YES else View.ACCESSIBILITY_DATA_SENSITIVE_AUTO,
+        )
     }
 }
 

@@ -2,7 +2,7 @@
 
 **Control your AdGuard Home DNS server from your phone.**
 
-[![Latest release](https://img.shields.io/github/v/release/VoidedKN0X/AdCtrl?label=download)](https://github.com/VoidedKN0X/AdCtrl/releases/latest) ![Android 13+](https://img.shields.io/badge/Android-13%2B-3DDC84?logo=android&logoColor=white) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE) ![Telemetry-free](https://img.shields.io/badge/telemetry-none-brightgreen) [![Sponsor](https://img.shields.io/badge/sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/VoidedKN0X)
+[![Latest release](https://img.shields.io/github/v/release/VoidedKN0X/AdCtrl?label=download)](https://github.com/VoidedKN0X/AdCtrl/releases/latest) ![Android 15+](https://img.shields.io/badge/Android-15%2B-3DDC84?logo=android&logoColor=white) [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE) ![Telemetry-free](https://img.shields.io/badge/telemetry-none-brightgreen) [![Sponsor](https://img.shields.io/badge/sponsor-GitHub-ea4aaa?logo=githubsponsors&logoColor=white)](https://github.com/sponsors/VoidedKN0X)
 
 AdCtrl is an Android app for [AdGuard Home](https://github.com/AdguardTeam/AdGuardHome): a fast, touch-first alternative to the web UI for what you do from your phone. See what's blocked, unblock a site that broke, pause protection and keep an eye on the devices on your network, from the app, a Quick Settings tile, a home screen widget or app shortcuts, with notifications when protection stays off or a server goes down.
 
@@ -27,7 +27,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 ## Requirements
 
-- Android 13 or newer, on a 64-bit ARM phone (nearly every phone from the last several years)
+- Android 15 or newer, on a 64-bit ARM phone (nearly every phone from the last several years)
 - AdGuard Home v0.107.37 or newer
 - **Google-free and de-Googled:** no Google Play services, Firebase or other Google services, and the app never contacts Google. It works the same on de-Googled phones (GrapheneOS, CalyxOS, /e/OS, LineageOS without Google apps).
 
