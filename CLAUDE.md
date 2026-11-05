@@ -12,6 +12,10 @@ Android app for a self-hosted AdGuard Home DNS server. Part of the VKNXWorks Ctr
 - Test rule changes with a harmless test domain first. Never disable protection or block a client without the user confirming on the device.
 - CI runs a Google-free dependency audit on every build; keep it passing.
 
+## Dependency verification
+
+Gradle checks every library and plugin download against its SHA-256 in `gradle/verification-metadata.xml` (checksums only, no PGP). When a dependency or plugin changes, run the `verification-metadata.yml` workflow (`gh api -X POST repos/VoidedKN0X/AdCtrl/actions/workflows/verification-metadata.yml/dispatches -f ref=main`), decode the file from its log, check the diff (only Maven Central, Google's Maven and the Gradle plugin portal) and commit it in the same push. Never turn verification off or make it lenient.
+
 ## Releasing
 
 - A release is published only when `versionName` in `app/build.gradle.kts` is bumped. Bump `versionCode` by 1 at the same time.
