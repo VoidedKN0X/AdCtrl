@@ -27,7 +27,11 @@ fun ConfirmDialog(
             null
         },
         title = { Text(title) },
-        text = { Text(body, color = MaterialTheme.colorScheme.onSurfaceVariant) },
+        text = {
+            // No other app's floating window over a destructive confirmation.
+            ShieldDialogWindow()
+            Text(body, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        },
         confirmButton = {
             CtrlTextButton(onClick = onConfirm) {
                 Text(confirmLabel, color = if (danger) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)

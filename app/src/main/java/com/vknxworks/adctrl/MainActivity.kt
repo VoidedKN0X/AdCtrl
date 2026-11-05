@@ -23,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.ui.components.ScreenPrivacy
+import com.vknxworks.adctrl.ui.components.shield
 import com.vknxworks.adctrl.ui.nav.AppRoot
 import com.vknxworks.adctrl.ui.theme.AdCtrlTheme
 
@@ -50,6 +51,11 @@ class MainActivity : ComponentActivity() {
                 else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
                 setRecentsScreenshotEnabled(!blankRecents)
             }
+            // The lock screen, PIN screens, "Confirm changes" and screens with a password or secret: no other app's
+            // floating window over them, and their content hidden from apps misusing accessibility. Lifted again when
+            // they close, so overlays keep working in the rest of the app.
+            val shielded = ScreenPrivacy.forced > 0 || lockCovering(c.vault)
+            LaunchedEffect(shielded) { window.shield(shielded) }
             // Ctrl / Signal follows the device: light status and navigation bar icons on the dark background,
             // dark icons on the light one. The window behind the app gets the theme's background too.
             val dark = isSystemInDarkTheme()
