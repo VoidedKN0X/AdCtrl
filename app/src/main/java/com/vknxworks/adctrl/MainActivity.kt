@@ -52,10 +52,12 @@ class MainActivity : ComponentActivity() {
                 setRecentsScreenshotEnabled(!blankRecents)
             }
             // The lock screen, PIN screens, "Confirm changes" and screens with a password or secret: no other app's
-            // floating window over them, and their content hidden from apps misusing accessibility. Lifted again when
-            // they close, so overlays keep working in the rest of the app.
+            // floating window over them. Lifted again when they close, so overlays keep working in the rest of the
+            // app. Only the lock and PIN screens are also hidden from apps misusing accessibility; screens with a
+            // password stay readable so password managers can fill them.
             val shielded = ScreenPrivacy.forced > 0 || lockCovering(c.vault)
-            LaunchedEffect(shielded) { window.shield(shielded) }
+            val lockShown = lockCovering(c.vault)
+            LaunchedEffect(shielded, lockShown) { window.shield(shielded, sensitiveData = lockShown) }
             // Ctrl / Signal follows the device: light status and navigation bar icons on the dark background,
             // dark icons on the light one. The window behind the app gets the theme's background too.
             val dark = isSystemInDarkTheme()

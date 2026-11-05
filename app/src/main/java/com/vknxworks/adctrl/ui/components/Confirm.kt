@@ -18,6 +18,8 @@ fun ConfirmDialog(
     onConfirm: () -> Unit,
     danger: Boolean = true,
     icon: ImageVector? = null,
+    /** Only for the app lock's own dialogs ("Forgot PIN?"); see [shield]. */
+    lockDialog: Boolean = false,
 ) {
     CtrlAlertDialog(
         onDismissRequest = onDismiss,
@@ -29,7 +31,7 @@ fun ConfirmDialog(
         title = { Text(title) },
         text = {
             // No other app's floating window over a destructive confirmation.
-            ShieldDialogWindow()
+            ShieldDialogWindow(sensitiveData = lockDialog)
             Text(body, color = MaterialTheme.colorScheme.onSurfaceVariant)
         },
         confirmButton = {

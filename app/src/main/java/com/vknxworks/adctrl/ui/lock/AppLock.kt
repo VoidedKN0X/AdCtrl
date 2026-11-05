@@ -488,6 +488,7 @@ private fun PinLockScreen() {
             title = stringResource(R.string.lock_forgot_title),
             body = stringResource(R.string.lock_forgot_body),
             confirmLabel = stringResource(R.string.lock_forgot_confirm),
+            lockDialog = true,
             onDismiss = { forgetting = false },
             onConfirm = {
                 forgetting = false

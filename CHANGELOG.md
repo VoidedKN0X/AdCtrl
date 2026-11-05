@@ -4,6 +4,14 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.12.7 (2026-11-05)
+
+Password managers work on the server setup screen again.
+
+### Fixed
+
+- Password managers can fill the server setup screen (address, username and password) again. 0.12.6 hid it, the push notifications screen and "can't be undone" confirmations from every app that reads the screen through accessibility, which also blocked password managers that fill that way; now only the lock screen, the PIN screens, "Confirm changes" and "Forgot PIN?" are hidden from them. Other apps' floating windows are still kept off those screens, and screen readers such as TalkBack keep working everywhere.
+
 ## v0.12.6 (2026-11-05)
 
 More protection for the PIN screens and confirmations, and a way to check that a download really comes from this repo. Nothing works differently in day-to-day use.
