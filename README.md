@@ -33,7 +33,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 
 ## Install
 
-1. Open the [Releases page](https://github.com/VoidedKN0X/AdCtrl/releases/latest) on your phone, scroll down to **Assets** and tap the file that ends in `.apk` (for example `AdCtrl-v0.12.3.apk`). The **Source code** (zip) and (tar.gz) files are not the app; you don't need them.
+1. Open the [Releases page](https://github.com/VoidedKN0X/AdCtrl/releases/latest) on your phone, scroll down to **Assets** and tap the file that ends in `.apk` (for example `AdCtrl-v0.12.4.apk`). The **Source code** (zip) and (tar.gz) files are not the app; you don't need them.
 2. Open it on your phone. Android may ask you to allow installing apps from your browser or file manager.
 3. Updates install over the old version. Your settings are kept.
 
@@ -72,10 +72,13 @@ Your servers, **Upstream DNS**, **Query log and statistics**, **Settings** and *
 | Permission | What it's for |
 | --- | --- |
 | Internet (`INTERNET`) | Talking to your own AdGuard Home servers. AdCtrl refuses to connect anywhere else. |
-| Fingerprint (`USE_BIOMETRIC`) | Optional fingerprint unlock for the app lock. |
+| Network state (`ACCESS_NETWORK_STATE`) | Waiting for a connection before a background check or widget refresh runs. Added by Android's background work library (WorkManager). |
+| Fingerprint (`USE_BIOMETRIC`) | Optional fingerprint unlock for the app lock, and for **Confirm changes**. |
 | Notifications (`POST_NOTIFICATIONS`) | Notifications from the background checks; only asked for when you turn them on. |
+| Run at startup (`RECEIVE_BOOT_COMPLETED`) | Putting the background checks and widget refreshes back on schedule after the phone restarts. Added by WorkManager. |
+| Keep awake (`WAKE_LOCK`) | Keeping the phone awake for the few seconds a background check runs. Added by WorkManager. |
 
-Android's background work library (WorkManager) also adds the standard permissions it needs to run the background checks and widget refreshes on time and after a restart.
+`DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` is an internal permission Android adds to every app built for Android 13 and newer; it lets AdCtrl keep its own broadcasts private. AdCtrl has no location, camera, microphone, contacts, storage or foreground-service permission.
 
 What AdCtrl does and doesn't do with your data is in the [Privacy](#privacy) section.
 
@@ -146,9 +149,18 @@ Allow ntfy to run unrestricted in the background (AdCtrl shows a row for it unde
 
 ## Privacy
 
-**Telemetry-free.** AdCtrl has no analytics, crash reporting, usage stats or tracking of any kind. It only talks to the AdGuard Home servers you add, and refuses to connect anywhere else. With push turned on, the ntfy app on your phone delivers wake-up calls to AdCtrl; AdCtrl itself never connects to your ntfy server. Your query log shows what everyone on your network visits, so it never leaves your phone except to and from your own server. See [PRIVACY.md](PRIVACY.md).
+**Telemetry-free and Google-free.** AdCtrl has no analytics, crash reporting, usage stats, ads or tracking of any kind, and no Google libraries or services. Your query log shows what everyone on your network visits, so it never leaves your phone except to and from your own server. See [PRIVACY.md](PRIVACY.md).
 
-- **Links:** the Support, Report a bug, Source code and Licence rows in About open in your browser; the app itself doesn't contact GitHub.
+Everything AdCtrl connects to:
+
+- **Your AdGuard Home servers**, at exactly the address you entered. Every other address is blocked inside the app, redirects are never followed, and plain HTTP only works for addresses on your own network when you switch it on for that server.
+- **Nothing else.** With push turned on, the ntfy app on your phone delivers wake-up calls to AdCtrl; AdCtrl itself never connects to your ntfy server.
+
+Things that look like other addresses but aren't connections from your phone:
+
+- **Well-known blocklists** (Filters › Add a list): the addresses of these lists (on `adguardteam.github.io`) are sent to your AdGuard Home server, which downloads them; your phone doesn't.
+- **Examples** in text fields, such as `https://dns.cloudflare.com/dns-query` as a placeholder for upstream servers, are only hints and are never contacted.
+- **Links:** the Support, Report a bug, Source code and Licence rows in About, and **Install ntfy** (f-droid.org), open in your browser only when you tap them; the app itself doesn't contact GitHub or F-Droid.
 
 ## How AdCtrl is made
 
@@ -189,21 +201,29 @@ Native Android apps for self-hosted services and everyday tools, all with the sa
 | **AdCtrl** (this app) | Control your AdGuard Home DNS server |
 | [ArrCtrl](https://github.com/VoidedKN0X/ArrCtrl) | Radarr, Sonarr, Prowlarr, Bazarr, qBittorrent, autobrr and Cleanuparr in one app |
 | [BeamCtrl](https://github.com/VoidedKN0X/BeamCtrl) | TV remote for phones with an IR blaster |
+| [CallCtrl](https://github.com/VoidedKN0X/CallCtrl) | Phone app: dialer, call history and in-call screen |
 | [ChatCtrl](https://github.com/VoidedKN0X/ChatCtrl) | Matrix chat client for matrix.org and self-hosted Synapse |
+| [ClockCtrl](https://github.com/VoidedKN0X/ClockCtrl) | Alarms, timers, stopwatch and world clock |
+| [ContactCtrl](https://github.com/VoidedKN0X/ContactCtrl) | Contacts: browse, edit, import and export |
 | [CraftyCtrl](https://github.com/VoidedKN0X/CraftyCtrl) | Manage Minecraft servers on Crafty Controller |
+| [DateCtrl](https://github.com/VoidedKN0X/DateCtrl) | Calendar for the calendars on your phone and your accounts |
 | [FilesCtrl](https://github.com/VoidedKN0X/FilesCtrl) | File manager with NFS, SMB, SFTP, FTP and WebDAV |
 | [FrigateCtrl](https://github.com/VoidedKN0X/FrigateCtrl) | Watch and review your Frigate NVR cameras |
 | [ImmichCtrl](https://github.com/VoidedKN0X/ImmichCtrl) | Photos and backup for your Immich server |
 | [JellyCtrl](https://github.com/VoidedKN0X/JellyCtrl) | Movies, shows, music and Live TV from Jellyfin |
+| [LijnCtrl](https://github.com/VoidedKN0X/LijnCtrl) | Live De Lijn bus and tram departures |
+| [MailCtrl](https://github.com/VoidedKN0X/MailCtrl) | Email for Gmail and Proton Mail |
 | [MemoCtrl](https://github.com/VoidedKN0X/MemoCtrl) | Notes on your Memos server |
 | [NaviCtrl](https://github.com/VoidedKN0X/NaviCtrl) | Music player for Navidrome servers |
 | [PaperCtrl](https://github.com/VoidedKN0X/PaperCtrl) | Scan and browse documents on Paperless-ngx |
 | [PrintCtrl](https://github.com/VoidedKN0X/PrintCtrl) | Bambu Lab printers through Bambuddy, and Spoolman spools |
 | [ProxCtrl](https://github.com/VoidedKN0X/ProxCtrl) | Manage your Proxmox VE server |
+| [RecorderCtrl](https://github.com/VoidedKN0X/RecorderCtrl) | Private, offline voice recorder |
 | [RideCtrl](https://github.com/VoidedKN0X/RideCtrl) | Offline maintenance, fuel and mod log for your vehicles |
 | [SeerrCtrl](https://github.com/VoidedKN0X/SeerrCtrl) | Request movies and shows on Seerr / Jellyseerr |
 | [SumCtrl](https://github.com/VoidedKN0X/SumCtrl) | Offline calculator, unit converter and work tools |
 | [SynapseCtrl](https://github.com/VoidedKN0X/SynapseCtrl) | Administer your Matrix Synapse server |
+| [TextCtrl](https://github.com/VoidedKN0X/TextCtrl) | Private SMS and MMS messaging |
 | [TrueCtrl](https://github.com/VoidedKN0X/TrueCtrl) | Monitor and manage your TrueNAS server |
 | [WrtCtrl](https://github.com/VoidedKN0X/WrtCtrl) | Manage your OpenWrt router |
 

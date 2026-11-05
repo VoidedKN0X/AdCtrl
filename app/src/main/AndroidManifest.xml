@@ -8,6 +8,10 @@
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <!-- Notifications from the background checks; asked for only when you turn them on. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- WorkManager adds the foreground-service permission for long jobs shown as a notification. The background
+         checks and widget refreshes are short jobs that never run as a foreground service, so it's removed (with
+         WorkManager's foreground service below). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
 
     <!-- ntfy, the only push app AdCtrl uses (UnifiedPush), to wake the background check. -->
     <queries>
@@ -106,6 +110,11 @@
         <!-- WorkManager's diagnostics receiver (debug dumps over adb) isn't needed; leave it out. -->
         <receiver
             android:name="androidx.work.impl.diagnostics.DiagnosticsReceiver"
+            tools:node="remove" />
+
+        <!-- WorkManager's foreground service, for long jobs shown as a notification. AdCtrl never uses it. -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
             tools:node="remove" />
 
         <!-- Don't let androidx.emoji2 look up a downloadable emoji font at start-up: emoji are drawn with the

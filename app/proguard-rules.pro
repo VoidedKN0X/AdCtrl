@@ -12,3 +12,10 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.openjsse.**
 -dontwarn javax.annotation.**
+
+# Release builds drop debug and info logging entirely (AdCtrl itself doesn't log; this also covers libraries).
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+}

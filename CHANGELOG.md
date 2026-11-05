@@ -4,6 +4,22 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.12.4 (2026-11-05)
+
+A privacy and security check-up: one permission fewer, and a clearer list of what AdCtrl may do and where it connects.
+
+### Privacy
+
+- **One permission fewer**: AdCtrl no longer has the "run foreground service" permission. Android's background work library added it for long jobs that show a notification, but AdCtrl's background checks and widget refreshes are short jobs that never need it, so it's gone, together with the library's unused foreground service. Notifications, the widget and push through ntfy work exactly as before.
+- **Fewer log messages**: release builds now strip debug and info log messages from the libraries AdCtrl uses as well (AdCtrl itself writes nothing to the system log).
+
+### Project
+
+- README: the permissions table now lists every permission the app has, with what each one is for (including the ones Android's background work library adds), and the Privacy section lists everything AdCtrl connects to. It also explains why the well-known blocklist addresses (`adguardteam.github.io`) and the example upstream servers aren't contacted by your phone.
+- README: the Ctrl series list now shows all 28 apps, with CallCtrl, ClockCtrl, ContactCtrl, DateCtrl, LijnCtrl, MailCtrl, RecorderCtrl and TextCtrl added.
+- PRIVACY.md: the closing paragraph about permissions is up to date and links to the full list.
+- The build now checks that the Gradle wrapper in the repo is an official Gradle release before building, and `.gitignore` also keeps `google-services.json` out of the repo.
+
 ## Project updates (2026-11-03)
 
 ### Project
