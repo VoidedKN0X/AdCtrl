@@ -37,8 +37,8 @@ private fun RemoteViews.tintIcon(c: WidgetColors) = setColorInt(R.id.widget_icon
 /**
  * Home screen widget for the active server: protection on, paused (with a live countdown) or off,
  * and the DNS queries and blocked share of the last 24 hours. A tap opens AdCtrl. It never changes
- * anything itself. While AdCtrl is locked and the password is sealed with the app lock, it only says
- * that AdCtrl is locked.
+ * anything itself. While the app lock is locked (also when the password isn't sealed, because
+ * background checks are on), it only says that AdCtrl is locked, as the Quick Settings tile does.
  */
 class ProtectionWidget : AppWidgetProvider() {
 
@@ -98,8 +98,8 @@ class ProtectionWidget : AppWidgetProvider() {
                     views.setTextViewText(R.id.widget_subtitle, context.getString(R.string.tile_no_server))
                     views.setViewVisibility(R.id.widget_stats, View.GONE)
                 }
-                // The password is sealed and AdCtrl is locked: show nothing about the server.
-                c.serverStore.sealedNow(server.id) -> {
+                // AdCtrl is locked: show nothing about the server, not even its name.
+                c.locked.value || c.serverStore.sealedNow(server.id) -> {
                     views.tintIcon(WidgetColors.IDLE)
                     views.setTextViewText(R.id.widget_title, context.getString(R.string.widget_locked))
                     views.setTextViewText(R.id.widget_subtitle, context.getString(R.string.widget_locked_subtitle))

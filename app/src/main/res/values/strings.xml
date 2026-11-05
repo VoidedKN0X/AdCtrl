@@ -56,7 +56,7 @@
     <string name="address_resolves">Connects to %1$s, and only to this address</string>
     <string name="address_only_this">Without http://, AdCtrl uses HTTPS. AdCtrl only ever connects to the address you enter here.</string>
     <string name="address_invalid">That doesn\'t look like a web address.</string>
-    <string name="address_http_public">Plain http:// is only allowed for addresses on your own network (like 192.168.x.x or adguard.lan), because AdGuard Home sends your password with every request. Use https:// for this address.</string>
+    <string name="address_http_public">Plain http:// is only allowed for addresses on your own network or Tailscale (like 192.168.x.x, 100.x.y.z, adguard.lan or adguard.tailnet-name.ts.net), because AdGuard Home sends your password with every request. Use https:// for this address.</string>
     <string name="field_name">Name (optional)</string>
     <string name="field_name_hint">Defaults to the address, like \"Primary\" or \"Secondary\"</string>
     <string name="field_username">Username</string>
@@ -66,7 +66,7 @@
     <string name="password_reenter">Enter the password again: it\'s only reused for the same address and username.</string>
     <string name="http_switch">Allow plain HTTP for this server</string>
     <string name="http_switch_subtitle">Your password and query log travel unencrypted on your network</string>
-    <string name="http_switch_footer">Only for addresses on your own network. A name like adguard.lan must also point to a private address, or AdCtrl won\'t connect. HTTPS is safer: see the README\'s recommended setup.</string>
+    <string name="http_switch_footer">Only for addresses on your own network or Tailscale. A name like adguard.lan or adguard.tailnet-name.ts.net must also point to a private or Tailscale address, or AdCtrl won\'t connect. HTTPS is safer: see the README\'s recommended setup.</string>
     <string name="http_warning_title">Use plain HTTP?</string>
     <string name="http_warning_body">AdCtrl will talk to %1$s without encryption. AdGuard Home sends your username and password with every request, and the query log shows what everyone on your network visits, so anyone who can watch your network can read both. Only do this on a network you trust.</string>
     <string name="http_allow">Allow HTTP</string>
@@ -118,7 +118,7 @@
     <string name="error_redirect">%1$s answered with a redirect. AdCtrl never follows redirects, so enter the address AdGuard Home actually runs on (often its https:// address).</string>
     <string name="error_redirect_to">%1$s redirects to %2$s. AdCtrl never follows redirects, so enter that address instead (often the https:// one).</string>
     <string name="error_too_old">This server runs AdGuard Home %1$s. AdCtrl needs %2$s or newer: update AdGuard Home, then tap Retry.</string>
-    <string name="error_cleartext">AdCtrl won\'t use plain HTTP for %1$s: it\'s only allowed for addresses on your own network, with the server\'s HTTP switch on.</string>
+    <string name="error_cleartext">AdCtrl won\'t use plain HTTP for %1$s: it\'s only allowed for addresses on your own network or Tailscale, with the server\'s HTTP switch on.</string>
     <string name="error_blocked_host">AdCtrl only connects to the servers you added, so this request wasn\'t sent.</string>
     <string name="error_server">AdGuard Home returned an error (%1$d).</string>
     <string name="error_with_detail">%1$s\n\n%2$s</string>

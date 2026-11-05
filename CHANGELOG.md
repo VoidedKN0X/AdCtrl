@@ -4,6 +4,24 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.12.5 (2026-11-05)
+
+Plain HTTP now works over Tailscale, and the widget and Quick Settings tile give nothing away while AdCtrl is locked.
+
+### Fixed
+
+- **Plain HTTP over Tailscale**: AdCtrl only allowed plain `http://` for private addresses like `192.168.x.x` and names like `adguard.lan`, so a server reached over Tailscale was refused even with the server's HTTP switch on. Tailscale addresses (`100.64.0.0` to `100.127.255.255`, and `fd7a:115c:a1e0::` addresses) and Tailscale MagicDNS names ending in `.ts.net` now count as your own network too. A `.ts.net` name must still point to a Tailscale or private address, HTTP still has to be switched on per server after the warning, and plain HTTP to public addresses is still refused.
+
+### Security
+
+- **Widget hidden while locked**: the home screen widget only hid your server while your passwords were sealed with the app lock. With background checks on (which keep the passwords unsealed so they can sign in), it kept showing the server name, protection state and query counts even while AdCtrl was locked. It now says "AdCtrl is locked" whenever AdCtrl is locked, like the Quick Settings tile.
+- **Quick Settings tile doesn't name the server while locked**: with more than one server, the locked tile still used the server's name as its label, and could show the last known protection state. While AdCtrl is locked it now shows the generic "AdGuard" label and only says AdCtrl is locked.
+- **One less way in for other apps**: removed a component from AndroidX's profile installer that let other apps on the phone ask AdCtrl to rewrite its app-start performance profile. AdCtrl never needed it; start-up works as before.
+
+### Project
+
+- README and PRIVACY.md: plain HTTP is described as working on local addresses and over Tailscale, and the widget and tile are described as hidden whenever AdCtrl is locked.
+
 ## v0.12.4 (2026-11-05)
 
 A privacy and security check-up: one permission fewer, and a clearer list of what AdCtrl may do and where it connects.

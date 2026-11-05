@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Android can't limit plain HTTP to private addresses here, so it's permitted at this level and
      enforced in AdCtrl's own code instead (HostAllowlist and PrivateOnlyDns): plain HTTP is only used
-     for a saved server on the user's own network (private IP, or a .lan/.local/.home.arpa/.internal or
-     single-label name that resolves to a private IP), and only when the user switched it on for that
+     for a saved server on the user's own network or tailnet (private or Tailscale IP, or a
+     .lan/.local/.home.arpa/.internal/.ts.net or single-label name that resolves to a private IP), and only when the user switched it on for that
      server. Every other request is HTTPS, and nothing but the saved servers can be reached at all.
      System and user-installed CAs are trusted so servers behind a private CA or Nginx Proxy Manager
      work; a self-signed certificate is never trusted here, only pinned per server by its SHA-256

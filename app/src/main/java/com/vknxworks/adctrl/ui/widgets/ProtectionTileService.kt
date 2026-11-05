@@ -168,11 +168,17 @@ class ProtectionTileService : TileService() {
         val st = status
         val now = System.currentTimeMillis()
         tile.icon = Icon.createWithResource(this, R.drawable.ic_tile_shield)
-        tile.label = server?.name?.takeIf { container.sessions.servers.value.size > 1 } ?: getString(R.string.tile_label)
+        // While AdCtrl is locked the tile never names the server or shows its state.
+        val appLocked = container.locked.value
+        tile.label = server?.name?.takeIf { !appLocked && container.sessions.servers.value.size > 1 } ?: getString(R.string.tile_label)
         when {
             server == null -> {
                 tile.state = Tile.STATE_UNAVAILABLE
                 tile.subtitle = getString(R.string.tile_no_server)
+            }
+            appLocked -> {
+                tile.state = Tile.STATE_INACTIVE
+                tile.subtitle = getString(R.string.tile_locked)
             }
             st == null -> {
                 tile.state = Tile.STATE_INACTIVE

@@ -84,7 +84,7 @@ What AdCtrl does and doesn't do with your data is in the [Privacy](#privacy) sec
 
 ## Recommended AdGuard Home setup
 
-- **Use HTTPS.** AdGuard Home signs you in with a username and password on every request (HTTP Basic auth), so reach it over HTTPS: turn on encryption in AdGuard Home under **Settings › Encryption settings**, or put it behind a reverse proxy such as Nginx Proxy Manager. AdCtrl only allows plain HTTP for addresses on your own network (private IPs and `.lan`, `.local`, `.home.arpa`, `.internal` or single-word names that point to a private IP), and only when you switch it on for that server.
+- **Use HTTPS.** AdGuard Home signs you in with a username and password on every request (HTTP Basic auth), so reach it over HTTPS: turn on encryption in AdGuard Home under **Settings › Encryption settings**, or put it behind a reverse proxy such as Nginx Proxy Manager. Plain HTTP works for addresses on your own network and over Tailscale: private IPs (like `192.168.x.x`), Tailscale IPs (`100.64.0.0/10` and `fd7a:115c:a1e0::/48`), and `.lan`, `.local`, `.home.arpa`, `.internal`, Tailscale MagicDNS `.ts.net` or single-word names that point to one of those addresses. You switch it on per server, after a warning; AdCtrl refuses plain HTTP to any public address.
 - **Use a dedicated, strong password.** Give the AdGuard Home admin account a long, random password that you don't use anywhere else.
 - **Self-signed certificate?** AdCtrl shows its SHA-256 fingerprint the first time it connects. Compare it with your certificate and tap **Trust**; AdCtrl then accepts only that exact certificate for that server.
 
@@ -100,9 +100,9 @@ Turn it on: tap your profile picture › **Settings › Privacy and security ›
 - **Change app PIN** asks for your current PIN first, and turning the app lock off asks for the PIN too.
 - **Forgot your PIN?** It can't be recovered, because it encrypts your passwords. The lock screen offers to remove your servers and their passwords and the statistics AdCtrl keeps on the phone, so you can add them again; nothing changes on your AdGuard Home servers.
 - **Confirm changes** (optional) asks for your fingerprint or app PIN before anything that changes a server, such as pausing protection, blocking a domain or editing rules. One confirmation covers the next minute.
-- **The Quick Settings tile** says AdCtrl is locked and opens it instead of pausing protection while AdCtrl is locked, so nobody can pause it without your PIN. With **Confirm changes** on, a tap on the tile always opens AdCtrl.
-- **The widget** only says "AdCtrl is locked" while your passwords are sealed, and **app shortcuts** open the lock screen first; **Pause protection** then still needs a duration picked on the phone (and **Confirm changes**, when it's on).
-- **Background checks** for notifications have to sign in while AdCtrl is locked. While they're on, your server passwords are only encrypted with the Android Keystore, as without the app lock, and the widget keeps showing your server; turn them off to keep the passwords sealed with your PIN.
+- **The Quick Settings tile** says AdCtrl is locked and opens it instead of pausing protection while AdCtrl is locked, so nobody can pause it without your PIN. While locked it shows neither the server's name nor whether protection is on. With **Confirm changes** on, a tap on the tile always opens AdCtrl.
+- **The widget** only says "AdCtrl is locked" while AdCtrl is locked, and **app shortcuts** open the lock screen first; **Pause protection** then still needs a duration picked on the phone (and **Confirm changes**, when it's on).
+- **Background checks** for notifications have to sign in while AdCtrl is locked. While they're on, your server passwords are only encrypted with the Android Keystore, as without the app lock; turn them off to keep the passwords sealed with your PIN. The widget and tile still only say AdCtrl is locked until you unlock it.
 
 **Hide in screenshots** and **Hide in recent apps** (the last two switches in the same section, also without the app lock, both off by default): the first keeps AdCtrl out of screenshots and screen recordings (and blanks its recent-apps preview), the second shows a blank card for AdCtrl in the recent-apps view while screenshots still work. With the app lock on, the recent-apps view always shows a blank card. Server setup, the lock screen and the PIN screens are always kept out of screenshots.
 
@@ -153,7 +153,7 @@ Allow ntfy to run unrestricted in the background (AdCtrl shows a row for it unde
 
 Everything AdCtrl connects to:
 
-- **Your AdGuard Home servers**, at exactly the address you entered. Every other address is blocked inside the app, redirects are never followed, and plain HTTP only works for addresses on your own network when you switch it on for that server.
+- **Your AdGuard Home servers**, at exactly the address you entered. Every other address is blocked inside the app, redirects are never followed, and plain HTTP only works for addresses on your own network or Tailscale when you switch it on for that server.
 - **Nothing else.** With push turned on, the ntfy app on your phone delivers wake-up calls to AdCtrl; AdCtrl itself never connects to your ntfy server.
 
 Things that look like other addresses but aren't connections from your phone:
