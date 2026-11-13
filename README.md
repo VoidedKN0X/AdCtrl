@@ -23,7 +23,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Push through ntfy** (UnifiedPush, optional): anything that posts to AdCtrl's push address, such as a cron job on your router, makes AdCtrl check your servers right away instead of waiting for the next background check
 - **Several servers**, such as a primary and a secondary, with "apply to all servers" for rule changes and pausing
 - **App lock** with its own PIN and optional fingerprint unlock; your server passwords stay encrypted while the app is locked, and **Confirm changes** can ask for the PIN or fingerprint before anything changes on a server
-- **Safe by design**: a read-only mode, confirmation before changes, certificate pinning, optional **Hide in screenshots** and **Hide in recent apps**, and passwords encrypted with the Android Keystore
+- **Safe by design**: a read-only mode, confirmation before changes, certificate pinning, optional **Hide in screenshots** and **Hide in recent apps**, and passwords encrypted with the Android Keystore (in the StrongBox security chip when the phone has one)
 
 ## Requirements
 

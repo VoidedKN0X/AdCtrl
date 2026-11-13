@@ -1,18 +1,15 @@
 package com.vknxworks.adctrl.data.server
 
 import android.content.Context
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import android.util.Base64
+import com.vknxworks.adctrl.data.crypto.KeystoreAes
 import com.vknxworks.adctrl.data.lock.LockVault
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
-import java.security.KeyStore
 import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
@@ -137,21 +134,9 @@ class ServerStore(context: Context, private val vault: LockVault) {
 
     private fun secretKey(id: String) = "secret_${id}_password"
 
-    // --- Keystore AES-GCM ---
+    // --- Keystore AES-GCM (StrongBox for a new key when the phone has it) ---
 
-    private fun key(): SecretKey {
-        val ks = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
-        (ks.getKey(KEY_ALIAS, null) as? SecretKey)?.let { return it }
-        val gen = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
-        gen.init(
-            KeyGenParameterSpec.Builder(KEY_ALIAS, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
-                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                .setKeySize(256)
-                .build(),
-        )
-        return gen.generateKey()
-    }
+    private fun key(): SecretKey = KeystoreAes.key(KEY_ALIAS)
 
     private fun encrypt(plain: String): String? {
         if (plain.isEmpty()) return null
