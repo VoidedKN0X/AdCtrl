@@ -167,13 +167,14 @@ fun CheckHostScreen(initialHost: String, initialClient: String) {
             client = ruleClient,
             clientLabel = null,
             writableServers = servers.count { !it.readOnly },
-            loadOpposing = { c.userRules.opposing(block, checked, ruleClient) },
+            loadOpposing = { r -> c.userRules.opposing(block, checked, ruleClient, r) },
             onDismiss = { rule = null },
-            onSave = { text, all ->
+            onSave = { text, all, removeOpposing ->
                 rule = null
                 scope.launch {
-                    val res = c.userRules.apply(block, checked, ruleClient, text, all)
-                    snackbar.showSnackbar(ruleResultMessage(context, res, block, checked))
+                    val res = c.userRules.apply(block, checked, ruleClient, text, all, removeOpposing)
+                    check()
+                    showRuleResult(context, snackbar, c.userRules, res, block, checked)
                     check()
                 }
             },
@@ -223,11 +224,11 @@ private fun CheckResultCard(host: String, r: CheckHostResult, names: Map<Long, S
                 Spacer(Modifier.height(4.dp))
                 if (kind.isBlocked) {
                     CtrlSecondaryButton(onClick = { onRule(false) }) {
-                        Icon(Icons.Outlined.Verified, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_unblock))
+                        Icon(Icons.Outlined.Verified, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_allow_domain))
                     }
                 } else {
                     CtrlSecondaryButton(onClick = { onRule(true) }) {
-                        Icon(Icons.Outlined.Block, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_block))
+                        Icon(Icons.Outlined.Block, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_block_domain))
                     }
                 }
             }

@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.container
-import com.vknxworks.adctrl.data.overview.PauseDuration
+import com.vknxworks.adctrl.data.settings.TilePause
 import com.vknxworks.adctrl.ui.overview.pauseLabel
 import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Notifications
@@ -75,7 +75,7 @@ fun SettingsScreen() {
             Group(stringResource(R.string.tile_settings_group), footer = stringResource(R.string.tile_settings_footer)) {
                 GroupChoice(
                     stringResource(R.string.tile_pause_setting),
-                    PauseDuration.entries.map { it to stringResource(pauseLabel(it)) },
+                    TilePause.entries.map { it to (it.pause?.let { d -> stringResource(pauseLabel(d)) } ?: stringResource(R.string.tile_pause_ask)) },
                     settings.tilePause,
                     icon = Icons.Outlined.Timer,
                 ) { d -> c.appScope.launch { c.settings.update { it.copy(tilePause = d) } } }

@@ -4,6 +4,24 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.13.0 (2026-11-13)
+
+Block or allow any domain straight from the query log, with Undo, and a Quick Settings tile that asks how long to pause and follows the countdown live.
+
+### New
+
+- **Block or allow from the query log:** a query's details now always offer both **Block this domain** and **Allow this domain**, plus **Block for this client only** and **Allow for this client only** when the query shows which device asked. The dialog shows the exact rule before anything is saved (for example `||example.com^`, or `@@||example.com^$important` to allow), and you still choose how much it covers: only that name, it and its subdomains, or the whole domain.
+- **Opposite rules found and offered for removal:** when one of your own custom rules does the opposite (an allow rule when you block, or a block rule when you allow), the dialog lists it with **Remove this rule** switched on. Switch it off to keep it; the dialog then says what that means.
+- **Undo:** after blocking or allowing, the message has an **Undo** button that puts your custom rules back exactly as they were (on every server that was changed), keeping any other edits made since.
+- **Pause from the tile for 1 minute, 10 minutes, 1 hour or until you turn it back on:** tapping the AdGuard tile while protection is on now asks how long. You can still set a fixed duration under Settings › Quick Settings tile. Tapping it while paused or off turns protection back on.
+- **The tile follows the state live:** while the Quick Settings panel is open, the tile shows protection on, paused (with the time left, counting down) or off, updates the moment you change it in AdCtrl, asks your server again every 15 seconds and lights up again when a pause ends.
+- **The tile works with the app lock on:** as long as background checks are on (so your server password isn't sealed with your app PIN), the tile shows the state and can pause or resume while AdCtrl is locked. It never shows the server's name then, and every change from the tile needs your phone unlocked first. With background checks off, it still says AdCtrl is locked and opens it, because nothing can sign in without your PIN. With **Confirm changes** on, a tap opens AdCtrl's pause menu.
+
+### Changed
+
+- **Unblock is now called Allow** in the query details, Check host and the block dialog, to match AdGuard Home's allow rules.
+- **International domain names** are written into rules in their punycode form (münchen.de becomes `xn--mnchen-3ya.de`), the way AdGuard Home matches them, and a wildcard name such as `*.example.com` becomes a rule for the domain and its subdomains. Names that contain rule characters can't be turned into a rule by mistake; AdCtrl points you to the custom rules editor instead.
+- **Pausing on older AdGuard Home versions:** a server without the timed pause turns protection off and on the old way, and AdCtrl says so if you pick a set time there instead of quietly leaving protection off.
 ## v0.12.10 (2026-11-13)
 
 A security and privacy check-up. Nothing works differently, and you don't need to sign in again.

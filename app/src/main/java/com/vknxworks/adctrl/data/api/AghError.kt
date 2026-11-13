@@ -51,6 +51,9 @@ sealed class AghError(val detail: String? = null, cause: Throwable? = null) : IO
     /** The change wasn't confirmed with the fingerprint or app PIN ("Confirm changes"); nothing was sent. */
     class Cancelled : AghError(null)
 
+    /** This AdGuard Home can't pause protection for a set time (no /control/protection); nothing was changed. */
+    class TimedPauseUnsupported : AghError(null)
+
     /** Any other error status from AdGuard Home (bad request, internal error, …). */
     class Server(val code: Int, detail: String?) : AghError(detail)
 

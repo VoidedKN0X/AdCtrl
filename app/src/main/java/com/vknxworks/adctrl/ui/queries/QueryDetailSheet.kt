@@ -39,14 +39,14 @@ import com.vknxworks.adctrl.data.api.DnsAnswer
 import com.vknxworks.adctrl.data.api.QueryLogItem
 import com.vknxworks.adctrl.ui.components.formatMs
 
-/** Everything about one query, with Block or Unblock, the client's queries and Check host. */
+/** Everything about one query, with Block and Allow (for everyone or this client), the client's queries and Check host. */
 @Composable
 fun QueryDetailSheet(
     item: QueryLogItem,
     listNames: Map<Long, String>,
     readOnly: Boolean,
     onDismiss: () -> Unit,
-    onRule: (block: Boolean) -> Unit,
+    onRule: (block: Boolean, onlyClient: Boolean) -> Unit,
     onClientQueries: () -> Unit,
     onCheckHost: () -> Unit,
 ) {
@@ -70,14 +70,25 @@ fun QueryDetailSheet(
 
             if (!readOnly) {
                 Spacer(Modifier.height(14.dp))
+                // The action that changes what happened comes first: Allow for a blocked query, Block otherwise.
+                val blockFirst = !kind.isBlocked
+                val hasClient = item.client.isNotBlank() || item.clientId.isNotBlank()
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (kind.isBlocked) {
-                        CtrlSecondaryButton(onClick = { onRule(false) }) {
-                            Icon(Icons.Outlined.Verified, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_unblock))
+                    listOf(blockFirst, !blockFirst).forEach { block ->
+                        CtrlSecondaryButton(onClick = { onRule(block, false) }) {
+                            Icon(if (block) Icons.Outlined.Block else Icons.Outlined.Verified, null, Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(stringResource(if (block) R.string.action_block_domain else R.string.action_allow_domain))
                         }
-                    } else {
-                        CtrlSecondaryButton(onClick = { onRule(true) }) {
-                            Icon(Icons.Outlined.Block, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(stringResource(R.string.action_block))
+                    }
+                    // A $client rule needs a client to name: its IP address or ClientID.
+                    if (hasClient) {
+                        listOf(blockFirst, !blockFirst).forEach { block ->
+                            CtrlSecondaryButton(onClick = { onRule(block, true) }) {
+                                Icon(if (block) Icons.Outlined.Block else Icons.Outlined.Verified, null, Modifier.size(18.dp))
+                                Spacer(Modifier.width(6.dp))
+                                Text(stringResource(if (block) R.string.action_block_client else R.string.action_allow_client))
+                            }
                         }
                     }
                 }

@@ -93,7 +93,7 @@ import kotlinx.coroutines.launch
 private const val LIVE_MS = 5_000L
 
 /** A pending block or unblock from a row's detail sheet. */
-private class RuleTarget(val block: Boolean, val item: QueryLogItem)
+private class RuleTarget(val block: Boolean, val item: QueryLogItem, val onlyClient: Boolean)
 
 /** The live query log: newest first, filters, and one-tap block or unblock for any query. */
 @Composable
@@ -277,7 +277,7 @@ fun QueriesScreen() {
             listNames = state.listNames,
             readOnly = readOnly,
             onDismiss = { selected = null },
-            onRule = { block -> selected = null; ruleTarget = RuleTarget(block, item) },
+            onRule = { block, onlyClient -> selected = null; ruleTarget = RuleTarget(block, item, onlyClient) },
             onClientQueries = {
                 selected = null
                 scope.launch { c.queries.setSearch(search.copy(client = item.client.ifBlank { item.clientId }, text = "")) }
@@ -297,15 +297,16 @@ fun QueriesScreen() {
             client = ruleClient,
             clientLabel = item.clientLabel,
             writableServers = servers.count { !it.readOnly },
-            loadOpposing = { c.userRules.opposing(target.block, item.asciiDomain, ruleClient) },
+            loadOpposing = { rule -> c.userRules.opposing(target.block, item.asciiDomain, ruleClient, rule) },
             onDismiss = { ruleTarget = null },
-            onSave = { rule, all ->
+            onSave = { rule, all, removeOpposing ->
                 ruleTarget = null
                 scope.launch {
-                    val result = c.userRules.apply(target.block, item.asciiDomain, ruleClient, rule, all)
-                    snackbar.showSnackbar(ruleResultMessage(context, result, target.block, item.domain))
+                    val result = c.userRules.apply(target.block, item.asciiDomain, ruleClient, rule, all, removeOpposing)
+                    showRuleResult(context, snackbar, c.userRules, result, target.block, item.domain)
                 }
             },
+            onlyClientAtStart = target.onlyClient,
         )
     }
 }

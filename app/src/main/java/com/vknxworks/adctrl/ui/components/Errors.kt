@@ -21,6 +21,7 @@ fun errorMessage(context: Context, e: Throwable, host: String): String {
         is AghError.BlockedHost -> context.getString(R.string.error_blocked_host)
         is AghError.ReadOnly -> context.getString(R.string.error_read_only)
         is AghError.Cancelled -> context.getString(R.string.error_cancelled)
+        is AghError.TimedPauseUnsupported -> context.getString(R.string.error_timed_pause, host)
         is AghError.Server -> context.getString(R.string.error_server, e.code)
         else -> context.getString(R.string.error_generic)
     }

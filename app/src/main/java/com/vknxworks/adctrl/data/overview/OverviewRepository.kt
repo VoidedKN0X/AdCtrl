@@ -1,6 +1,7 @@
 package com.vknxworks.adctrl.data.overview
 
 import android.content.Context
+import com.vknxworks.adctrl.data.api.AghClient
 import com.vknxworks.adctrl.data.api.AghError
 import com.vknxworks.adctrl.data.api.AghJson
 import com.vknxworks.adctrl.data.api.AghVersion
@@ -189,21 +190,27 @@ class OverviewRepository(
         }
     }
 
-    /** Status only: quick, for the countdown ending and after changing protection. */
-    suspend fun refreshStatus() {
-        val active = sessions.active.value ?: return
+    /**
+     * Status only: quick, for the countdown ending and after changing protection. [using] replaces the
+     * active server's client (the Quick Settings tile while AdCtrl is locked, see Sessions.directClient).
+     * True when the server answered.
+     */
+    suspend fun refreshStatus(using: AghClient? = null): Boolean {
+        val active = sessions.active.value ?: return false
         try {
-            val st = active.client.status()
-            if (sessions.active.value?.server?.id != active.server.id) return
+            val st = (using ?: active.client).status()
+            if (sessions.active.value?.server?.id != active.server.id) return false
             sessions.reportStatus(active.server.id, st)
             WidgetData.fromApp(context, active.server, st)
             val now = System.currentTimeMillis()
             _state.value = _state.value.copy(
-                snapshot = _state.value.snapshot.copy(status = st),
+                snapshot = _state.value.snapshot.copy(serverId = active.server.id, status = st),
                 pausedUntil = pausedUntil(st, now),
             )
+            return true
         } catch (e: AghError) {
             sessions.reportError(active.server.id, e)
+            return false
         }
     }
 
@@ -211,24 +218,44 @@ class OverviewRepository(
      * Pauses protection for [pause] (or until turned back on), or turns it back on ([pause] null),
      * on the active server, or on every saved server that isn't read-only when [allServers] is set.
      */
-    suspend fun setProtection(pause: PauseDuration?, allServers: Boolean): ProtectionResult {
+    suspend fun setProtection(
+        pause: PauseDuration?,
+        allServers: Boolean,
+        /** The client for each server; the Quick Settings tile passes its own while AdCtrl is locked. */
+        clientFor: ((Server) -> AghClient)? = null,
+    ): ProtectionResult {
         val activeServer = sessions.active.value?.server ?: return ProtectionResult(emptyList())
         val targets = if (allServers) sessions.servers.value.filter { !it.readOnly } else listOf(activeServer)
-        val body = buildJsonObject {
-            put("enabled", pause == null)
-            pause?.ms?.let { put("duration", it) }
-        }
         val failed = mutableListOf<Pair<Server, AghError>>()
+        var activeClient: AghClient? = null
         targets.forEach { server ->
-            val client = if (server.id == activeServer.id) sessions.active.value?.client ?: sessions.clientFor(server) else sessions.clientFor(server)
+            val client = clientFor?.invoke(server)
+                ?: if (server.id == activeServer.id) sessions.active.value?.client ?: sessions.clientFor(server) else sessions.clientFor(server)
+            if (server.id == activeServer.id) activeClient = client
             try {
-                client.post("protection", body)
+                sendProtection(client, server, pause)
             } catch (e: AghError) {
                 failed += server to e
             }
         }
-        refreshStatus()
+        refreshStatus(if (clientFor != null) activeClient else null)
         return ProtectionResult(failed)
+    }
+
+    /**
+     * POST /control/protection with a duration, or the old dns_config switch on servers without it
+     * (by version, or when the server answers 404/405), see [ProtectionApi].
+     */
+    private suspend fun sendProtection(client: AghClient, server: Server, pause: PauseDuration?) {
+        val legacy = ProtectionApi.legacyFor(AghVersion.parse(server.version))
+        val request = ProtectionApi.request(pause, legacy)
+        try {
+            client.post(request.path, request.body)
+        } catch (e: AghError) {
+            if (legacy || !ProtectionApi.isMissingEndpoint(e)) throw e
+            val fallback = ProtectionApi.request(pause, legacy = true)
+            client.post(fallback.path, fallback.body)
+        }
     }
 
     /** POST /control/cache_clear on the active server. */
