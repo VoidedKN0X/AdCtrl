@@ -18,7 +18,7 @@ Only the latest release gets security fixes. Please update before reporting, and
 ## What counts
 
 - Your AdGuard Home password, your query log or other data leaking to anyone other than your own AdGuard Home server
-- Ways around the app lock (including through the Quick Settings tile, the widget, app shortcuts or notifications), or protected screens showing up in screenshots when they shouldn't
+- Ways around the app lock (including through app shortcuts or notifications), or protected screens showing up in screenshots when they shouldn't
 - Ways to pause protection, block or unblock a domain, or change anything else on your server without you asking for it
 - Another app on the phone being able to make AdCtrl do something you didn't ask for (for example through push from ntfy)
 - Certificate checks being skipped, or a pinned certificate being replaced without you confirming it

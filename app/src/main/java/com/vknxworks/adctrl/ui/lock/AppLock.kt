@@ -180,8 +180,8 @@ object AppLock {
 
     /**
      * Locks now when AdCtrl has been away for longer than the lock timeout. Leaving the app only notes
-     * the time and [onForeground] locks when it comes back on screen, so the Quick Settings tile and the
-     * widget, which work without AdCtrl on screen, call this first.
+     * the time and [onForeground] locks when it comes back on screen, so anything that
+     * works without AdCtrl on screen calls this first.
      */
     fun lockIfExpired(enabled: Boolean, timeoutMillis: Long) {
         if (!enabled || !unlocked || inForeground || backgroundAt <= 0 || timeoutMillis < 0) return

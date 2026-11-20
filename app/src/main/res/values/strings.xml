@@ -22,7 +22,7 @@
     <string name="you_not_connected">Not connected</string>
     <string name="you_not_connected_body">Add your AdGuard Home server to get started.</string>
     <string name="settings">Settings</string>
-    <string name="settings_subtitle">Appearance, privacy and app lock, Quick Settings tile</string>
+    <string name="settings_subtitle">Appearance, privacy and app lock</string>
     <string name="group_about">About</string>
     <string name="support_title">Support AdCtrl</string>
     <string name="support_subtitle">AdCtrl is free and open source. Sponsor development on GitHub</string>
@@ -236,27 +236,7 @@
         <item quantity="one">Last hour</item>
         <item quantity="other">Last %1$d hours</item>
     </plurals>
-    <!-- Quick Settings tile -->
     <string name="pause_5m">5 minutes</string>
-    <string name="tile_label">AdGuard</string>
-    <string name="tile_on">Protection on</string>
-    <string name="tile_on_tap">On · tap to pause %1$s</string>
-    <string name="tile_on_ask">On · tap to pause</string>
-    <string name="tile_pause_title_all">Pause protection on all servers</string>
-    <string name="tile_timed_unsupported">Can\'t pause for a set time here</string>
-    <string name="tile_pause_ask">Ask each time</string>
-    <string name="tile_paused">Paused · %1$s left</string>
-    <string name="tile_off">Off</string>
-    <string name="tile_unknown">Checking…</string>
-    <string name="tile_working">Changing…</string>
-    <string name="tile_failed">Couldn\'t change protection</string>
-    <string name="tile_unreachable">Can\'t reach the server</string>
-    <string name="tile_no_server">Add a server in AdCtrl</string>
-    <string name="tile_settings_group">Quick Settings tile</string>
-    <string name="tile_pause_setting">Tapping the tile pauses for</string>
-    <string name="tile_all_setting">Pause all servers</string>
-    <string name="tile_all_setting_subtitle">The tile pauses and resumes every server that isn\'t read-only, not only the active one</string>
-    <string name="tile_settings_footer">Add the AdGuard tile from your phone\'s Quick Settings edit screen. Tap it to pause protection (for 1 minute, 10 minutes, 1 hour or until you turn it back on) or to turn it back on; long-press it to open AdCtrl. It shows the state live, with the time left while paused. Every change needs your phone unlocked first.</string>
     <!-- Queries -->
     <string name="clear">Clear</string>
     <string name="yes">Yes</string>
@@ -617,8 +597,8 @@
     <string name="group_privacy">Privacy and security</string>
     <string name="app_lock">App lock</string>
     <string name="app_lock_subtitle">Ask for an app PIN (and optionally your fingerprint) when opening AdCtrl. While locked, your server passwords stay encrypted with the PIN and nothing is sent to your servers, unless you turned on background checks</string>
-    <string name="app_lock_footer">AdCtrl has no analytics or tracking. It only talks to your own AdGuard Home servers. While AdCtrl is locked, the Quick Settings tile only opens the app, so nobody can pause protection without your PIN, and the widget only says that AdCtrl is locked.</string>
-    <string name="app_lock_footer_background">Background checks are on, so they can still sign in while AdCtrl is locked: your server passwords are then only encrypted with the Android Keystore, as without the app lock, and the widget keeps showing your server. Turn off background checks in Notifications to keep them sealed with your PIN too. The Quick Settings tile still only opens the app while AdCtrl is locked. AdCtrl has no analytics or tracking.</string>
+    <string name="app_lock_footer">AdCtrl has no analytics or tracking. It only talks to your own AdGuard Home servers.</string>
+    <string name="app_lock_footer_background">Background checks are on, so they can still sign in while AdCtrl is locked: your server passwords are then only encrypted with the Android Keystore, as without the app lock. Turn off background checks in Notifications to keep them sealed with your PIN too. AdCtrl has no analytics or tracking.</string>
     <string name="hide_screenshots">Hide in screenshots</string>
     <string name="hide_screenshots_subtitle">Screenshots and screen recordings show a blank screen</string>
     <string name="hide_recents">Hide in recent apps</string>
@@ -673,7 +653,6 @@
     <string name="lock_confirm_title">Confirm the change</string>
     <string name="lock_confirm_subtitle">AdCtrl is about to change something on your server</string>
     <string name="lock_confirm_body">AdCtrl is about to change something on your server. Enter your app PIN or use your fingerprint.</string>
-    <string name="tile_locked">AdCtrl is locked · tap to open</string>
     <!-- Notifications: AdCtrl's own background checks (AdGuard Home can't push) -->
     <string name="group_notifications">Notifications</string>
     <string name="notifications">Notifications</string>
@@ -738,19 +717,6 @@
     <string name="nt_unreachable_title">Can\'t reach %1$s</string>
     <string name="nt_signin_title">Can\'t sign in to %1$s</string>
     <string name="nt_update_text">Open AdCtrl to install it from Server info.</string>
-
-    <!-- Home screen widget -->
-    <string name="widget_name">AdGuard protection</string>
-    <string name="widget_description">Protection on, paused or off, and the last 24 hours</string>
-    <string name="widget_locked">AdCtrl is locked</string>
-    <string name="widget_locked_subtitle">Unlock AdCtrl to see your server</string>
-    <string name="widget_unreachable">Can\'t reach the server · %1$s</string>
-    <string name="widget_back_in">Back on in</string>
-    <string name="widget_blocking">Blocking ads and trackers</string>
-    <string name="widget_off_until">Off until turned back on</string>
-    <string name="widget_queries_label">Queries, last 24 h</string>
-    <string name="widget_blocked_label">Blocked</string>
-    <string name="widget_no_value">–</string>
 
     <!-- Launcher shortcuts (long-press the app icon) -->
     <string name="shortcut_pause">Pause</string>

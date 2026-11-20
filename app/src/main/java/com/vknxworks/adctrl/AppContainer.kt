@@ -12,9 +12,6 @@ import com.vknxworks.adctrl.data.notify.NotifySettingsRepository
 import com.vknxworks.adctrl.data.notify.NotifyWorker
 import com.vknxworks.adctrl.data.notify.Push
 import com.vknxworks.adctrl.data.notify.PushStatus
-import com.vknxworks.adctrl.data.widget.WidgetRefreshWorker
-import com.vknxworks.adctrl.data.widget.WidgetStore
-import com.vknxworks.adctrl.ui.widgets.ProtectionWidget
 import com.vknxworks.adctrl.ui.lock.AppLock
 import com.vknxworks.adctrl.data.clients.ClientsRepository
 import com.vknxworks.adctrl.data.dns.DnsRepository
@@ -36,7 +33,9 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.work.WorkManager
 import okhttp3.OkHttpClient
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 /** A launcher shortcut, waiting for the main screen (and the app lock) to handle it. */
@@ -132,7 +131,6 @@ class AppContainer(val context: Context) {
             serverStore.servers.value.forEach { overview.forget(it.id) }
             serverStore.removeAll()
             CheckStore.forgetAll(context)
-            WidgetStore.clear(context)
         }
         Notifier.cancelAll(context)
         sessions.forgetSecrets()
@@ -140,7 +138,6 @@ class AppContainer(val context: Context) {
         AppLock.markUnlocked()
         locked.value = false
         settings.update { it.copy(lockChanges = false) }
-        ProtectionWidget.redraw(context)
     }
 
     /** Locked: wipe the key and every decrypted password from memory; requests wait until unlocked. */
@@ -150,15 +147,7 @@ class AppContainer(val context: Context) {
             locked.value = true
             sessions.forgetSecrets()
         }
-        // With sealed passwords the widget now only says that AdCtrl is locked.
-        ProtectionWidget.redraw(context)
     }
-
-    /**
-     * The lock timeout ran out while AdCtrl was away: lock now. For the Quick Settings tile and the
-     * widget, which work without AdCtrl on screen. Main thread only.
-     */
-    fun lockIfExpired() = AppLock.lockIfExpired(vault.enabled, settings.settings.value.lockTimeout.millis)
 
     fun onUnlocked() {
         AppLock.markUnlocked()
@@ -166,18 +155,25 @@ class AppContainer(val context: Context) {
         // Seal any password left unsealed (AdCtrl stopped between setting up the lock and sealing them),
         // and match background checks turned on or off since.
         if (vault.enabled) appScope.launch { runCatching { serverStore.applySealing(sealing()) } }
-        if (ProtectionWidget.anyPlaced(context)) {
-            ProtectionWidget.redraw(context)
-            WidgetRefreshWorker.enqueue(context)
+    }
+
+    /**
+     * The home screen widget and the Quick Settings tile were removed. An install that had the widget placed
+     * may still have its refresh job waiting and its saved numbers: cancel the job and delete the file. Runs
+     * off the main thread and is harmless when there is nothing to clean up.
+     */
+    fun cleanUpRemovedWidget() {
+        appScope.launch(Dispatchers.IO) {
+            runCatching { WorkManager.getInstance(context).cancelUniqueWork("adctrl-widget") }
+            runCatching { File(context.noBackupFilesDir, "widget.json").delete() }
         }
     }
 
-    /** A server was removed: its notifications, check state and widget numbers go too. */
+    /** A server was removed: its notifications and check state go too. */
     fun forgetServer(id: String) {
         overview.forget(id)
         CheckStore.forget(context, id)
         Notifier.cancelServer(context, id)
-        if (ProtectionWidget.anyPlaced(context)) WidgetRefreshWorker.enqueue(context)
     }
 
     init {

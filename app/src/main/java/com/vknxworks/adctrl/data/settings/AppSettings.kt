@@ -37,24 +37,6 @@ enum class LockTimeout(@StringRes val label: Int, val millis: Long) {
     RESTART(R.string.lock_again_restart, -1L),
 }
 
-/**
- * What tapping the Quick Settings tile does while protection is on. [ASK] shows a choice of 1 minute,
- * 10 minutes, 1 hour or until turned back on ([TilePause.CHOICES]).
- */
-enum class TilePause(val pause: PauseDuration?) {
-    ASK(null),
-    M1(PauseDuration.M1),
-    M10(PauseDuration.M10),
-    H1(PauseDuration.H1),
-    UNTIL_ON(PauseDuration.UNTIL_ON),
-    ;
-
-    companion object {
-        /** The durations the tile offers. */
-        val CHOICES = listOf(PauseDuration.M1, PauseDuration.M10, PauseDuration.H1, PauseDuration.UNTIL_ON)
-    }
-}
-
 data class AppSettings(
     val theme: ThemeChoice = ThemeChoice.SYSTEM,
     val dynamicColor: Boolean = false,
@@ -62,10 +44,6 @@ data class AppSettings(
     val hideScreenshots: Boolean = false,
     /** "Hide in recent apps": the Recents view shows a blank card. Screenshots still work. */
     val hideRecents: Boolean = false,
-    /** What a tap on the Quick Settings tile does while protection is on: ask how long, or pause for a set time. */
-    val tilePause: TilePause = TilePause.ASK,
-    /** The tile pauses and resumes every server that isn't read-only, not only the active one. */
-    val tileAllServers: Boolean = false,
     /** The Queries tab adds new queries by itself while it's on screen. */
     val queriesLive: Boolean = true,
     /** App lock: when it asks again after AdCtrl was in the background. */
@@ -82,9 +60,6 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         val hideRecents = booleanPreferencesKey("hide_recents")
         /** The earlier single "hide in screenshots and recent apps" switch; an "on" turns on both new ones. */
         val legacyHide = booleanPreferencesKey("hide_content")
-        /** Replaces "tile_pause" (a fixed duration only), so everyone starts with the new "Ask each time". */
-        val tilePause = stringPreferencesKey("tile_pause_choice")
-        val tileAll = booleanPreferencesKey("tile_all_servers")
         val queriesLive = booleanPreferencesKey("queries_live")
         val lockTimeout = stringPreferencesKey("lock_timeout")
         val lockChanges = booleanPreferencesKey("lock_changes")
@@ -94,7 +69,7 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         .map { it.toSettings() }
         .stateIn(scope, SharingStarted.Eagerly, AppSettings())
 
-    /** The stored settings, read now. For places that start without the UI, like the Quick Settings tile. */
+    /** The stored settings, read now. For places that start without the UI. */
     suspend fun current(): AppSettings = context.appDataStore.data.first().toSettings()
 
     private fun Preferences.toSettings() = AppSettings(
@@ -102,8 +77,6 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
         dynamicColor = this[K.dynamic] ?: false,
         hideScreenshots = this[K.hideScreenshots] ?: this[K.legacyHide] ?: false,
         hideRecents = this[K.hideRecents] ?: this[K.legacyHide] ?: false,
-        tilePause = enumOr(this[K.tilePause], TilePause.ASK),
-        tileAllServers = this[K.tileAll] ?: false,
         queriesLive = this[K.queriesLive] ?: true,
         lockTimeout = enumOr(this[K.lockTimeout], LockTimeout.IMMEDIATELY),
         lockChanges = this[K.lockChanges] ?: false,
@@ -117,8 +90,6 @@ class SettingsRepository(private val context: Context, scope: CoroutineScope) {
             p[K.hideScreenshots] = s.hideScreenshots
             p[K.hideRecents] = s.hideRecents
             p.remove(K.legacyHide)
-            p[K.tilePause] = s.tilePause.name
-            p[K.tileAll] = s.tileAllServers
             p[K.queriesLive] = s.queriesLive
             p[K.lockTimeout] = s.lockTimeout.name
             p[K.lockChanges] = s.lockChanges

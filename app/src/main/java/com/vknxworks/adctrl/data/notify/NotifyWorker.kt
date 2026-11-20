@@ -14,8 +14,6 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.vknxworks.adctrl.container
 import com.vknxworks.adctrl.data.api.AghJson
-import com.vknxworks.adctrl.data.widget.WidgetData
-import com.vknxworks.adctrl.ui.widgets.ProtectionWidget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -83,8 +81,6 @@ class NotifyWorker(context: Context, params: WorkerParameters) : CoroutineWorker
             result.post.forEach { Notifier.post(applicationContext, it) }
             CheckStore.write(applicationContext, server.id, result.state)
         }
-        // Widgets get fresh numbers with every check.
-        if (ProtectionWidget.anyPlaced(applicationContext)) runCatching { WidgetData.refresh(applicationContext) }
         return Result.success()
     }
 

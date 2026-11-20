@@ -32,9 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.container
-import com.vknxworks.adctrl.data.settings.TilePause
-import com.vknxworks.adctrl.ui.overview.pauseLabel
-import androidx.compose.material.icons.outlined.Dns
 import androidx.compose.material.icons.outlined.Notifications
 import com.vknxworks.adctrl.ui.nav.LocalNavigator
 import com.vknxworks.adctrl.ui.nav.NotificationsRoute
@@ -46,8 +43,8 @@ import com.vknxworks.adctrl.ui.components.rememberNotificationAccess
 import kotlinx.coroutines.launch
 
 /**
- * App settings, in the Ctrl series order: notifications, privacy and security (app lock), then the Quick
- * Settings tile. Ctrl / Signal follows the device's dark or light mode, so there is no theme or dynamic colour choice.
+ * App settings, in the Ctrl series order: notifications, then privacy and security (app lock).
+ * Ctrl / Signal follows the device's dark or light mode, so there is no theme or dynamic colour choice.
  */
 @Composable
 fun SettingsScreen() {
@@ -72,20 +69,6 @@ fun SettingsScreen() {
                 )
             }
             PrivacyAndSecurityGroup(settings)
-            Group(stringResource(R.string.tile_settings_group), footer = stringResource(R.string.tile_settings_footer)) {
-                GroupChoice(
-                    stringResource(R.string.tile_pause_setting),
-                    TilePause.entries.map { it to (it.pause?.let { d -> stringResource(pauseLabel(d)) } ?: stringResource(R.string.tile_pause_ask)) },
-                    settings.tilePause,
-                    icon = Icons.Outlined.Timer,
-                ) { d -> c.appScope.launch { c.settings.update { it.copy(tilePause = d) } } }
-                GroupSwitch(
-                    stringResource(R.string.tile_all_setting),
-                    stringResource(R.string.tile_all_setting_subtitle),
-                    checked = settings.tileAllServers,
-                    icon = Icons.Outlined.Dns,
-                ) { on -> c.appScope.launch { c.settings.update { it.copy(tileAllServers = on) } } }
-            }
         }
     }
 }

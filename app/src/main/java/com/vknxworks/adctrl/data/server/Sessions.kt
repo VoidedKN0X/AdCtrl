@@ -78,7 +78,7 @@ class Sessions(
     )
 
     /**
-     * A client for background work (notifications, the widget) that reads the password straight from
+     * A client for background work (notifications) that reads the password straight from
      * storage and doesn't wait for the app lock: it only works while the password isn't sealed (see
      * [ServerStore.sealedNow]). Reads only; it refuses to send any change.
      */
@@ -87,19 +87,6 @@ class Sessions(
         baseHttp,
         secrets = { store.secrets(server.id) },
         isReadOnly = { true },
-    )
-
-    /**
-     * A client for the Quick Settings tile while AdCtrl is locked: it reads the password straight from
-     * storage (only possible while it isn't sealed with the app lock, see [ServerStore.sealedNow]) and
-     * doesn't wait for the app lock. It can change protection, so the tile only uses it after the
-     * phone itself has been unlocked (TileService.unlockAndRun). Read-only mode still applies.
-     */
-    fun directClient(server: Server): AghClient = AghClient(
-        server,
-        baseHttp,
-        secrets = { store.secrets(server.id) },
-        isReadOnly = { store.servers.value.firstOrNull { it.id == server.id }?.readOnly ?: server.readOnly },
     )
 
     /** The server's password is sealed with the app lock right now, so nothing can sign in without the PIN. */

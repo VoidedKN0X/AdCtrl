@@ -12,7 +12,7 @@
          show). Granted at install, no prompt. -->
     <uses-permission android:name="android.permission.HIDE_OVERLAY_WINDOWS" />
     <!-- WorkManager adds the foreground-service permission for long jobs shown as a notification. The background
-         checks and widget refreshes are short jobs that never run as a foreground service, so it's removed (with
+         checks are short jobs that never run as a foreground service, so it's removed (with
          WorkManager's foreground service below). -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
 
@@ -56,11 +56,6 @@
                 <action android:name="com.vknxworks.adctrl.BLOCKED" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <!-- Long-pressing the Quick Settings tile opens AdCtrl. -->
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
@@ -89,40 +84,6 @@
             <intent-filter>
                 <action android:name="org.unifiedpush.android.connector.RAISE_TO_FOREGROUND" />
             </intent-filter>
-        </service>
-
-        <!-- Home screen widget: protection state with a pause countdown, and the last 24 hours. -->
-        <receiver
-            android:name=".ui.widgets.ProtectionWidget"
-            android:exported="false"
-            android:label="@string/widget_name">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
-                <action android:name="android.appwidget.action.APPWIDGET_DISABLED" />
-                <action android:name="android.appwidget.action.APPWIDGET_DELETED" />
-                <action android:name="android.appwidget.action.APPWIDGET_OPTIONS_CHANGED" />
-                <action android:name="android.appwidget.action.APPWIDGET_RESTORED" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_protection_info" />
-        </receiver>
-
-        <!-- Quick Settings tile: protection on, paused or off; tap to pause or resume. Exported because
-             only System UI can bind to it (BIND_QUICK_SETTINGS_TILE). -->
-        <service
-            android:name=".ui.widgets.ProtectionTileService"
-            android:exported="true"
-            android:icon="@drawable/ic_tile_shield"
-            android:label="@string/tile_label"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
-                android:value="true" />
         </service>
 
         <!-- WorkManager's diagnostics receiver (debug dumps over adb) isn't needed; leave it out. -->

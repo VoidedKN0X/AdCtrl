@@ -14,7 +14,6 @@ import com.vknxworks.adctrl.data.api.StatsConfig
 import com.vknxworks.adctrl.data.api.VersionInfo
 import com.vknxworks.adctrl.data.server.Server
 import com.vknxworks.adctrl.data.server.Sessions
-import com.vknxworks.adctrl.data.widget.WidgetData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -174,15 +173,6 @@ class OverviewRepository(
                 error = null,
             )
             save(snap)
-            // The widget shows the same state; it takes the numbers when they cover the last 24 hours.
-            val st = snap.status
-            if (st != null) {
-                val stats = snap.stats
-                val day = StatsRange.DAY.ms
-                val covers24h = snap.statsRangeMs == day || (snap.statsRangeMs == 0L && (snap.statsConfig?.interval ?: 0L) in 1..day)
-                val counts = if (stats != null && covers24h && snap.statsConfig?.enabled != false) stats.numDnsQueries to stats.numBlockedFiltering else null
-                WidgetData.fromApp(context, server, st, counts)
-            }
         } catch (e: AghError) {
             if (sessions.active.value?.server?.id != server.id) return@withLock
             sessions.reportError(server.id, e)
@@ -190,18 +180,13 @@ class OverviewRepository(
         }
     }
 
-    /**
-     * Status only: quick, for the countdown ending and after changing protection. [using] replaces the
-     * active server's client (the Quick Settings tile while AdCtrl is locked, see Sessions.directClient).
-     * True when the server answered.
-     */
-    suspend fun refreshStatus(using: AghClient? = null): Boolean {
+    /** Status only: quick, for the countdown ending and after changing protection. True when the server answered. */
+    suspend fun refreshStatus(): Boolean {
         val active = sessions.active.value ?: return false
         try {
-            val st = (using ?: active.client).status()
+            val st = active.client.status()
             if (sessions.active.value?.server?.id != active.server.id) return false
             sessions.reportStatus(active.server.id, st)
-            WidgetData.fromApp(context, active.server, st)
             val now = System.currentTimeMillis()
             _state.value = _state.value.copy(
                 snapshot = _state.value.snapshot.copy(serverId = active.server.id, status = st),
@@ -218,27 +203,19 @@ class OverviewRepository(
      * Pauses protection for [pause] (or until turned back on), or turns it back on ([pause] null),
      * on the active server, or on every saved server that isn't read-only when [allServers] is set.
      */
-    suspend fun setProtection(
-        pause: PauseDuration?,
-        allServers: Boolean,
-        /** The client for each server; the Quick Settings tile passes its own while AdCtrl is locked. */
-        clientFor: ((Server) -> AghClient)? = null,
-    ): ProtectionResult {
+    suspend fun setProtection(pause: PauseDuration?, allServers: Boolean): ProtectionResult {
         val activeServer = sessions.active.value?.server ?: return ProtectionResult(emptyList())
         val targets = if (allServers) sessions.servers.value.filter { !it.readOnly } else listOf(activeServer)
         val failed = mutableListOf<Pair<Server, AghError>>()
-        var activeClient: AghClient? = null
         targets.forEach { server ->
-            val client = clientFor?.invoke(server)
-                ?: if (server.id == activeServer.id) sessions.active.value?.client ?: sessions.clientFor(server) else sessions.clientFor(server)
-            if (server.id == activeServer.id) activeClient = client
+            val client = if (server.id == activeServer.id) sessions.active.value?.client ?: sessions.clientFor(server) else sessions.clientFor(server)
             try {
                 sendProtection(client, server, pause)
             } catch (e: AghError) {
                 failed += server to e
             }
         }
-        refreshStatus(if (clientFor != null) activeClient else null)
+        refreshStatus()
         return ProtectionResult(failed)
     }
 
