@@ -147,15 +147,18 @@ fun ClientsScreen() {
         // Rows are keyed; never let two share a key.
         (p + r).distinctBy { it.key }
     }
-    val shown = rows.filter { row ->
-        (search.isBlank() || row.name.contains(search, true) || row.ids.any { it.contains(search, true) } || row.tags.any { it.contains(search, true) }) &&
-            when (filter) {
-                ClientFilter.ALL -> true
-                ClientFilter.PERSISTENT -> row.persistent
-                ClientFilter.RUNTIME -> !row.persistent
-                ClientFilter.BLOCKED -> row.blocked
-            }
-    }.sortedWith(compareByDescending<ClientItem> { it.queries ?: -1L }.thenBy { it.name.lowercase() })
+    // Filtered and sorted when the clients, the search or the filter change, not with every redraw.
+    val shown = remember(rows, search, filter) {
+        rows.filter { row ->
+            (search.isBlank() || row.name.contains(search, true) || row.ids.any { it.contains(search, true) } || row.tags.any { it.contains(search, true) }) &&
+                when (filter) {
+                    ClientFilter.ALL -> true
+                    ClientFilter.PERSISTENT -> row.persistent
+                    ClientFilter.RUNTIME -> !row.persistent
+                    ClientFilter.BLOCKED -> row.blocked
+                }
+        }.sortedWith(compareByDescending<ClientItem> { it.queries ?: -1L }.thenBy { it.name.lowercase() })
+    }
     val range = stringResource(rangeLabel(overview.range))
 
     Box(Modifier.fillMaxSize()) {

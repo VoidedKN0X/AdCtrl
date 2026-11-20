@@ -4,6 +4,27 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+Not released yet: these changes are on `main` and will be part of the next version.
+
+### Removed
+
+- **The home screen widget is gone.** The **AdGuard protection** widget (protection on, paused or off, and the last 24 hours) has been removed from AdCtrl, together with its background refresh. If you had it on your home screen, Android shows an empty or "can't load" box in its place after updating: remove that box by hand. AdCtrl cancels the widget's leftover refresh job and deletes the small file with the widget's last numbers the next time you open the app.
+- **The Quick Settings tile is gone.** The **AdGuard** tile for pausing and resuming protection has been removed. Pause from the Overview, or with the **Pause protection** app shortcut (long-press the AdCtrl icon), which opens the pause menu. App shortcuts are unchanged.
+- **Settings › Quick Settings tile is gone** with it: "Tapping the tile pauses for" and "Pause all servers" only applied to the tile. Pausing on all servers from the Overview works as before.
+- AdCtrl no longer opens from a long-press on a Quick Settings tile, and the texts under **App lock** no longer mention the tile and the widget.
+
+### Changed
+
+- **Faster start with a pinned certificate or a plain-HTTP server.** The connection setup for a server with a self-signed certificate you trusted (and the private-addresses-only setup for a plain-HTTP server) used to be made on the main thread while the app was starting, twice. It's now made once, on a background thread, with the first request.
+- **One connection object at start instead of two.** AdCtrl made the active server's connection twice while starting; it now makes it once.
+- **The Clients list redraws more cheaply.** The list was filtered and sorted again with every redraw of the screen; now only when the clients, the search or the filter change.
+
+### Privacy
+
+- The widget's saved numbers (protection state and the last 24 hours' query counts) are no longer kept on the phone, since the widget is gone.
+
 ## v0.13.1 (2026-11-20)
 
 ### Changed

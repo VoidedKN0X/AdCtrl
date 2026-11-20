@@ -77,7 +77,12 @@ class AghClient(
     constructor(server: Server, base: OkHttpClient, secrets: ServerSecrets) : this(server, base, { secrets })
 
     private val baseUrl: HttpUrl = server.url.toHttpUrl()
-    val http: OkHttpClient = httpFor(base, baseUrl, server.certPin)
+
+    /**
+     * Made on first use (a request, which runs on a background thread) instead of when the client is
+     * created: setting up TLS for a pinned certificate is too slow for the main thread at app start.
+     */
+    val http: OkHttpClient by lazy { httpFor(base, baseUrl, server.certPin) }
 
     fun url(path: String, query: List<Pair<String, String>> = emptyList()): HttpUrl {
         val b = baseUrl.newBuilder().addPathSegment("control")
