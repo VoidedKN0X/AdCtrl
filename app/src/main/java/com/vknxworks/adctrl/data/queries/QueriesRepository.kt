@@ -93,7 +93,12 @@ class QueriesRepository(private val sessions: Sessions, scope: CoroutineScope) {
 
     /**
      * Live update: fetches the newest page and puts queries that weren't shown yet on top, keeping
-     * what's further down. Returns false when it failed (so polling backs off).
+     * what's further down, up to the newest [MAX_SHOWN] rows. Returns false when it failed (so polling
+     * backs off).
+     *
+     * Only call this while the list is at or near its top (the Queries tab stops polling once it is
+     * scrolled a page down): rows past [MAX_SHOWN] are dropped here, which must never happen to rows
+     * someone is looking at.
      */
     suspend fun poll(): Boolean = lock.withLock {
         val active = sessions.active.value ?: return@withLock false
@@ -104,10 +109,19 @@ class QueriesRepository(private val sessions: Sessions, scope: CoroutineScope) {
             val shown = _state.value.items
             val known = shown.mapTo(HashSet()) { it.key }
             val fresh = page.data.takeWhile { it.key !in known }
+            val gap = fresh.size >= PAGE
+            val merged = (if (gap) page.data else fresh + shown).distinctBy { it.key }
+            // A long live session would otherwise hold every query it ever showed. The oldest rows are
+            // let go and loaded again from the server when the list is scrolled back down to them.
+            val capped = if (gap) null else capNewest(merged, MAX_SHOWN) { it.time }
             _state.value = _state.value.copy(
-                items = (if (fresh.size >= PAGE) page.data else fresh + shown).distinctBy { it.key },
-                // A whole new page means there's a gap: start the list over from it.
-                oldest = if (fresh.size >= PAGE) page.oldest else _state.value.oldest,
+                items = capped ?: merged,
+                oldest = when {
+                    // A whole new page means there's a gap: start the list over from it.
+                    gap -> page.oldest
+                    capped != null -> capped.last().time
+                    else -> _state.value.oldest
+                },
                 error = null,
                 updatedAt = System.currentTimeMillis(),
             )
@@ -194,6 +208,9 @@ class QueriesRepository(private val sessions: Sessions, scope: CoroutineScope) {
 
     private companion object {
         const val PAGE = 50
+
+        /** How many rows a live update keeps; scrolling down past them loads the older ones again. */
+        const val MAX_SHOWN = 2_000
         const val NAMES_TTL = 5 * 60_000L
     }
 }
