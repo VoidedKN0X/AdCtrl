@@ -4,6 +4,30 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+Not released yet: these changes are on `main` and get a version number when the next release is made. Built and checked by CI only: nothing here has been run on a phone.
+
+### Security
+
+- **The saved Overview is now encrypted on the phone.** To show the Overview when your server can't be reached, AdCtrl keeps the last one it fetched per server (`overview/<server id>.json` in the app's private storage). That file holds your most queried domains, most blocked domains and busiest clients, and used to be readable text. It is now encrypted with AES-256-GCM.
+- **How the key works.** AdCtrl makes one random 256-bit data key and stores it in `data.key` in its private storage, itself encrypted by a key in the Android Keystore that can't be taken off the phone (in the StrongBox security chip when the phone has one). That Keystore key is separate from the ones that protect your server passwords and the app lock, which are untouched. It needs no fingerprint or PIN. What this protects against: someone reading AdCtrl's files copied off the phone. It works the same with the app lock on or off: the app lock still doesn't add your PIN to this file, and it does not protect against something that controls the running app.
+- **Existing files are converted safely.** The first start after updating seals the saved Overviews that are there, in the background: an encrypted copy is written to a temporary file, read back from disk, decrypted and compared with the original, and only then swapped in, in one step. If the app is stopped half-way, the old file is simply still there and the next start tries again. Both the old and the new form are read, now and in later versions.
+- **If the key can't be had** (the phone's Keystore doesn't work), nothing changes: AdCtrl keeps saving the Overview the way it did before, unencrypted, and tries again at the next start.
+- **If an encrypted Overview can't be opened** (the Keystore key is gone or the file is damaged), AdCtrl deletes that one file and fetches the Overview again the next time the server answers. Nothing else is lost: it only ever held a copy of what your server has. Until then, an unreachable server shows an empty Overview instead of the last known one. An unusable `data.key` is never replaced, so after that the Overview is saved unencrypted, as before this change.
+- **Going back to an older version of AdCtrl:** an older version can't read the encrypted file. It shows an empty Overview until the server answers and then saves its own, readable copy again. There is nothing to export first: the saved Overview is only a copy.
+
+### Not encrypted, and why
+
+- **The list of servers** (name, address, user name, last seen version) and **the app's settings** stay in the app's private settings as before. They are read the moment the app starts, to decide which screen to show; encrypting them would mean asking the Keystore on the main thread at every start (which was just removed to make the app start faster) or showing a wrong "no server yet" screen while the key loads. Server passwords were already encrypted and are unchanged, as are the app lock's own files.
+- **What the background checks last saw** (`notify/<server id>.json`: which problems were already notified, how long protection has been off, the newest version notified, when the last check ran) stays a plain file. It holds no domains, clients or queries, and losing it would repeat notifications you already had.
+- **The ntfy push address and the push registration** stay as they are: the push receiver reads them the moment a push arrives.
+- AdCtrl keeps nothing else on the phone: the query log, the client list, filters and rules are read from your server each time and only held in memory.
+
+### Changed
+
+- The saved Overview is now written to a temporary file and swapped in, so a crash or power cut while saving can't leave half a file.
+
 ## v0.14.0 (2026-11-20)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.

@@ -12,6 +12,14 @@ Android app for a self-hosted AdGuard Home DNS server. Part of the VKNXWorks Ctr
 - Test rule changes with a harmless test domain first. Never disable protection or block a client without the user confirming on the device.
 - CI runs a Google-free dependency audit on every build; keep it passing.
 
+## Encryption at rest
+
+- The saved last known Overview (`filesDir/overview/<server id>.json`, `OverviewRepository`; it holds top domains and clients) is sealed with AES-256-GCM (`data/crypto/SealedFile`, marker `ADCTRL-REST1`) under the data key (`DataKeyStore`: 32 random bytes in `filesDir/data.key`, wrapped by the Keystore key `adctrl_data_at_rest` through `KeystoreWrapper`/`KeystoreAes`; no user authentication, independent of the app lock). `DataKeys` holds the one key store and `SealedCache` of the process. The server list, the settings, the check state (`noBackupFilesDir/notify`) and the ntfy push address are not encrypted; passwords and the app lock vault keep their own encryption and keys and must not be touched from here.
+- It is a cache (`SealedCache`): reads accept sealed and ordinary files, a sealed file that can't be opened is deleted and fetched again, and without a data key ordinary files are written as before. Ordinary files from an older version are sealed at start through `SealedFile.sealInPlace` (temp file, sync, read back, compare, atomic rename).
+- Never replace an existing `data.key`, and never create a Keystore key on the decrypt path (`KeystoreAes.existing`). `SealedCache` is only for data the app can fetch again; anything the user typed in needs the stricter rules (see RideCtrl or WrtCtrl's `NotesStore`).
+- Key unwrapping, sealing and decryption run off the main thread (`Dispatchers.IO`); keep it that way.
+- `SealedFileTest` covers the format, the migration step, the key rules and the cache (`./gradlew :app:testDebugUnitTest`; CI doesn't run it).
+
 ## Dependency verification
 
 Gradle checks every library and plugin download against its SHA-256 in `gradle/verification-metadata.xml` (checksums only, no PGP). When a dependency or plugin changes, run the `verification-metadata.yml` workflow (`gh api -X POST repos/VoidedKN0X/AdCtrl/actions/workflows/verification-metadata.yml/dispatches -f ref=main`), decode the file from its log, check the diff (only Maven Central, Google's Maven and the Gradle plugin portal) and commit it in the same push. Never turn verification off or make it lenient.

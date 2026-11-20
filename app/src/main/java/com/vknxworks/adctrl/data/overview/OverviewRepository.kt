@@ -12,6 +12,7 @@ import com.vknxworks.adctrl.data.api.ServerStatus
 import com.vknxworks.adctrl.data.api.Stats
 import com.vknxworks.adctrl.data.api.StatsConfig
 import com.vknxworks.adctrl.data.api.VersionInfo
+import com.vknxworks.adctrl.data.crypto.DataKeys
 import com.vknxworks.adctrl.data.server.Server
 import com.vknxworks.adctrl.data.server.Sessions
 import kotlinx.coroutines.CoroutineScope
@@ -98,10 +99,15 @@ class OverviewRepository(
     val state: StateFlow<OverviewState> = _state.asStateFlow()
     private val lock = Mutex()
 
+    /** Reads and writes the saved last known states, encrypted at rest. Declared before `init`, which uses it. */
+    private val cache = DataKeys.cache(context)
+
     /** The server's version check is only asked again after this long (or when asked explicitly). */
     private var versionCheckedAt = 0L
 
     init {
+        // Saved states an older version left as ordinary files are sealed once, in the background.
+        scope.launch(Dispatchers.IO) { runCatching { cache.sealAll(dir()) } }
         // Switching servers shows that server's last known state right away, then refreshes.
         scope.launch {
             sessions.active.map { it?.server?.id }.distinctUntilChanged().collect { id ->
@@ -260,20 +266,28 @@ class OverviewRepository(
     }
 
     // --- Last known state, per server, in the app's private storage (never backed up) ---
+    // It holds the most queried and most blocked domains and the busiest clients, so it's encrypted at rest
+    // (SealedCache). It can always be fetched again: a saved state that can't be opened is dropped.
 
-    private fun file(id: String) = File(File(context.filesDir, "overview").apply { mkdirs() }, "$id.json")
+    private fun dir() = File(context.filesDir, "overview").apply { mkdirs() }
+
+    private fun file(id: String) = File(dir(), "$id.json")
 
     private suspend fun save(snap: OverviewSnapshot) = withContext(Dispatchers.IO) {
-        runCatching { file(snap.serverId).writeText(AghJson.encodeToString(OverviewSnapshot.serializer(), snap)) }
+        runCatching {
+            cache.write(file(snap.serverId), AghJson.encodeToString(OverviewSnapshot.serializer(), snap).toByteArray(Charsets.UTF_8))
+        }
     }
 
     private suspend fun load(id: String): OverviewSnapshot? = withContext(Dispatchers.IO) {
-        runCatching { AghJson.decodeFromString(OverviewSnapshot.serializer(), file(id).readText()) }.getOrNull()
+        runCatching {
+            cache.read(file(id))?.let { AghJson.decodeFromString(OverviewSnapshot.serializer(), it.toString(Charsets.UTF_8)) }
+        }.getOrNull()
     }
 
     /** Deletes a removed server's saved state. */
     fun forget(id: String) {
-        runCatching { file(id).delete() }
+        runCatching { cache.delete(file(id)) }
     }
 
     private companion object {
