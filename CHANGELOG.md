@@ -4,6 +4,15 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+Built and checked by CI only: nothing here has been run on a phone yet.
+
+### Changed
+
+- **Live updates of the query log wait while you read older queries.** With live updates on, AdCtrl asked the server for the newest queries every 5 seconds, also while the list was scrolled far down where new rows (which come in at the top) can't be seen. Once the list is scrolled 50 rows or more away from the top, AdCtrl now stops asking; nothing in the list changes while you read. When you scroll back to the very top, the log refreshes right away and live updates carry on, so the queries that came in meanwhile appear then. If 50 or more came in while you were away, the list starts over from the newest 50, exactly as it already did when a whole page of new queries arrived between two updates; scrolling down loads the older ones again. Changing the search, a filter or the server starts live updates again. The pause button, pull to refresh and loading older queries by scrolling work as before.
+- **A long live session no longer keeps every query in memory.** The live log used to grow for as long as the Queries tab stayed open: every update added the new queries on top and nothing was ever removed, so hours on a busy network meant tens of thousands of rows held in memory and gone through at every update. A live update now keeps the newest 2,000 rows and lets go of the ones below. Because live updates only run while the list is at or near the top (see above), rows are never removed around the place you are reading: when you scroll far down, updates are paused and everything you loaded stays until you are back at the top. Scrolling down past the 2,000th row loads the older queries from the server again, from exactly where the list was cut, so no query is skipped or shown twice.
+
 ## v0.15.0 (2026-11-20)
 
 **This release encrypts some of what the app stores on the phone. An older version cannot read it afterwards, so export or back up anything you need before you update (details below).** Built and checked by CI only: nothing in this release had been run on a phone when it was published.
