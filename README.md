@@ -56,7 +56,7 @@ Your servers, **Upstream DNS**, **Query log and statistics**, **Settings** and *
 ## Is it safe to install?
 
 - **Open source:** all of AdCtrl's code is in this repo, under the GPL-3.0 licence.
-- **Built by GitHub, not on a personal computer:** every APK on the Releases page is built by GitHub Actions from the code in this repo, with [the build workflow](.github/workflows/build.yml).
+- **Built by GitHub, not on a personal computer:** every APK on the Releases page is built by GitHub Actions from the code in this repo, with [the build workflow](.github/workflows/build.yml). The signing key is kept away from the build: one job builds the APK without any secrets, and a separate job that runs no code from this repo signs it and checks the signature against the fingerprint below.
 - **Always signed with the same key:** every release is signed with the same AdCtrl release key, and the build checks this before publishing. Android refuses to install an update signed with a different key over the app you have, and the CtrlF-Droid repo only accepts APKs signed with this key. The SHA-256 fingerprint of the signing certificate is:
 
   ```
