@@ -92,6 +92,9 @@ import kotlinx.coroutines.launch
 
 private const val LIVE_MS = 5_000L
 
+/** Live updates are held from this row on: one page of the query log. */
+private const val LIVE_HOLD_FROM = 50
+
 /** A pending block or unblock from a row's detail sheet. */
 private class RuleTarget(val block: Boolean, val item: QueryLogItem, val onlyClient: Boolean)
 
@@ -140,8 +143,21 @@ fun QueriesScreen() {
     LaunchedEffect(server?.id) {
         if (server != null && state.updatedAt == 0L) c.queries.reload()
     }
+    val list = rememberLazyListState()
+    // Live updates stop once the list is scrolled a page or more away from the newest queries, where they
+    // couldn't be seen anyway, and start again (with a refresh right away) back at the very top. A new
+    // server, search or filter starts with live updates running.
+    var liveHeld by remember { mutableStateOf(false) }
+    LaunchedEffect(server?.id, search) { liveHeld = false }
+    LaunchedEffect(list) {
+        snapshotFlow { list.firstVisibleItemIndex }
+            .distinctUntilChanged()
+            .collect { first ->
+                if (first >= LIVE_HOLD_FROM) liveHeld = true else if (first == 0) liveHeld = false
+            }
+    }
     // Live updates only while this screen is visible, and only when switched on.
-    if (settings.queriesLive) {
+    if (settings.queriesLive && !liveHeld) {
         PollWhileVisible(server?.id to search, LIVE_MS) { c.queries.poll() }
     }
     // Typing filters the log after a short pause.
@@ -151,7 +167,6 @@ fun QueriesScreen() {
         c.queries.setSearch(search.copy(text = text))
     }
 
-    val list = rememberLazyListState()
     // Infinite scroll: load the next older page near the end.
     LaunchedEffect(list) {
         snapshotFlow { list.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0 }
