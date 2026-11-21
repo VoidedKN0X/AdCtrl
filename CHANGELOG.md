@@ -4,7 +4,9 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
-## Unreleased
+## v0.17.0 (2026-11-21)
+
+Built and checked by CI only: nothing in this release had been run on a phone when it was published.
 
 Built and checked by CI only: none of this had been run on a phone or against a server when it was written. Every request was checked against AdGuard Home 0.107.79's API description (`openapi/openapi.yaml`), but please try each new screen once.
 
