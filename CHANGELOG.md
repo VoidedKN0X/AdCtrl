@@ -4,6 +4,12 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+### New
+
+- **AdCtrl in Dutch, French and German, following the phone's language.** With the phone set to Dutch, French or German, every screen, message, notification and shortcut of AdCtrl is in that language (Belgian Dutch with the informal "je", French with the polite "vous", German with the informal "du"); any other language still gets English. There is no language switch in the app: Android decides, and under Settings > Apps > AdCtrl > Language you can also pick English, Dutch, French or German for AdCtrl alone. AdGuard Home's own names and technical words (DNS, DHCP, upstream, ClientID, DNS-over-HTTPS, TTL, CNAME, the filter rule syntax), units and the app name are not translated, and what the server itself sends (domain names, list and service names, AdGuard Home's error text) stays as AdGuard Home writes it. The translations were written with this release and have not been read on a phone yet: tell me where a word is off.
+
 ## v0.17.0 (2026-11-21)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.

@@ -6,7 +6,7 @@ Android app for a self-hosted AdGuard Home DNS server. Part of the VKNXWorks Ctr
 
 - Push fixes and updates straight to `main`, with no branches or pull requests.
 - Every push needs a detailed `CHANGELOG.md` entry.
-- Every user-visible string goes in `app/src/main/res/values/strings.xml`.
+- Every user-visible string goes in `app/src/main/res/values/strings.xml`, and in the Dutch (`values-nl`, Belgian Dutch, informal "je"), French (`values-fr`, polite "vous") and German (`values-de`, informal "du") files too. Android picks the language from the phone (`res/xml/locales_config.xml` lists all four for the per-app language setting); there is no in-app switch.
 - Check AdGuard Home endpoints against `openapi/openapi.yaml` and `openapi/CHANGELOG.md` in the AdGuard Home repo for the server's version; never guess field names. Parse API responses leniently (missing or new fields must never crash).
 - The only network destinations are the configured AdGuard Home servers. Never log query log contents, credentials or URLs containing credentials.
 - Test rule changes with a harmless test domain first. Never disable protection or block a client without the user confirming on the device.

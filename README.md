@@ -24,6 +24,7 @@ Part of the [Ctrl series](#the-ctrl-series) by VKNXWorks.
 - **Several servers**, such as a primary and a secondary, with "apply to all servers" for rule changes and pausing, and **Copy settings to another server**: compare the server you're connected to with another one and make that one match (blocklists and allowlists, custom rules, DNS rewrites, blocked services, the safe browsing, parental control and safe search switches, and clients; you pick which), after a list of what would change and a confirmation
 - **Export and import** of AdCtrl's own settings and your list of servers (names, addresses, usernames) to a file, for a new phone. Passwords, the app lock and trusted certificates are never in the file; an import only adds servers you don't have yet and never switches on plain HTTP
 - **App lock** with its own PIN and optional fingerprint unlock; your server passwords stay encrypted while the app is locked, and **Confirm changes** can ask for the PIN or fingerprint before anything changes on a server
+- **English, Dutch, French and German**, following your phone's language (or pick one for AdCtrl alone under Android's Settings › Apps › AdCtrl › Language)
 - **Safe by design**: a read-only mode, confirmation before changes, certificate pinning, optional **Hide in screenshots** and **Hide in recent apps**, and passwords encrypted with the Android Keystore (in the StrongBox security chip when the phone has one)
 
 ## Requirements
