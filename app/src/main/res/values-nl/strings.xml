@@ -408,6 +408,18 @@
     <string name="services_blocked">Geblokkeerd (%1$d)</string>
     <string name="services_none">Geen diensten die overeenkomen.</string>
     <string name="services_group_other">Andere</string>
+    <string name="services_group_ai">AI</string>
+    <string name="services_group_cdn">CDN</string>
+    <string name="services_group_dating">Dating</string>
+    <string name="services_group_gambling">Gokken</string>
+    <string name="services_group_gaming">Gaming</string>
+    <string name="services_group_hosting">Hosting</string>
+    <string name="services_group_messenger">Berichtenapps</string>
+    <string name="services_group_privacy">Privacy</string>
+    <string name="services_group_shopping">Winkelen</string>
+    <string name="services_group_social_network">Sociale netwerken</string>
+    <string name="services_group_software">Software</string>
+    <string name="services_group_streaming">Streaming</string>
     <string name="schedule_body">Geblokkeerde diensten zijn tijdens deze uren niet geblokkeerd, bijvoorbeeld om \'s avonds games toe te laten. De tijden zijn in de tijdzone van de server (%1$s).</string>
     <string name="schedule_from">Gepauzeerd van</string>
     <string name="schedule_until">Gepauzeerd tot</string>
@@ -465,7 +477,7 @@
     <string name="clients_persistent">Toegevoegd (%1$d)</string>
     <string name="clients_runtime">Gevonden (%1$d)</string>
     <string name="clients_blocked">Geblokkeerd (%1$d)</string>
-    <string name="clients_counts_note">De cijfers zijn query\'s in de %1$s gekozen op het Overzicht.</string>
+    <string name="clients_counts_note">De cijfers zijn query\'s in de laatste %1$s, de periode die je op het Overzicht koos.</string>
     <string name="clients_allowlist_mode">Alleen toegelaten clients kunnen AdGuard Home gebruiken: de toegangslijst staat in toelatingslijstmodus.</string>
     <string name="clients_empty_title">Geen clients</string>
     <string name="clients_empty_body">Apparaten verschijnen hier zodra ze AdGuard Home voor DNS gebruiken.</string>
@@ -486,7 +498,7 @@
     <string name="client_blocked_long">Deze client is geblokkeerd: AdGuard Home beantwoordt zijn DNS-query\'s niet.</string>
     <string name="client_blocked_rule">Geblokkeerd door de toegangslijst (%1$s): AdGuard Home beantwoordt zijn DNS-query\'s niet.</string>
     <string name="client_activity">Activiteit</string>
-    <string name="client_queries_in">Query\'s in de %1$s</string>
+    <string name="client_queries_in">Query\'s in de laatste %1$s</string>
     <string name="client_recent_queries">Recente query\'s</string>
     <string name="client_recent_queries_subtitle">De query\'s van deze client openen in het querylogboek</string>
     <string name="client_top_domains">Recent het meest opgevraagd</string>

@@ -408,6 +408,18 @@
     <string name="services_blocked">Bloqués (%1$d)</string>
     <string name="services_none">Aucun service ne correspond.</string>
     <string name="services_group_other">Autres</string>
+    <string name="services_group_ai">IA</string>
+    <string name="services_group_cdn">CDN</string>
+    <string name="services_group_dating">Rencontres</string>
+    <string name="services_group_gambling">Jeux d’argent</string>
+    <string name="services_group_gaming">Jeux vidéo</string>
+    <string name="services_group_hosting">Hébergement</string>
+    <string name="services_group_messenger">Messageries</string>
+    <string name="services_group_privacy">Confidentialité</string>
+    <string name="services_group_shopping">Shopping</string>
+    <string name="services_group_social_network">Réseaux sociaux</string>
+    <string name="services_group_software">Logiciels</string>
+    <string name="services_group_streaming">Streaming</string>
     <string name="schedule_body">Les services bloqués ne sont pas bloqués pendant ces heures, par exemple pour autoriser les jeux le soir. Les heures sont dans le fuseau horaire du serveur (%1$s).</string>
     <string name="schedule_from">En pause de</string>
     <string name="schedule_until">En pause jusqu’à</string>
@@ -465,7 +477,7 @@
     <string name="clients_persistent">Ajoutés (%1$d)</string>
     <string name="clients_runtime">Détectés (%1$d)</string>
     <string name="clients_blocked">Bloqués (%1$d)</string>
-    <string name="clients_counts_note">Les chiffres sont les requêtes sur la période %1$s choisie dans l’Aperçu.</string>
+    <string name="clients_counts_note">Les chiffres sont les requêtes sur %1$s, la période choisie dans l’Aperçu.</string>
     <string name="clients_allowlist_mode">Seuls les clients autorisés peuvent utiliser AdGuard Home : sa liste d’accès est en mode liste d’autorisation.</string>
     <string name="clients_empty_title">Aucun client</string>
     <string name="clients_empty_body">Les appareils apparaissent ici dès qu’ils utilisent AdGuard Home pour le DNS.</string>
@@ -486,7 +498,7 @@
     <string name="client_blocked_long">Ce client est bloqué : AdGuard Home ne répond pas à ses requêtes DNS.</string>
     <string name="client_blocked_rule">Bloqué par la liste d’accès (%1$s) : AdGuard Home ne répond pas à ses requêtes DNS.</string>
     <string name="client_activity">Activité</string>
-    <string name="client_queries_in">Requêtes sur la période %1$s</string>
+    <string name="client_queries_in">Requêtes sur %1$s</string>
     <string name="client_recent_queries">Requêtes récentes</string>
     <string name="client_recent_queries_subtitle">Ouvrir les requêtes de ce client dans le journal des requêtes</string>
     <string name="client_top_domains">Les plus demandés récemment</string>

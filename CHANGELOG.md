@@ -4,6 +4,13 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+### Fixed
+
+- **"Queries in the last 24 hours" reads right in every language.** The note above the Clients list and the queries heading on a client's page put the Overview's period into the sentence as a bare amount ("Queries in the 7 days"); in French and German that didn't read as a sentence. They now say "in the last 7 days" (Dutch "in de laatste 7 dagen", French "sur 7 jours", German "der letzten 7 Tage").
+- **Blocked services groups in your language.** The group headings on the Blocked services page (AI, Gambling, Social network, Messenger and the others) came straight from AdGuard Home's English ids, like "Social network" or "Ai". They now use the phone's language; a group AdCtrl doesn't know yet still shows its id.
+
 ## v0.18.0 (2026-11-21)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.

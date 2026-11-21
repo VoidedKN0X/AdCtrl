@@ -448,6 +448,18 @@
     <string name="services_blocked">Blocked (%1$d)</string>
     <string name="services_none">No services match.</string>
     <string name="services_group_other">Other</string>
+    <string name="services_group_ai">AI</string>
+    <string name="services_group_cdn">CDN</string>
+    <string name="services_group_dating">Dating</string>
+    <string name="services_group_gambling">Gambling</string>
+    <string name="services_group_gaming">Gaming</string>
+    <string name="services_group_hosting">Hosting</string>
+    <string name="services_group_messenger">Messenger</string>
+    <string name="services_group_privacy">Privacy</string>
+    <string name="services_group_shopping">Shopping</string>
+    <string name="services_group_social_network">Social network</string>
+    <string name="services_group_software">Software</string>
+    <string name="services_group_streaming">Streaming</string>
     <string name="schedule_body">Blocked services aren\'t blocked during these hours, for example to allow games in the evening. Times are in the server\'s time zone (%1$s).</string>
     <string name="schedule_from">Paused from</string>
     <string name="schedule_until">Paused until</string>
@@ -511,7 +523,7 @@
     <string name="clients_persistent">Added (%1$d)</string>
     <string name="clients_runtime">Found (%1$d)</string>
     <string name="clients_blocked">Blocked (%1$d)</string>
-    <string name="clients_counts_note">Numbers are queries in the %1$s chosen on the Overview.</string>
+    <string name="clients_counts_note">Numbers are queries in the last %1$s, the period chosen on the Overview.</string>
     <string name="clients_allowlist_mode">Only allowed clients can use AdGuard Home: its access list is in allowlist mode.</string>
     <string name="clients_empty_title">No clients</string>
     <string name="clients_empty_body">Devices appear here once they use AdGuard Home for DNS.</string>
@@ -532,7 +544,7 @@
     <string name="client_blocked_long">This client is blocked: AdGuard Home doesn\'t answer its DNS queries.</string>
     <string name="client_blocked_rule">Blocked by the access list (%1$s): AdGuard Home doesn\'t answer its DNS queries.</string>
     <string name="client_activity">Activity</string>
-    <string name="client_queries_in">Queries in the %1$s</string>
+    <string name="client_queries_in">Queries in the last %1$s</string>
     <string name="client_recent_queries">Recent queries</string>
     <string name="client_recent_queries_subtitle">Open this client\'s queries in the query log</string>
     <string name="client_top_domains">Most queried recently</string>

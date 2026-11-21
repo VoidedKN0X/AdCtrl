@@ -175,10 +175,24 @@ fun ServicesSection(
     }
 }
 
-/** "social_network" → "Social network". */
+/** AdGuard Home's service group ids in the phone's language; an unknown id made readable ("new_group" → "New group"). */
 @Composable
-private fun groupLabel(id: String): String =
-    if (id.isBlank()) stringResource(R.string.services_group_other) else id.replace('_', ' ').replaceFirstChar { it.titlecase(Locale.getDefault()) }
+private fun groupLabel(id: String): String = when (id) {
+    "" -> stringResource(R.string.services_group_other)
+    "ai" -> stringResource(R.string.services_group_ai)
+    "cdn" -> stringResource(R.string.services_group_cdn)
+    "dating" -> stringResource(R.string.services_group_dating)
+    "gambling" -> stringResource(R.string.services_group_gambling)
+    "gaming" -> stringResource(R.string.services_group_gaming)
+    "hosting" -> stringResource(R.string.services_group_hosting)
+    "messenger" -> stringResource(R.string.services_group_messenger)
+    "privacy" -> stringResource(R.string.services_group_privacy)
+    "shopping" -> stringResource(R.string.services_group_shopping)
+    "social_network" -> stringResource(R.string.services_group_social_network)
+    "software" -> stringResource(R.string.services_group_software)
+    "streaming" -> stringResource(R.string.services_group_streaming)
+    else -> if (id.isBlank()) stringResource(R.string.services_group_other) else id.replace('_', ' ').replaceFirstChar { it.titlecase(Locale.getDefault()) }
+}
 
 /** Weekday is Monday first, like java.time.DayOfWeek (MONDAY = 1). */
 private fun dayName(d: Weekday, style: TextStyle = TextStyle.FULL): String =
