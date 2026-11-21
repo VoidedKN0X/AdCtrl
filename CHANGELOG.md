@@ -8,6 +8,10 @@ To publish a new version: bump `versionCode` and `versionName` in `app/build.gra
 
 Built and checked by CI only: nothing here has been run on a phone yet.
 
+### Fixed
+
+- **Fixed before release: the app would have crashed at start with the new build tools.** AdCtrl uses WorkManager for its background work, and WorkManager stores its jobs in a small Room database that is created by name when the app starts. The shrinker (R8) in Android Gradle Plugin 9 is stricter than the old one and removed the constructor that needs, which makes the app stop right at launch (a known problem with Room 2.6.1 under Android Gradle Plugin 9). A keep rule for that constructor, the same one newer Room versions ship themselves, is now in `app/proguard-rules.pro`. No released version was affected: the new build tools have not been in any release. Built by CI only; not yet run on a phone.
+
 ### Changed
 
 - **Live updates of the query log wait while you read older queries.** With live updates on, AdCtrl asked the server for the newest queries every 5 seconds, also while the list was scrolled far down where new rows (which come in at the top) can't be seen. Once the list is scrolled 50 rows or more away from the top, AdCtrl now stops asking; nothing in the list changes while you read. When you scroll back to the very top, the log refreshes right away and live updates carry on, so the queries that came in meanwhile appear then. If 50 or more came in while you were away, the list starts over from the newest 50, exactly as it already did when a whole page of new queries arrived between two updates; scrolling down loads the older ones again. Changing the search, a filter or the server starts live updates again. The pause button, pull to refresh and loading older queries by scrolling work as before.
