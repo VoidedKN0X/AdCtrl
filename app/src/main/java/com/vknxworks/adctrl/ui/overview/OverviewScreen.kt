@@ -260,7 +260,7 @@ fun OverviewScreen() {
                                 TopEntry.parse(stats.topClients).take(TOP_COUNT),
                                 stringResource(R.string.top_empty),
                                 format = { formatCount(it.value.toLong()) },
-                                onClick = { e -> nav.navigate(ClientRoute(key = e.key, persistent = false)) },
+                                onClick = { e -> openQueries(QuerySearch(client = e.key)) },
                             )
                         }
                         item(key = "top-upstreams") { UpstreamsCard(stats) }

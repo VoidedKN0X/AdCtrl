@@ -83,6 +83,7 @@ import com.vknxworks.adctrl.ui.components.TabTitle
 import com.vknxworks.adctrl.ui.components.errorMessage
 import com.vknxworks.adctrl.ui.components.formatMs
 import com.vknxworks.adctrl.ui.nav.CheckHostRoute
+import com.vknxworks.adctrl.ui.nav.ClientRoute
 import com.vknxworks.adctrl.ui.nav.LocalNavigator
 import com.vknxworks.adctrl.ui.theme.Gutter
 import kotlinx.coroutines.delay
@@ -219,6 +220,12 @@ fun QueriesScreen() {
                         onClick = { scope.launch { c.queries.setSearch(search.copy(client = "")) } },
                         label = { Text(stringResource(R.string.queries_client_chip, search.client)) },
                         trailingIcon = { Icon(Icons.Outlined.Close, stringResource(R.string.clear), Modifier.size(18.dp)) },
+                    )
+                    // The page of the client the log is filtered by (its settings and numbers).
+                    CtrlFilterChip(
+                        selected = false,
+                        onClick = { nav.navigate(ClientRoute(key = search.client, persistent = false)) },
+                        label = { Text(stringResource(R.string.queries_open_client)) },
                     )
                 }
                 QueryFilter.entries.forEach { f ->

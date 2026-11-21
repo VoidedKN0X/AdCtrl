@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.SyncAlt
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Dns
@@ -101,6 +102,17 @@ fun ServersScreen() {
             }
             Group {
                 GroupRow(stringResource(R.string.add_server), icon = Icons.Outlined.Add, showChevron = true, onClick = { nav.navigate(AddServerRoute) })
+            }
+            if (servers.size > 1) {
+                Group {
+                    GroupRow(
+                        stringResource(R.string.sync_title),
+                        stringResource(R.string.sync_subtitle),
+                        icon = Icons.Outlined.SyncAlt,
+                        showChevron = true,
+                        onClick = { nav.navigate(com.vknxworks.adctrl.ui.nav.SyncRoute) },
+                    )
+                }
             }
         }
     }

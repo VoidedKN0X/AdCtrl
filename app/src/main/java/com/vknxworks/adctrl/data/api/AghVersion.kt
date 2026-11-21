@@ -17,6 +17,9 @@ data class AghVersion(val raw: String, val major: Int, val minor: Int, val patch
     /** POST /control/protection with "enabled" and "duration" (0.107.27); before, only dns_config's protection_enabled. */
     val protectionDuration: Boolean get() = atLeast(27)
 
+    /** POST /control/dhcp/update_static_lease: change a static lease's address or name (0.107.39). */
+    val dhcpUpdateLease: Boolean get() = atLeast(39)
+
     /** "upstream_mode" takes "load_balance"; before, load balancing was the empty string (0.107.44). */
     val loadBalanceMode: Boolean get() = atLeast(44)
 

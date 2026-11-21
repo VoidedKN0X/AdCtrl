@@ -52,10 +52,14 @@ import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.container
 import com.vknxworks.adctrl.ui.components.GroupSwitch
 import com.vknxworks.adctrl.ui.nav.ServersRoute
+import com.vknxworks.adctrl.ui.nav.DhcpRoute
 import com.vknxworks.adctrl.ui.nav.DnsSettingsRoute
+import com.vknxworks.adctrl.ui.nav.EncryptionRoute
 import com.vknxworks.adctrl.ui.nav.LogsStatsRoute
 import androidx.compose.material.icons.outlined.CloudSync
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Lan
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.runtime.getValue
@@ -84,6 +88,9 @@ fun YouScreen() {
     val active by c.sessions.active.collectAsStateWithLifecycle()
     val connection by c.sessions.connection.collectAsStateWithLifecycle()
     val server = active?.server
+    // From the last Overview refresh of this server (it reads AdGuard Home's DHCP status every time).
+    val overview by c.overview.state.collectAsStateWithLifecycle()
+    val dhcpOn = server != null && overview.snapshot.serverId == server.id && overview.snapshot.dhcp?.enabled == true
     fun open(url: String) {
         try {
             // Opening the browser from here doesn't count as leaving AdCtrl for the app lock.
@@ -169,6 +176,23 @@ fun YouScreen() {
                         showChevron = true,
                         onClick = { nav.navigate(LogsStatsRoute) },
                     )
+                    GroupRow(
+                        stringResource(R.string.enc_title),
+                        stringResource(R.string.enc_subtitle),
+                        icon = Icons.Outlined.Lock,
+                        showChevron = true,
+                        onClick = { nav.navigate(EncryptionRoute) },
+                    )
+                    // AdGuard Home's own DHCP server: only offered while it is switched on, on this server.
+                    if (dhcpOn) {
+                        GroupRow(
+                            stringResource(R.string.dhcp_title),
+                            stringResource(R.string.dhcp_subtitle),
+                            icon = Icons.Outlined.Lan,
+                            showChevron = true,
+                            onClick = { nav.navigate(DhcpRoute) },
+                        )
+                    }
                 }
             }
 

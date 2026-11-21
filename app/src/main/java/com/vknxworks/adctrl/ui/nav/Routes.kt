@@ -20,6 +20,15 @@ import kotlinx.serialization.Serializable
 /** Query log and statistics: retention, and clearing them. */
 @Serializable data object LogsStatsRoute
 
+/** AdGuard Home's own DHCP server: leases and static leases. Only linked while that DHCP server is on. */
+@Serializable data object DhcpRoute
+
+/** Encryption status: HTTPS and encrypted DNS ports, and the certificate with its expiry. */
+@Serializable data object EncryptionRoute
+
+/** Copy settings from the active server to another saved server. */
+@Serializable data object SyncRoute
+
 // Account and settings, opened from the profile picture
 @Serializable data object YouRoute
 @Serializable data object SettingsRoute

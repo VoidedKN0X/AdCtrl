@@ -831,4 +831,140 @@
         <item quantity="one">%d day</item>
         <item quantity="other">%d days</item>
     </plurals>
+
+    <!-- Queries: the client the log is filtered by -->
+    <string name="queries_open_client">Open client</string>
+
+    <!-- DHCP (only while AdGuard Home's own DHCP server is on) -->
+    <string name="dhcp_title">DHCP</string>
+    <string name="dhcp_subtitle">Leases and static leases of AdGuard Home\'s DHCP server</string>
+    <string name="dhcp_server">DHCP server</string>
+    <string name="dhcp_server_footer">The range and the interface are shown, not changed: change them in AdGuard Home\'s web interface.</string>
+    <string name="dhcp_interface">Interface</string>
+    <string name="dhcp_range">Address range</string>
+    <string name="dhcp_range_v6">IPv6 range starts at</string>
+    <string name="dhcp_gateway">Gateway / subnet mask</string>
+    <string name="dhcp_lease_time">Lease time</string>
+    <string name="dhcp_days">%1$d days</string>
+    <string name="dhcp_hours">%1$d hours</string>
+    <string name="dhcp_minutes">%1$d minutes</string>
+    <string name="dhcp_static">Static leases (%1$d)</string>
+    <string name="dhcp_static_none">No static leases</string>
+    <string name="dhcp_leases">Leases (%1$d)</string>
+    <string name="dhcp_leases_none">No leases handed out</string>
+    <string name="dhcp_leases_footer">Tap a lease to make it static, so that device always gets the same address.</string>
+    <string name="dhcp_expires">expires %1$s</string>
+    <string name="dhcp_static_add">Add static lease</string>
+    <string name="dhcp_static_edit">Change static lease</string>
+    <string name="dhcp_static_remove">Remove static lease</string>
+    <string name="dhcp_static_remove_body">Remove the static lease of %1$s (%2$s)? The device gets an address from the range again.</string>
+    <string name="dhcp_static_saved">Static lease saved</string>
+    <string name="dhcp_static_removed">Static lease removed</string>
+    <string name="dhcp_field_mac">MAC address</string>
+    <string name="dhcp_field_ip">IPv4 address</string>
+    <string name="dhcp_field_hostname">Hostname (optional)</string>
+    <string name="dhcp_save">Save</string>
+    <string name="dhcp_off_title">DHCP is switched off</string>
+    <string name="dhcp_off_body">AdGuard Home\'s own DHCP server isn\'t switched on on this server, so there are no leases to manage here.</string>
+    <string name="dhcp_load_failed">Couldn\'t load DHCP</string>
+    <string name="dhcp_unsupported">AdGuard Home has no DHCP server on the system this server runs on.</string>
+
+    <!-- Encryption status -->
+    <string name="enc_title">Encryption</string>
+    <string name="enc_subtitle">HTTPS, encrypted DNS and the certificate\'s expiry</string>
+    <string name="enc_group_status">Status</string>
+    <string name="enc_encryption">Encryption</string>
+    <string name="enc_on">Switched on</string>
+    <string name="enc_off">Switched off</string>
+    <string name="enc_server_name">Server name</string>
+    <string name="enc_https">HTTPS</string>
+    <string name="enc_dot">DNS-over-TLS</string>
+    <string name="enc_doq">DNS-over-QUIC</string>
+    <string name="enc_plain_dns">Plain DNS</string>
+    <string name="enc_port">Port %1$d</string>
+    <string name="enc_force_https">always redirects to HTTPS</string>
+    <string name="enc_group_cert">Certificate</string>
+    <string name="enc_expiry">Expiry</string>
+    <plurals name="enc_days_left">
+        <item quantity="one">%1$d day left (until %2$s)</item>
+        <item quantity="other">%1$d days left (until %2$s)</item>
+    </plurals>
+    <string name="enc_expired">Expired on %1$s</string>
+    <string name="enc_not_yet">Not valid yet (from %1$s)</string>
+    <string name="enc_checks">Checks by AdGuard Home</string>
+    <string name="enc_cert_ok">Certificate is valid</string>
+    <string name="enc_cert_bad">Certificate isn\'t valid</string>
+    <string name="enc_chain_ok">Chain is trusted</string>
+    <string name="enc_chain_bad">Chain isn\'t trusted (normal for a self-signed certificate)</string>
+    <string name="enc_key_ok">Private key fits the certificate</string>
+    <string name="enc_key_bad">Private key is missing or doesn\'t fit</string>
+    <string name="enc_subject">Issued to</string>
+    <string name="enc_issuer">Issued by</string>
+    <string name="enc_names">Names</string>
+    <string name="enc_valid_from">Valid from</string>
+    <string name="enc_key_type">Key type</string>
+    <string name="enc_group_warning">Warning</string>
+    <string name="enc_warning">AdGuard Home says</string>
+    <string name="enc_footer">Status only. Certificates and ports are set up in AdGuard Home\'s web interface (Settings › Encryption settings). AdCtrl doesn\'t read the certificate or the key themselves.</string>
+    <string name="enc_footer_off">Encryption isn\'t set up in AdGuard Home itself. If you reach it through a reverse proxy, the proxy holds the certificate and this page can\'t see it.</string>
+    <string name="enc_load_failed">Couldn\'t load the encryption status</string>
+
+    <!-- Settings export and import -->
+    <string name="sx_title">Export and import</string>
+    <string name="sx_footer">The file holds AdCtrl\'s settings and your servers\' names, addresses and usernames. Passwords, the app lock and trusted certificates are never in it, and an import never switches on plain HTTP.</string>
+    <string name="sx_export">Export settings</string>
+    <string name="sx_export_sub">Save them to a file</string>
+    <string name="sx_import">Import settings</string>
+    <string name="sx_import_sub">Read them from a file</string>
+    <string name="sx_import_setup">Import settings from a file</string>
+    <string name="sx_exported">Settings exported</string>
+    <string name="sx_export_failed">Couldn\'t write the file</string>
+    <string name="sx_imported">Settings imported</string>
+    <string name="sx_imported_servers">Settings imported. Servers added: %1$d. Enter each one\'s password under Servers.</string>
+    <string name="sx_import_failed">Couldn\'t import the settings</string>
+    <string name="sx_not_valid">This isn\'t an AdCtrl settings file</string>
+    <string name="sx_too_new">This file comes from a newer AdCtrl. Update AdCtrl first.</string>
+    <string name="sx_confirm_title">Import these settings?</string>
+    <string name="sx_confirm_settings">The app settings from this file (written on %1$s) replace the ones on this phone: theme, live query log, and which notifications you get and how often.</string>
+    <string name="sx_confirm_add">Servers that will be added, without a password:\n%1$s</string>
+    <string name="sx_confirm_kept">Already on this phone, left as they are: %1$s</string>
+    <string name="sx_confirm_never">The app lock, saved passwords, trusted certificates and servers you already have don\'t change. Background checks stay as they are.</string>
+
+    <!-- Sync from this server to another -->
+    <string name="sync_title">Copy settings to another server</string>
+    <string name="sync_subtitle">Make a secondary server match this one</string>
+    <string name="sync_group_servers">Servers</string>
+    <string name="sync_servers_footer">Settings are copied from the server you\'re connected to. To copy the other way, switch servers first.</string>
+    <string name="sync_from">From</string>
+    <string name="sync_to">To</string>
+    <string name="sync_no_target">No other server that may be changed (read-only servers can\'t be a target)</string>
+    <string name="sync_group_parts">What to copy</string>
+    <string name="sync_part_lists">Blocklists and allowlists</string>
+    <string name="sync_part_rules">Custom rules</string>
+    <string name="sync_part_rewrites">DNS rewrites</string>
+    <string name="sync_part_services">Blocked services</string>
+    <string name="sync_part_protection">Safe browsing, parental control, safe search</string>
+    <string name="sync_part_clients">Clients</string>
+    <string name="sync_compare">Compare</string>
+    <string name="sync_comparing">Comparing…</string>
+    <string name="sync_group_changes">Changes on %1$s</string>
+    <string name="sync_same">Already the same</string>
+    <string name="sync_same_sub">Nothing to copy for what you picked</string>
+    <string name="sync_counts">Add %1$d · remove %2$d · change %3$d</string>
+    <string name="sync_removed_names">Removed there: %1$s</string>
+    <string name="sync_rules_replace">Its %1$d rules are replaced by these %2$d</string>
+    <string name="sync_services_replace">Replaced: %1$d blocked services and their pause schedule</string>
+    <string name="sync_protection_change">Switches set as on this server</string>
+    <string name="sync_copy_to">Copy to %1$s</string>
+    <string name="sync_copying">Copying… %1$d of %2$d</string>
+    <string name="sync_confirm_title">Copy to %1$s?</string>
+    <string name="sync_confirm_body">%3$d changes are made on %2$s so that what you picked matches %1$s. The servers are compared once more right before copying.</string>
+    <string name="sync_confirm_removals">%1$d lists, rewrites or clients that only exist on %2$s are removed there. That can\'t be undone from AdCtrl.</string>
+    <string name="sync_confirm">Copy</string>
+    <string name="sync_done">%1$s now matches</string>
+    <string name="sync_done_partly">%1$d of %2$d changes were refused</string>
+    <string name="sync_stopped">Stopped part-way: %1$s</string>
+    <string name="sync_target_failed">Couldn\'t read %1$s: %2$s</string>
+    <string name="sync_group_refused">Refused by the server</string>
+    <string name="sync_footer">Never copied: upstream DNS servers, DHCP, encryption, the access list (allowed and blocked clients), the query log and statistics settings, and passwords. Nothing is sent until you confirm.</string>
 </resources>

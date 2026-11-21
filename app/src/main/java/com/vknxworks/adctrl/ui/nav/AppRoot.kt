@@ -250,6 +250,9 @@ private fun AppNavHost(navController: NavHostController) {
         composable<YouRoute> { YouScreen() }
         composable<DnsSettingsRoute> { DnsSettingsScreen() }
         composable<LogsStatsRoute> { LogsStatsScreen() }
+        composable<DhcpRoute> { com.vknxworks.adctrl.ui.server.DhcpScreen() }
+        composable<EncryptionRoute> { com.vknxworks.adctrl.ui.server.EncryptionScreen() }
+        composable<SyncRoute> { com.vknxworks.adctrl.ui.server.SyncScreen() }
         composable<SettingsRoute> { SettingsScreen() }
         composable<NotificationsRoute> { NotificationsScreen() }
         composable<ServersRoute> { ServersScreen() }
