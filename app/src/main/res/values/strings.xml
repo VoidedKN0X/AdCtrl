@@ -967,4 +967,33 @@
     <string name="sync_target_failed">Couldn\'t read %1$s: %2$s</string>
     <string name="sync_group_refused">Refused by the server</string>
     <string name="sync_footer">Never copied: upstream DNS servers, DHCP, encryption, the access list (allowed and blocked clients), the query log and statistics settings, and passwords. Nothing is sent until you confirm.</string>
+
+    <!-- Pause for one client -->
+    <string name="pause_30m">30 minutes</string>
+    <string name="pause_2h">2 hours</string>
+    <string name="client_pause_group">Pause</string>
+    <string name="client_pause">Pause blocking for this device</string>
+    <string name="client_pause_subtitle">Lets everything through for a while, then blocks again by itself</string>
+    <string name="client_pause_title">Pause blocking for how long?</string>
+    <string name="client_paused_until">Blocking is paused until %1$s</string>
+    <string name="client_pause_ended">The pause is over</string>
+    <string name="client_pause_resume">Tap to block again now</string>
+    <string name="client_pause_resumed">Blocking is back on for this device</string>
+    <string name="client_pause_footer">The pause is an allow-everything rule for this device in your custom rules, with a comment that holds the end time; AdCtrl removes both when the time is up. Blocked services, safe browsing and parental control are separate settings and keep working. If the phone is off or has no connection at that moment, the pause ends as soon as AdCtrl can reach the server again.</string>
+
+    <!-- Scheduled pause of protection -->
+    <string name="sched_pause">Pause at a set time</string>
+    <string name="sched_pause_subtitle">Protection switches off at a time you pick and back on by itself</string>
+    <string name="sched_pause_at">Pauses at %1$s for %2$s</string>
+    <string name="sched_daily">Every day</string>
+    <string name="sched_once">Once</string>
+    <string name="sched_result_missed">last time it was skipped: the phone couldn\'t run it in time</string>
+    <string name="sched_result_sealed">last time it was skipped: AdCtrl was locked and the password sealed</string>
+    <string name="sched_result_failed">last time the server couldn\'t be reached or refused</string>
+    <string name="sched_title">Pause %1$s at a set time</string>
+    <string name="sched_body">AdGuard Home can\'t do this by itself, so your phone sends the pause at that time. It needs a connection to the server then, and Android may run it a few minutes late while the phone sleeps; the pause still ends at the planned time. AdGuard Home switches protection back on by itself.</string>
+    <string name="sched_time">Time (24-hour, like 21:00)</string>
+    <string name="sched_sealed_warning">With the app lock on, AdCtrl can only do this while background checks are on (Settings › Notifications): otherwise the password is sealed whenever AdCtrl is locked.</string>
+    <string name="sched_save">Save</string>
+    <string name="sched_remove">Remove</string>
 </resources>

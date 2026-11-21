@@ -30,6 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vknxworks.adctrl.R
 import com.vknxworks.adctrl.ShortcutAction
+import com.vknxworks.adctrl.data.timed.ClientPause
+import com.vknxworks.adctrl.data.timed.TimedWorker
 import com.vknxworks.adctrl.container
 import com.vknxworks.adctrl.ui.lock.lockCovering
 import com.vknxworks.adctrl.data.api.AghError
@@ -131,6 +133,16 @@ fun OverviewScreen() {
     }
     val attention = remember(snap, state.pausedUntil, now / 1000) { snap?.let { Attention.compute(it, state.pausedUntil, now) }.orEmpty() }
 
+    // Client pauses that have ended but are still in the custom rules (the phone was off, or AdCtrl was
+    // locked with its passwords sealed when the job ran): removed now, as the user set up when pausing.
+    val userRules = snap?.filtering?.userRules
+    LaunchedEffect(server?.id, userRules) {
+        val s = server ?: return@LaunchedEffect
+        if (s.readOnly || userRules == null) return@LaunchedEffect
+        if (ClientPause.find(userRules).none { it.untilMs <= System.currentTimeMillis() }) return@LaunchedEffect
+        runCatching { TimedWorker.endClientPauses(c.sessions.timedClient(s)) }.onSuccess { c.overview.refresh(force = false) }
+    }
+
     /** Opens the Queries tab filtered by a domain or client from a top list. */
     fun openQueries(search: QuerySearch) {
         c.appScope.launch { c.queries.setSearch(search) }
@@ -227,6 +239,9 @@ fun OverviewScreen() {
                             onPause = { pauseSheet = true },
                             onResume = { changeProtection(null, all = false) },
                         )
+                    }
+                    if (server != null && !readOnly && AghVersion.parse(server.version).protectionDuration) {
+                        item(key = "scheduled-pause") { ScheduledPauseCard(server.id, server.name) }
                     }
                     if (attention.isNotEmpty()) {
                         item(key = "attention") { AttentionCard(attention, now) }

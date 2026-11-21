@@ -72,6 +72,12 @@ class AghClient(
     private val isReadOnly: () -> Boolean = { server.readOnly },
     /** Waits while AdCtrl is locked, so nothing is sent without the password (or while you're away). */
     private val awaitUnlocked: suspend () -> Unit = {},
+    /**
+     * Whether a change asks "Confirm changes" first. Only off for the timed jobs (a scheduled pause, the
+     * end of a client's pause), which the user confirmed when setting them up and which run with nobody
+     * there to ask.
+     */
+    private val confirmWrites: Boolean = true,
 ) {
     /** A client for a server being set up, with the password just typed in. */
     constructor(server: Server, base: OkHttpClient, secrets: ServerSecrets) : this(server, base, { secrets })
@@ -139,7 +145,7 @@ class AghClient(
         // Read-only mode is enforced here, for every request that could change something, not only by hiding buttons.
         if (write && isReadOnly()) throw AghError.ReadOnly()
         awaitUnlocked()
-        if (write && !WriteGuard.check()) throw AghError.Cancelled()
+        if (write && confirmWrites && !WriteGuard.check()) throw AghError.Cancelled()
         val auth = Credentials.basic(server.username, secrets().password, Charsets.UTF_8)
         return withContext(Dispatchers.IO) {
             val requestBody = when {

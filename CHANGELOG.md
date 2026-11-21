@@ -6,14 +6,6 @@ To publish a new version: bump `versionCode` and `versionName` in `app/build.gra
 
 ## Unreleased
 
-Changes on `main` that aren't in a release yet. They ship with the next version.
-
-### Project
-
-- **Checksum list regenerated without the old entries.** `gradle/verification-metadata.xml` was regenerated on CI with the fixed workflow and committed exactly as printed (its SHA-256 matches the log). It now lists only the 401 components the build downloads today; the leftovers from earlier library and build-tool versions are gone.
-- **The checksum list no longer collects old entries.** The hand-started workflow that regenerates `gradle/verification-metadata.xml` used to add the new checksums to the existing file, so entries for library versions that are no longer used stayed in it. It now clears the old entries first and writes only what the build uses, and prints the file's SHA-256 so the copy that gets committed can be checked against the log. Nothing in the app changes.
-## Unreleased
-
 Built and checked by CI only: none of this had been run on a phone or against a server when it was written. Every request was checked against AdGuard Home 0.107.79's API description (`openapi/openapi.yaml`), but please try each new screen once.
 
 ### New
@@ -22,7 +14,18 @@ Built and checked by CI only: none of this had been run on a phone or against a 
 - **Encryption** (profile picture › Encryption): whether encryption is switched on in AdGuard Home, the server name, the HTTPS, DNS-over-TLS and DNS-over-QUIC ports, whether plain DNS is still served, and the certificate: how many days are left (orange under three weeks, red once expired or not valid yet), who it's issued to and by, the names it covers, and AdGuard Home's own checks of the certificate, chain and key. Status only; AdCtrl doesn't read the certificate or key themselves.
 - **Copy settings to another server** (profile picture › Servers, with two or more servers): pick the target and what to copy (blocklists and allowlists with the filtering switch and update interval, custom rules, DNS rewrites, blocked services with their pause schedule, the safe browsing / parental control / safe search switches, clients). **Compare** only reads both servers and lists what would be added, removed and changed, with the names of what would be removed. **Copy** asks first, compares once more, and then sends the changes one by one with a counter. A change the target refuses is listed with AdGuard Home's reason and the rest goes on. Never copied: upstream DNS, DHCP, encryption, the access list, query log and statistics settings, and passwords. Read-only servers can't be a target.
 - **Export and import settings** (profile picture › Settings › Export and import, and "Import settings from a file" on the first-start screen): saves AdCtrl's own settings (theme, live query log, which notifications and how often, the pause limit) and your servers' names, addresses, usernames and read-only switch to a JSON file, and reads them back on another phone. Passwords, the app lock and its PIN, trusted certificates, the "allow plain HTTP" switch and the push address are never written. Before anything changes, an import shows which servers it would add and which you already have; servers you already have are left exactly as they are, new ones come without a password (enter it under Servers), without a trusted certificate and with plain HTTP off, and hiding in screenshots or recent apps can only be switched on by a file, never off. Whether background checks run is not changed by an import.
+- **Pause at a set time** (Overview, under the protection switch): pick a time of day, how long (5 minutes to 8 hours) and whether it's once or every day. AdGuard Home has no schedule for protection, so the phone sends the pause in the background at that time and AdGuard Home switches protection back on by itself when the duration is over. If the phone runs the job late, the pause still ends at the planned time; if it's later than that, the pause is skipped and the row says so. One schedule per server; tap the row to change or remove it. Not offered for read-only servers. With the app lock on it needs background checks to be on (otherwise the password is sealed while AdCtrl is locked), and the dialog says so. With "Confirm changes" on, you confirm when you save the schedule.
+- **Temporary pause for one device** (a client's page › Pause): pause blocking for 10 or 30 minutes, 1, 2 or 8 hours. AdCtrl adds the rule from AdGuard Home's documentation that lets everything through for one client (`@@||*^$important,client=…`) to your custom rules, with a comment line holding the end time, and removes both when the time is up; "Tap to block again now" ends it early. Nothing about the pause is stored on the phone: it's visible in the custom rules, and any phone with AdCtrl (or the web interface) can end it. Blocked services, safe browsing and parental control are separate settings and keep working during the pause. If the phone is off or can't reach the server when the pause ends, it's ended as soon as AdCtrl is opened and reaches the server.
 - **Statistics drill-down**: tapping a client in the Overview's top clients now opens the query log filtered by that client, like tapping a top domain already did. A new **Open client** chip next to the client filter in the query log opens that client's page.
+
+### Changed
+
+- **AdCtrl can now change a server in the background, but only for the two timed jobs above.** Until now nothing in the background ever changed anything. The background checks for notifications still only read. The timed jobs use their own connection that may send exactly what you set up, skips "Confirm changes" (nobody is there to ask), and still refuses on a read-only server.
+
+### Project
+
+- **Checksum list regenerated without the old entries.** `gradle/verification-metadata.xml` was regenerated on CI with the fixed workflow and committed exactly as printed (its SHA-256 matches the log). It now lists only the 401 components the build downloads today; the leftovers from earlier library and build-tool versions are gone.
+- **The checksum list no longer collects old entries.** The hand-started workflow that regenerates `gradle/verification-metadata.xml` used to add the new checksums to the existing file, so entries for library versions that are no longer used stayed in it. It now clears the old entries first and writes only what the build uses, and prints the file's SHA-256 so the copy that gets committed can be checked against the log. Nothing in the app changes.
 
 ## v0.16.0 (2026-11-21)
 

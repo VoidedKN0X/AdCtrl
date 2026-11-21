@@ -110,6 +110,20 @@ class Sessions(
         isReadOnly = { true },
     )
 
+    /**
+     * A client for the timed jobs the user set up (a scheduled protection pause, ending a client's pause):
+     * like [backgroundClient] it reads the password straight from storage and doesn't wait for the app
+     * lock, but it may send the one change it was set up for. Read-only mode still stops it, and it only
+     * works while the password isn't sealed.
+     */
+    fun timedClient(server: Server): AghClient = AghClient(
+        server,
+        baseHttp,
+        secrets = { store.secrets(server.id) },
+        isReadOnly = { store.servers.value.firstOrNull { it.id == server.id }?.readOnly ?: true },
+        confirmWrites = false,
+    )
+
     /** The server's password is sealed with the app lock right now, so nothing can sign in without the PIN. */
     fun sealedNow(id: String): Boolean = store.sealedNow(id)
 

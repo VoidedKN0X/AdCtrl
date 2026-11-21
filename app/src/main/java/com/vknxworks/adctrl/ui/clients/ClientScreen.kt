@@ -243,6 +243,8 @@ fun ClientScreen(key: String, persistent: Boolean) {
                     }
                 }
 
+                // Pause blocking for this device for a while (a persistent client by name, a found device by address).
+                ClientPauseGroup(client = if (currentPersistent) currentKey else (sampleId ?: currentKey), readOnly = readOnly) { msg -> scope.launch { snackbar.showSnackbar(msg) } }
                 // Settings of a persistent client.
                 if (pc != null) {
                     val f = pc.fields
