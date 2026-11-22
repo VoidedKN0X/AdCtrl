@@ -133,4 +133,14 @@ class SyncPlanTest {
         assertEquals(listOf("Old laptop"), plan.clientsRemove)
         assertEquals(1, plan.removals)
     }
+
+    @Test
+    fun clientPausesAreNotCopied() {
+        val pause = com.vknxworks.adctrl.data.timed.ClientPause.add(emptyList(), "tablet", 5_000L, "x")
+        // Only the source's pause differs: nothing to copy.
+        assertNull(planSync(ServerSnapshot(rules = listOf("||a^") + pause), ServerSnapshot(rules = listOf("||a^")), setOf(SyncPart.RULES)).rules)
+        // The target's own pause stays after the copied rules.
+        val plan = planSync(ServerSnapshot(rules = listOf("||b^")), ServerSnapshot(rules = listOf("||a^") + pause), setOf(SyncPart.RULES))
+        assertEquals(listOf("||b^") + pause, plan.rules)
+    }
 }

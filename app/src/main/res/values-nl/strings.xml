@@ -579,7 +579,7 @@
     <string name="lock_too_many">Te veel pogingen. Probeer opnieuw over %1$d s</string>
     <string name="lock_forgot">Pincode vergeten?</string>
     <string name="lock_forgot_title">Je pincode vergeten?</string>
-    <string name="lock_forgot_body">De pincode kan niet hersteld worden, omdat ze je opgeslagen wachtwoorden versleutelt. AdCtrl verwijdert elke server met zijn wachtwoord, en de statistieken die op deze telefoon bewaard worden. Op je AdGuard Home-servers verandert niets.</string>
+    <string name="lock_forgot_body">De pincode kan niet hersteld worden, omdat ze je opgeslagen wachtwoorden versleutelt. AdCtrl verwijdert elke server met zijn wachtwoord, en de statistieken die op deze telefoon bewaard worden. Op je AdGuard Home-servers verandert niets. Heeft je telefoon een schermvergrendeling, dan bevestig je eerst daarmee.</string>
     <string name="lock_forgot_confirm">Servers verwijderen en opnieuw beginnen</string>
     <string name="lock_choose_pin">Kies een app-pincode</string>
     <string name="lock_enable_intro">Minstens %1$d cijfers, anders dan de pincode van je telefoon. Als je ze vergeet, kun je alleen nog binnen door je servers opnieuw toe te voegen.</string>
@@ -918,7 +918,7 @@
     <string name="client_pause_ended">De pauze is voorbij</string>
     <string name="client_pause_resume">Tik om nu weer te blokkeren</string>
     <string name="client_pause_resumed">Blokkeren staat weer aan voor dit apparaat</string>
-    <string name="client_pause_footer">De pauze is een regel die alles toelaat voor dit apparaat in je eigen regels, met een commentaar dat de eindtijd bevat; AdCtrl verwijdert beide als de tijd om is. Geblokkeerde diensten, veilig browsen en ouderlijk toezicht zijn aparte instellingen en blijven werken. Als de telefoon op dat moment uit staat of geen verbinding heeft, eindigt de pauze zodra AdCtrl de server weer bereikt.</string>
+    <string name="client_pause_footer">De pauze is een regel die alles toelaat voor dit apparaat in je eigen regels, met een commentaar dat de eindtijd bevat; AdCtrl verwijdert beide als de tijd om is. Geblokkeerde diensten, veilig browsen en ouderlijk toezicht zijn aparte instellingen en blijven werken. Als de telefoon op dat moment uit staat of geen verbinding heeft, eindigt de pauze zodra AdCtrl de server weer bereikt. Lukt het na een paar uur proberen nog altijd niet, dan krijg je een melding.</string>
     <string name="sched_pause">Pauzeren op een vast tijdstip</string>
     <string name="sched_pause_subtitle">Bescherming gaat uit op een tijdstip dat je kiest en vanzelf weer aan</string>
     <string name="sched_pause_at">Pauzeert om %1$s gedurende %2$s</string>
@@ -933,4 +933,9 @@
     <string name="sched_sealed_warning">Met de app-vergrendeling aan kan AdCtrl dit alleen als achtergrondcontroles aan staan (Instellingen › Meldingen): anders is het wachtwoord verzegeld zodra AdCtrl vergrendeld is.</string>
     <string name="sched_save">Opslaan</string>
     <string name="sched_remove">Verwijderen</string>
+    <string name="client_pause_stuck_title">Een pauze voor een apparaat op %1$s kon niet beëindigd worden</string>
+    <string name="client_pause_stuck_text">Het filteren staat nog uit voor dat apparaat. Open AdCtrl om de pauze te beëindigen.</string>
+    <string name="lock_reset_prompt_title">App-vergrendeling van AdCtrl resetten</string>
+    <string name="lock_reset_prompt_subtitle">Bevestig met de schermvergrendeling van je telefoon dat jij het bent</string>
+    <string name="lock_reset_prompt_failed">De schermvergrendeling kon niet getoond worden</string>
 </resources>

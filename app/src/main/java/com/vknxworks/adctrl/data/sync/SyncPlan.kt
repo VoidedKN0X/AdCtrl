@@ -4,6 +4,7 @@ import com.vknxworks.adctrl.data.api.BlockedServicesConfig
 import com.vknxworks.adctrl.data.api.FilterList
 import com.vknxworks.adctrl.data.api.Rewrite
 import com.vknxworks.adctrl.data.api.SafeSearch
+import com.vknxworks.adctrl.data.timed.ClientPause
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
@@ -43,7 +44,7 @@ data class SyncPlan(
     val listsUpdate: List<ListChange> = emptyList(),
     /** Filtering on or off and the update interval in hours, when they differ. */
     val filteringConfig: Pair<Boolean, Int>? = null,
-    /** The source's custom rules, when the target's differ. */
+    /** The source's custom rules (without its client pauses, plus the target's own), when the target's differ. */
     val rules: List<String>? = null,
     /** How many custom rules the target has now. */
     val rulesBefore: Int = 0,
@@ -107,7 +108,11 @@ fun planSync(source: ServerSnapshot, target: ServerSnapshot, parts: Set<SyncPart
         )
     }
 
-    if (SyncPart.RULES in parts && source.rules != target.rules) plan = plan.copy(rules = source.rules)
+    if (SyncPart.RULES in parts) {
+        // Client pauses are never copied, and the target keeps its own (see ClientPause.forCopy).
+        val wanted = ClientPause.forCopy(source.rules, target.rules)
+        if (wanted != target.rules) plan = plan.copy(rules = wanted)
+    }
 
     if (SyncPart.REWRITES in parts) {
         val dstByKey = target.rewrites.associateBy { it.key }

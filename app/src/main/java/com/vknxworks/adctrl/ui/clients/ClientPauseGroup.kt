@@ -19,14 +19,17 @@ import com.vknxworks.adctrl.data.api.AghError
 import com.vknxworks.adctrl.data.api.FilteringStatus
 import com.vknxworks.adctrl.data.rules.RulesApi
 import com.vknxworks.adctrl.data.timed.ClientPause
+import com.vknxworks.adctrl.data.timed.PauseSecrets
 import com.vknxworks.adctrl.data.timed.TimedWorker
 import com.vknxworks.adctrl.ui.components.ChoiceSheet
 import com.vknxworks.adctrl.ui.components.Group
 import com.vknxworks.adctrl.ui.components.GroupRow
 import com.vknxworks.adctrl.ui.components.errorMessage
 import com.vknxworks.adctrl.ui.theme.Health
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -79,15 +82,27 @@ fun ClientPauseGroup(client: String, readOnly: Boolean, onMessage: (String) -> U
     }
     if (until == null && readOnly) return
 
-    fun change(done: String, edit: (List<String>) -> List<String>, after: () -> Unit = {}) {
+    /**
+     * Reads the rules, applies [edit], runs [before] with the new rules, writes them, then runs [after].
+     * [before] runs ahead of the write so that the job that ends a pause is always queued before the pause
+     * exists on the server (a job with nothing to end is harmless).
+     */
+    fun change(
+        done: String,
+        edit: (List<String>) -> List<String>,
+        before: suspend (List<String>) -> Unit = {},
+        after: suspend (List<String>) -> Unit = {},
+    ) {
         val api = active?.client ?: return
         busy = true
         scope.launch {
             try {
                 // Read again right before writing, so nothing that changed elsewhere is lost.
                 val current = api.get("filtering/status", FilteringStatus.serializer()).userRules
-                api.post("filtering/set_rules", RulesApi.setRulesBody(edit(current)))
-                after()
+                val updated = edit(current)
+                before(updated)
+                api.post("filtering/set_rules", RulesApi.setRulesBody(updated))
+                after(updated)
                 runCatching { c.filters.loadLists() }
                 onMessage(done)
             } catch (e: AghError) {
@@ -106,7 +121,17 @@ fun ClientPauseGroup(client: String, readOnly: Boolean, onMessage: (String) -> U
                 icon = Icons.Outlined.PlayCircle,
                 iconTint = Health.warn,
                 onClick = if (readOnly || busy) null else ({
-                    change(context.getString(R.string.client_pause_resumed), { ClientPause.remove(it, client) })
+                    val id = server?.id
+                    change(
+                        context.getString(R.string.client_pause_resumed),
+                        { ClientPause.remove(it, client) },
+                        after = { updated ->
+                            // No pause left on this server: the password copy for the pause-end job goes.
+                            if (id != null) {
+                                withContext(Dispatchers.IO) { PauseSecrets.afterPausesChanged(context, id, ClientPause.nextEnd(updated)) }
+                            }
+                        },
+                    )
                 }),
             )
         } else {
@@ -132,7 +157,18 @@ fun ClientPauseGroup(client: String, readOnly: Boolean, onMessage: (String) -> U
             change(
                 context.getString(R.string.client_paused_until, clock(end)),
                 { ClientPause.add(it, client, end, markerLabel(end)) },
-                after = { if (id != null) TimedWorker.enqueueResume(context, id, ms) },
+                before = { updated ->
+                    if (id != null) {
+                        withContext(Dispatchers.IO) {
+                            // The job must be able to sign in even when AdCtrl is locked then and the normal
+                            // password is sealed by the app lock: keep a copy for that job only.
+                            PauseSecrets.save(context, id, c.serverStore.secrets(id).password)
+                        }
+                        // For the pause that ends first (another device's may end before this one).
+                        val next = ClientPause.nextEnd(updated) ?: end
+                        TimedWorker.enqueueResume(context, id, next - System.currentTimeMillis())
+                    }
+                },
             )
         }
     }

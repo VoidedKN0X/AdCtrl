@@ -579,7 +579,7 @@
     <string name="lock_too_many">Trop d’essais. Réessayez dans %1$d s</string>
     <string name="lock_forgot">Code PIN oublié ?</string>
     <string name="lock_forgot_title">Code PIN oublié ?</string>
-    <string name="lock_forgot_body">Le code PIN ne peut pas être récupéré, car il chiffre vos mots de passe enregistrés. AdCtrl va supprimer chaque serveur avec son mot de passe, ainsi que les statistiques conservées sur ce téléphone. Rien ne change sur vos serveurs AdGuard Home.</string>
+    <string name="lock_forgot_body">Le code PIN ne peut pas être récupéré, car il chiffre vos mots de passe enregistrés. AdCtrl va supprimer chaque serveur avec son mot de passe, ainsi que les statistiques conservées sur ce téléphone. Rien ne change sur vos serveurs AdGuard Home. Si votre téléphone a un verrouillage d\'écran, vous le confirmerez d\'abord avec celui-ci.</string>
     <string name="lock_forgot_confirm">Supprimer les serveurs et réinitialiser</string>
     <string name="lock_choose_pin">Choisir un code PIN d’appli</string>
     <string name="lock_enable_intro">Au moins %1$d chiffres, différent du code PIN de votre téléphone. Si vous l’oubliez, la seule solution est d’ajouter à nouveau vos serveurs.</string>
@@ -918,7 +918,7 @@
     <string name="client_pause_ended">La pause est terminée</string>
     <string name="client_pause_resume">Touchez pour bloquer à nouveau maintenant</string>
     <string name="client_pause_resumed">Le blocage est réactivé pour cet appareil</string>
-    <string name="client_pause_footer">La pause est une règle qui autorise tout pour cet appareil dans vos règles personnalisées, avec un commentaire qui contient l’heure de fin ; AdCtrl supprime les deux une fois le temps écoulé. Les services bloqués, la navigation sécurisée et le contrôle parental sont des réglages distincts et continuent de fonctionner. Si le téléphone est éteint ou sans connexion à ce moment-là, la pause se termine dès qu’AdCtrl peut à nouveau joindre le serveur.</string>
+    <string name="client_pause_footer">La pause est une règle qui autorise tout pour cet appareil dans vos règles personnalisées, avec un commentaire qui contient l’heure de fin ; AdCtrl supprime les deux une fois le temps écoulé. Les services bloqués, la navigation sécurisée et le contrôle parental sont des réglages distincts et continuent de fonctionner. Si le téléphone est éteint ou sans connexion à ce moment-là, la pause se termine dès qu’AdCtrl peut à nouveau joindre le serveur. Si elle ne peut toujours pas être terminée après quelques heures d\'essais, une notification vous prévient.</string>
     <string name="sched_pause">Pause à heure fixe</string>
     <string name="sched_pause_subtitle">La protection se désactive à l’heure choisie et se réactive d’elle-même</string>
     <string name="sched_pause_at">Pause à %1$s pendant %2$s</string>
@@ -933,4 +933,9 @@
     <string name="sched_sealed_warning">Avec le verrouillage de l’appli activé, AdCtrl ne peut faire cela que si les vérifications en arrière-plan sont activées (Paramètres › Notifications) : sinon le mot de passe est scellé dès qu’AdCtrl est verrouillé.</string>
     <string name="sched_save">Enregistrer</string>
     <string name="sched_remove">Supprimer</string>
+    <string name="client_pause_stuck_title">Une pause d\'appareil sur %1$s n\'a pas pu être terminée</string>
+    <string name="client_pause_stuck_text">Le filtrage est toujours désactivé pour cet appareil. Ouvrez AdCtrl pour terminer la pause.</string>
+    <string name="lock_reset_prompt_title">Réinitialiser le verrouillage de AdCtrl</string>
+    <string name="lock_reset_prompt_subtitle">Utilisez le verrouillage d\'écran de votre téléphone pour confirmer votre identité</string>
+    <string name="lock_reset_prompt_failed">Impossible d\'afficher le verrouillage d\'écran</string>
 </resources>

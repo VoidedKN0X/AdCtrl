@@ -130,6 +130,7 @@ class AppContainer(val context: Context) {
         withContext(Dispatchers.IO) {
             serverStore.servers.value.forEach { overview.forget(it.id) }
             serverStore.removeAll()
+            com.vknxworks.adctrl.data.timed.PauseSecrets.clearAll(context)
             CheckStore.forgetAll(context)
         }
         Notifier.cancelAll(context)
@@ -174,6 +175,11 @@ class AppContainer(val context: Context) {
         overview.forget(id)
         CheckStore.forget(context, id)
         Notifier.cancelServer(context, id)
+        // Its timed jobs and the password copy kept for the pause-end job go too.
+        appScope.launch(Dispatchers.IO) {
+            com.vknxworks.adctrl.data.timed.PauseSecrets.clear(context, id)
+            runCatching { WorkManager.getInstance(context).cancelUniqueWork("adctrl-resume-$id") }
+        }
     }
 
     init {
@@ -200,7 +206,9 @@ class AppContainer(val context: Context) {
             }
         }
         // "Confirm changes": every request that could change something asks for the fingerprint or PIN first.
-        WriteGuard.check = { AppLock.confirmChange(vault.enabled && settings.settings.value.lockChanges) }
+        // Read from storage, not the in-memory copy: right after a cold start that copy may still hold the
+        // defaults (Confirm changes off) for a moment.
+        WriteGuard.check = { AppLock.confirmChange(vault.enabled && settings.current().lockChanges) }
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 AppLock.onForeground(vault.enabled, settings.settings.value.lockTimeout.millis)

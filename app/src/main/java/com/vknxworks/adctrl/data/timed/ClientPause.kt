@@ -61,6 +61,20 @@ object ClientPause {
     /** [rules] without the pauses that ended at or before [nowMs]; the same list when none did. */
     fun removeExpired(rules: List<String>, nowMs: Long): List<String> = without(rules, find(rules).filter { it.untilMs <= nowMs })
 
+    /** [rules] without any client pause (comment line and rule). */
+    fun withoutAll(rules: List<String>): List<String> = without(rules, find(rules))
+
+    /** The lines of every client pause in [rules], in order (each comment line followed by its rule). */
+    fun pauseLines(rules: List<String>): List<String> = find(rules).flatMap { listOf(rules[it.index], rules[it.index + 1]) }
+
+    /**
+     * The custom rules a copy from another server should leave on the target: the source's rules without its
+     * client pauses (they belong to that server, and nothing would end them on the target), plus the target's
+     * own pauses, which its pause-end job still ends.
+     */
+    fun forCopy(sourceRules: List<String>, targetRules: List<String>): List<String> =
+        withoutAll(sourceRules) + pauseLines(targetRules)
+
     /** When the next pause in [rules] ends, or null when there is none. */
     fun nextEnd(rules: List<String>): Long? = find(rules).minOfOrNull { it.untilMs }
 }
@@ -70,12 +84,15 @@ object PauseTimes {
     const val DAY_MS = 86_400_000L
 
     /**
-     * The next moment at or after [nowMs] when the local time is [minuteOfDay]. [midnightMs] is the
-     * start of today in local time (the caller knows the time zone).
+     * The next moment at or after [nowMs] when the local time in [zone] is [minuteOfDay]. Worked out on the
+     * calendar, so it stays at that local time on the days the clocks change (a day is then 23 or 25 hours).
+     * A time that doesn't exist that day (skipped by the spring change) moves forward by the gap, as java.time does.
      */
-    fun nextStart(minuteOfDay: Int, nowMs: Long, midnightMs: Long): Long {
-        val today = midnightMs + minuteOfDay * 60_000L
-        return if (today >= nowMs) today else today + DAY_MS
+    fun nextStart(minuteOfDay: Int, nowMs: Long, zone: java.time.ZoneId): Long {
+        val time = java.time.LocalTime.ofSecondOfDay(minuteOfDay.coerceIn(0, 1439) * 60L)
+        val today = java.time.Instant.ofEpochMilli(nowMs).atZone(zone).toLocalDate()
+        val atToday = today.atTime(time).atZone(zone).toInstant().toEpochMilli()
+        return if (atToday >= nowMs) atToday else today.plusDays(1).atTime(time).atZone(zone).toInstant().toEpochMilli()
     }
 
     /**

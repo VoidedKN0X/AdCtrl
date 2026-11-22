@@ -579,7 +579,7 @@
     <string name="lock_too_many">Zu viele Versuche. Versuche es in %1$d s erneut</string>
     <string name="lock_forgot">PIN vergessen?</string>
     <string name="lock_forgot_title">PIN vergessen?</string>
-    <string name="lock_forgot_body">Die PIN kann nicht wiederhergestellt werden, weil sie deine gespeicherten Passwörter verschlüsselt. AdCtrl entfernt jeden Server mit seinem Passwort sowie die auf diesem Handy gespeicherten Statistiken. An deinen AdGuard-Home-Servern ändert sich nichts.</string>
+    <string name="lock_forgot_body">Die PIN kann nicht wiederhergestellt werden, weil sie deine gespeicherten Passwörter verschlüsselt. AdCtrl entfernt jeden Server mit seinem Passwort sowie die auf diesem Handy gespeicherten Statistiken. An deinen AdGuard-Home-Servern ändert sich nichts. Wenn dein Handy eine Displaysperre hat, bestätigst du zuerst damit.</string>
     <string name="lock_forgot_confirm">Server entfernen und zurücksetzen</string>
     <string name="lock_choose_pin">App-PIN festlegen</string>
     <string name="lock_enable_intro">Mindestens %1$d Ziffern, anders als die PIN deines Handys. Wenn du sie vergisst, kommst du nur wieder rein, indem du deine Server neu hinzufügst.</string>
@@ -918,7 +918,7 @@
     <string name="client_pause_ended">Die Pause ist vorbei</string>
     <string name="client_pause_resume">Tippen, um jetzt wieder zu blockieren</string>
     <string name="client_pause_resumed">Blockieren ist für dieses Gerät wieder an</string>
-    <string name="client_pause_footer">Die Pause ist eine Regel in deinen eigenen Regeln, die für dieses Gerät alles zulässt, mit einem Kommentar, der die Endzeit enthält; AdCtrl entfernt beides, wenn die Zeit um ist. Gesperrte Dienste, Safe Browsing und Kindersicherung sind eigene Einstellungen und funktionieren weiter. Ist das Handy in dem Moment aus oder ohne Verbindung, endet die Pause, sobald AdCtrl den Server wieder erreicht.</string>
+    <string name="client_pause_footer">Die Pause ist eine Regel in deinen eigenen Regeln, die für dieses Gerät alles zulässt, mit einem Kommentar, der die Endzeit enthält; AdCtrl entfernt beides, wenn die Zeit um ist. Gesperrte Dienste, Safe Browsing und Kindersicherung sind eigene Einstellungen und funktionieren weiter. Ist das Handy in dem Moment aus oder ohne Verbindung, endet die Pause, sobald AdCtrl den Server wieder erreicht. Klappt es nach ein paar Stunden Versuchen immer noch nicht, bekommst du eine Benachrichtigung.</string>
     <string name="sched_pause">Zu einer festen Zeit pausieren</string>
     <string name="sched_pause_subtitle">Der Schutz geht zu einer Zeit deiner Wahl aus und von selbst wieder an</string>
     <string name="sched_pause_at">Pausiert um %1$s für %2$s</string>
@@ -933,4 +933,9 @@
     <string name="sched_sealed_warning">Mit aktiver App-Sperre kann AdCtrl das nur, wenn Hintergrundprüfungen an sind (Einstellungen › Benachrichtigungen): Sonst ist das Passwort versiegelt, sobald AdCtrl gesperrt ist.</string>
     <string name="sched_save">Speichern</string>
     <string name="sched_remove">Entfernen</string>
+    <string name="client_pause_stuck_title">Eine Gerätepause auf %1$s konnte nicht beendet werden</string>
+    <string name="client_pause_stuck_text">Die Filterung ist für dieses Gerät noch aus. Öffne AdCtrl, um die Pause zu beenden.</string>
+    <string name="lock_reset_prompt_title">App-Sperre von AdCtrl zurücksetzen</string>
+    <string name="lock_reset_prompt_subtitle">Bestätige mit der Displaysperre deines Handys, dass du es bist</string>
+    <string name="lock_reset_prompt_failed">Displaysperre konnte nicht angezeigt werden</string>
 </resources>

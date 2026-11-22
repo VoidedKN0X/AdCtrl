@@ -629,7 +629,7 @@
     <string name="lock_too_many">Too many tries. Try again in %1$d s</string>
     <string name="lock_forgot">Forgot PIN?</string>
     <string name="lock_forgot_title">Forgot your PIN?</string>
-    <string name="lock_forgot_body">The PIN can\'t be recovered, because it encrypts your saved passwords. AdCtrl will remove every server with its password, and the statistics kept on this phone. Nothing changes on your AdGuard Home servers.</string>
+    <string name="lock_forgot_body">The PIN can\'t be recovered, because it encrypts your saved passwords. AdCtrl will remove every server with its password, and the statistics kept on this phone. Nothing changes on your AdGuard Home servers. If your phone has a screen lock, you\'ll confirm with it first.</string>
     <string name="lock_forgot_confirm">Remove servers and reset</string>
     <string name="lock_choose_pin">Choose an app PIN</string>
     <string name="lock_enable_intro">At least %1$d digits, different from your phone\'s PIN. If you forget it, the only way back in is to add your servers again.</string>
@@ -991,7 +991,7 @@
     <string name="client_pause_ended">The pause is over</string>
     <string name="client_pause_resume">Tap to block again now</string>
     <string name="client_pause_resumed">Blocking is back on for this device</string>
-    <string name="client_pause_footer">The pause is an allow-everything rule for this device in your custom rules, with a comment that holds the end time; AdCtrl removes both when the time is up. Blocked services, safe browsing and parental control are separate settings and keep working. If the phone is off or has no connection at that moment, the pause ends as soon as AdCtrl can reach the server again.</string>
+    <string name="client_pause_footer">The pause is an allow-everything rule for this device in your custom rules, with a comment that holds the end time; AdCtrl removes both when the time is up. Blocked services, safe browsing and parental control are separate settings and keep working. If the phone is off or has no connection at that moment, the pause ends as soon as AdCtrl can reach the server again. If it still can\'t be ended after a few hours of trying, a notification tells you.</string>
 
     <!-- Scheduled pause of protection -->
     <string name="sched_pause">Pause at a set time</string>
@@ -1008,4 +1008,9 @@
     <string name="sched_sealed_warning">With the app lock on, AdCtrl can only do this while background checks are on (Settings › Notifications): otherwise the password is sealed whenever AdCtrl is locked.</string>
     <string name="sched_save">Save</string>
     <string name="sched_remove">Remove</string>
+    <string name="client_pause_stuck_title">A client pause on %1$s couldn\'t be ended</string>
+    <string name="client_pause_stuck_text">Filtering is still off for that device. Open AdCtrl to end the pause.</string>
+    <string name="lock_reset_prompt_title">Reset AdCtrl\'s app lock</string>
+    <string name="lock_reset_prompt_subtitle">Use your phone\'s screen lock to confirm it\'s you</string>
+    <string name="lock_reset_prompt_failed">Couldn\'t show the screen lock prompt</string>
 </resources>

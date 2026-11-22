@@ -124,6 +124,19 @@ class Sessions(
         confirmWrites = false,
     )
 
+    /**
+     * The client for the job that ends client pauses while the normal password is sealed: the same as
+     * [timedClient], but signing in with the copy kept for that job only (see
+     * [com.vknxworks.adctrl.data.timed.PauseSecrets]).
+     */
+    fun pauseEndClient(server: Server, password: String): AghClient = AghClient(
+        server,
+        baseHttp,
+        secrets = { ServerSecrets(password = password) },
+        isReadOnly = { store.servers.value.firstOrNull { it.id == server.id }?.readOnly ?: true },
+        confirmWrites = false,
+    )
+
     /** The server's password is sealed with the app lock right now, so nothing can sign in without the PIN. */
     fun sealedNow(id: String): Boolean = store.sealedNow(id)
 

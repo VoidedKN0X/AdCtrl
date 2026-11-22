@@ -1,5 +1,6 @@
 package com.vknxworks.adctrl.ui.server
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,7 +51,9 @@ import com.vknxworks.adctrl.ui.components.errorMessage
 import com.vknxworks.adctrl.ui.theme.CtrlColors
 import com.vknxworks.adctrl.ui.theme.Gutter
 import com.vknxworks.adctrl.ui.theme.Health
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private fun partLabel(p: SyncPart): Int = when (p) {
     SyncPart.LISTS -> R.string.sync_part_lists
@@ -127,7 +130,11 @@ fun SyncScreen() {
         progress = 0 to p.steps
         scope.launch {
             try {
-                val failed = applySync(p, c.sessions.clientFor(to), AghVersion.parse(to.version)) { done -> progress = done to p.steps }
+                // Leaving the screen mid-copy must not stop it halfway: the copy always runs to its end
+                // (or until the server refuses or can't be reached).
+                val failed = withContext(NonCancellable) {
+                    applySync(p, c.sessions.clientFor(to), AghVersion.parse(to.version)) { done -> progress = done to p.steps }
+                }
                 failures = failed
                 snackbar.showSnackbar(
                     if (failed.isEmpty()) context.getString(R.string.sync_done, to.name) else context.getString(R.string.sync_done_partly, failed.size, p.steps),
@@ -143,9 +150,12 @@ fun SyncScreen() {
         }
     }
 
+    // While copying, Back stays on this screen (the copy finishes anyway, but its result is shown here).
+    BackHandler(enabled = progress != null) {}
+
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize()) {
-            ScreenTopBar(stringResource(R.string.sync_title))
+            ScreenTopBar(stringResource(R.string.sync_title), showBack = progress == null)
             Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 24.dp)) {
                 Group(stringResource(R.string.sync_group_servers), footer = stringResource(R.string.sync_servers_footer)) {
                     GroupRow(stringResource(R.string.sync_from), source?.let { it.name + " · " + it.displayUrl }.orEmpty(), icon = Icons.Outlined.Dns)

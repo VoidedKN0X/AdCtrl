@@ -18,7 +18,6 @@ import com.vknxworks.adctrl.data.rules.RulesApi
 import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import java.time.LocalDate
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
@@ -62,13 +61,10 @@ object ScheduledPauses {
             .apply()
     }
 
-    private fun midnight(nowMs: Long): Long =
-        LocalDate.ofInstant(java.time.Instant.ofEpochMilli(nowMs), ZoneId.systemDefault()).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-
     /** Plans a pause at [minuteOfDay] for [durationMs] on [serverId] and queues the job for it. */
     fun schedule(context: Context, serverId: String, minuteOfDay: Int, durationMs: Long, daily: Boolean) {
         val now = System.currentTimeMillis()
-        val next = PauseTimes.nextStart(minuteOfDay, now, midnight(now))
+        val next = PauseTimes.nextStart(minuteOfDay, now, ZoneId.systemDefault())
         put(context, serverId, ScheduledPause(minuteOfDay, durationMs, daily, next))
         TimedWorker.enqueuePause(context, serverId, next - now)
     }
@@ -77,7 +73,7 @@ object ScheduledPauses {
     fun scheduleNextDay(context: Context, serverId: String, s: ScheduledPause, result: String) {
         val now = System.currentTimeMillis()
         // A minute past now, so a job that ran on the dot plans tomorrow's pause, not today's again.
-        val next = PauseTimes.nextStart(s.minuteOfDay, now + 60_000L, midnight(now))
+        val next = PauseTimes.nextStart(s.minuteOfDay, now + 60_000L, ZoneId.systemDefault())
         put(context, serverId, s.copy(nextAtMs = next, lastResult = result))
         TimedWorker.enqueuePause(context, serverId, next - now)
     }
@@ -96,8 +92,10 @@ object ScheduledPauses {
  *  - "resume": delete the client pauses that have ended from one server's custom rules (see [ClientPause]).
  *
  * Unlike the background checks these change something on the server, through [com.vknxworks.adctrl.data.server.Sessions.timedClient].
- * A server in read-only mode is left alone. While the password is sealed by the app lock the job can't
- * sign in: it tries again later, and AdCtrl also removes ended client pauses whenever it is opened.
+ * A server in read-only mode is left alone. While the password is sealed by the app lock, the pause job
+ * can't sign in and tries again later; the resume job signs in with the copy of the password kept for it
+ * ([PauseSecrets]). If ending a client pause still fails after the retries, a notification says so
+ * ([PauseStuck]). AdCtrl also removes ended client pauses whenever it is opened.
  * Android may run the job some minutes late while the phone sleeps.
  */
 class TimedWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
@@ -115,18 +113,36 @@ class TimedWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
         return try {
             when (kind) {
                 KIND_PAUSE -> pause(serverId, if (sealed) null else c.sessions.timedClient(server))
-                else -> if (sealed) retryOrGiveUp() else resume(serverId, c.sessions.timedClient(server))
+                else -> {
+                    // Sealed by the app lock: sign in with the copy kept for this job only (see PauseSecrets).
+                    val api = if (!sealed) {
+                        c.sessions.timedClient(server)
+                    } else {
+                        PauseSecrets.read(applicationContext, serverId)?.let { c.sessions.pauseEndClient(server, it) }
+                    }
+                    if (api == null) resumeRetryOrGiveUp(server) else resume(serverId, api)
+                }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: AghError.Unreachable) {
-            if (kind == KIND_PAUSE) pauseFailed(serverId, "failed", retry = true) else retryOrGiveUp()
+            if (kind == KIND_PAUSE) pauseFailed(serverId, "failed", retry = true) else resumeRetryOrGiveUp(server)
         } catch (e: Exception) {
-            if (kind == KIND_PAUSE) pauseFailed(serverId, "failed", retry = false) else Result.failure()
+            if (kind == KIND_PAUSE) {
+                pauseFailed(serverId, "failed", retry = false)
+            } else {
+                PauseStuck.notify(applicationContext, server)
+                Result.failure()
+            }
         }
     }
 
-    private fun retryOrGiveUp(): Result = if (runAttemptCount < MAX_ATTEMPTS) Result.retry() else Result.failure()
+    /** Ending a client pause didn't work this time: try again later, and after the last try say so in a notification. */
+    private fun resumeRetryOrGiveUp(server: com.vknxworks.adctrl.data.server.Server): Result {
+        if (runAttemptCount < MAX_ATTEMPTS) return Result.retry()
+        PauseStuck.notify(applicationContext, server)
+        return Result.failure()
+    }
 
     /** The pause couldn't be sent: try again while it would still make sense, else note it and plan the next day. */
     private fun pauseFailed(serverId: String, result: String, retry: Boolean): Result {
@@ -154,6 +170,9 @@ class TimedWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
     private suspend fun resume(serverId: String, api: AghClient): Result {
         val next = endClientPauses(api)
         if (next != null) enqueueResume(applicationContext, serverId, next - System.currentTimeMillis())
+        // No pause left: the password copy for this job goes.
+        PauseSecrets.afterPausesChanged(applicationContext, serverId, next)
+        PauseStuck.cancel(applicationContext, serverId)
         return Result.success()
     }
 

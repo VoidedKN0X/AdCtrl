@@ -67,8 +67,10 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.text.style.TextOverflow
 import com.vknxworks.adctrl.ui.components.errorMessage
 import com.vknxworks.adctrl.ui.components.formatCount
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val POLL_MS = 30_000L
 
@@ -140,7 +142,14 @@ fun OverviewScreen() {
         val s = server ?: return@LaunchedEffect
         if (s.readOnly || userRules == null) return@LaunchedEffect
         if (ClientPause.find(userRules).none { it.untilMs <= System.currentTimeMillis() }) return@LaunchedEffect
-        runCatching { TimedWorker.endClientPauses(c.sessions.timedClient(s)) }.onSuccess { c.overview.refresh(force = false) }
+        runCatching { TimedWorker.endClientPauses(c.sessions.timedClient(s)) }.onSuccess { next ->
+            // None left: the password copy kept for the pause-end job goes, and so does a "couldn't end" notification.
+            withContext(Dispatchers.IO) {
+                com.vknxworks.adctrl.data.timed.PauseSecrets.afterPausesChanged(c.context, s.id, next)
+                com.vknxworks.adctrl.data.timed.PauseStuck.cancel(c.context, s.id)
+            }
+            c.overview.refresh(force = false)
+        }
     }
 
     /** Opens the Queries tab filtered by a domain or client from a top list. */

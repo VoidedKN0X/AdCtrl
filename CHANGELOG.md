@@ -4,6 +4,24 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## Unreleased
+
+### Fixed
+
+- **A device's pause now really ends while AdCtrl is locked.** With the app lock on and background checks off, your server passwords are sealed with your PIN, so the job that ends a device's pause ("Pause blocking for this device") couldn't sign in once AdCtrl was locked, which is the normal case after closing the app. It gave up after about 2.5 hours and the allow-everything rule stayed, so that device (say, a kid's tablet) stayed unfiltered until you next opened AdCtrl. Now, when you pause a device, AdCtrl keeps a separate copy of that server's password just for this job (see Security below), and the pause ends on time even while AdCtrl is locked.
+- **A notification if a device's pause can't be ended.** If ending a pause still fails after the retries (about 2.5 hours, for example because the server can't be reached), AdCtrl now posts a notification "A client pause on … couldn't be ended", saying filtering is still off for that device and to open AdCtrl. On a locked phone it shows no server name. It disappears once the pause is ended.
+- **Pausing a second device no longer makes the first pause last longer.** Each new device pause replaced the job that ends pauses with one for its own end time, so pausing your tablet for 1 hour and then the TV for 8 hours kept the tablet unfiltered for 8 hours. The job is now always set for the pause that ends first.
+- **A device's pause always gets its end job.** The job that ends the pause is now set up before the pause is written to the server, so leaving the screen at the wrong moment can no longer leave a pause with nothing to end it.
+- **"Copy settings" no longer copies a device's pause.** Copying custom rules used to copy an active device pause (its allow-everything rule) to the other server, where nothing would end it, and wiped the other server's own pauses. Device pauses are now left out of the copy, and the other server keeps its own pauses.
+- **"Copy settings" can't leave the other server half-changed.** Going back during a copy cancelled it halfway, and because removals were done first, the other server could end up with blocklists, rewrites or clients removed and the replacements not added. The copy now always runs to its end even if you leave the screen, Back is ignored and the back arrow hidden while it runs, and it adds and changes things before it removes anything. A new client that the other server refuses because a client being removed still uses its address is tried once more after the removals.
+- **"Pause at a set time" keeps its time around clock changes.** On the day the clocks went forward or back (and the day after, for a daily pause), a pause planned for 21:00 started at 20:00 or 22:00. It now always starts at the time you chose.
+- **"Confirm changes" right after opening AdCtrl.** In the first moment after AdCtrl started, a change could go through without the fingerprint or PIN because the setting hadn't been read yet. The setting is now read from storage each time.
+
+### Security
+
+- **The password copy for ending a device's pause.** It is encrypted with its own key in the phone's secure key store (not with your PIN, so the background job can use it while AdCtrl is locked), kept in its own file that is never backed up, used only by the job that ends device pauses, and deleted as soon as no device pause is left on that server, when the server is removed and with "Forgot PIN?". Without the app lock nothing changes: passwords were never sealed then.
+- **"Forgot PIN?" now asks for the phone's own screen lock first.** Resetting the app lock removes every server, so it shouldn't be open to anyone who picks up your unlocked phone. After you confirm, AdCtrl asks for the phone's PIN, pattern, password or a fingerprint; only then is the lock reset. Cancelling leaves everything as it was. A phone without a screen lock keeps the old confirmation alone.
+
 ## v0.18.1 (2026-11-21)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.

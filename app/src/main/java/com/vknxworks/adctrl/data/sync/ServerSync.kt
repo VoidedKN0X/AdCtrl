@@ -11,6 +11,7 @@ import com.vknxworks.adctrl.data.api.FilteringStatus
 import com.vknxworks.adctrl.data.api.Rewrite
 import com.vknxworks.adctrl.data.api.RewriteSettings
 import com.vknxworks.adctrl.data.api.SafeSearch
+import com.vknxworks.adctrl.data.timed.ClientPause
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -65,10 +66,12 @@ private fun rewriteJson(r: Rewrite, withEnabled: Boolean) = buildJsonObject {
 }
 
 /**
- * Applies [plan] to the target server behind [api], one request after the other: removals first, then
- * additions, then changes. A request the server refuses is noted and the rest goes on; read-only
- * mode, a cancelled "Confirm changes" and a server that can't be reached stop everything at once
- * (thrown). [onProgress] gets the number of requests done so far.
+ * Applies [plan] to the target server behind [api], one request after the other: additions first, then
+ * changes, then removals, so a copy that stops halfway (no connection, Confirm changes cancelled) leaves
+ * the target with more than before, never with lists or clients taken away and their replacements missing.
+ * A request the server refuses is noted and the rest goes on; read-only mode, a cancelled "Confirm changes"
+ * and a server that can't be reached stop everything at once (thrown). [onProgress] gets the number of
+ * requests done so far.
  */
 suspend fun applySync(plan: SyncPlan, api: AghClient, version: AghVersion, onProgress: (Int) -> Unit): List<SyncFailure> {
     val failures = mutableListOf<SyncFailure>()
@@ -95,9 +98,6 @@ suspend fun applySync(plan: SyncPlan, api: AghClient, version: AghVersion, onPro
         },
     )
 
-    plan.listsRemove.forEach { l ->
-        step(SyncPart.LISTS, l.name.ifBlank { l.url }) { api.post("filtering/remove_url", buildJsonObject { put("url", l.url); put("whitelist", l.allowlist) }) }
-    }
     plan.listsAdd.forEach { l ->
         val before = failures.size
         step(SyncPart.LISTS, l.name.ifBlank { l.url }) { api.post("filtering/add_url", buildJsonObject { put("name", l.name); put("url", l.url); put("whitelist", l.allowlist) }) }
@@ -107,21 +107,29 @@ suspend fun applySync(plan: SyncPlan, api: AghClient, version: AghVersion, onPro
         }
     }
     plan.listsUpdate.forEach { l -> step(SyncPart.LISTS, l.name.ifBlank { l.url }) { setUrl(l) } }
+    plan.listsRemove.forEach { l ->
+        step(SyncPart.LISTS, l.name.ifBlank { l.url }) { api.post("filtering/remove_url", buildJsonObject { put("url", l.url); put("whitelist", l.allowlist) }) }
+    }
     plan.filteringConfig?.let { (enabled, interval) ->
         step(SyncPart.LISTS, "") { api.post("filtering/config", buildJsonObject { put("enabled", enabled); put("interval", interval) }) }
     }
 
     plan.rules?.let { rules ->
-        step(SyncPart.RULES, "") { api.post("filtering/set_rules", buildJsonObject { put("rules", JsonArray(rules.map { JsonPrimitive(it) })) }) }
+        step(SyncPart.RULES, "") {
+            // The target's client pauses as they are right now (one may have ended or been set since Compare).
+            val current = api.get("filtering/status", FilteringStatus.serializer()).userRules
+            val wanted = ClientPause.forCopy(rules, current)
+            api.post("filtering/set_rules", buildJsonObject { put("rules", JsonArray(wanted.map { JsonPrimitive(it) })) })
+        }
     }
 
-    plan.rewritesRemove.forEach { r -> step(SyncPart.REWRITES, r.domain) { api.post("rewrite/delete", rewriteJson(r, withEnabled = false)) } }
     plan.rewritesAdd.forEach { r -> step(SyncPart.REWRITES, r.domain) { api.post("rewrite/add", rewriteJson(r, withEnabled = version.rewriteToggle)) } }
     plan.rewritesToggle.forEach { r ->
         step(SyncPart.REWRITES, r.domain) {
             api.put("rewrite/update", buildJsonObject { put("target", rewriteJson(r, withEnabled = false)); put("update", rewriteJson(r, withEnabled = true)) })
         }
     }
+    plan.rewritesRemove.forEach { r -> step(SyncPart.REWRITES, r.domain) { api.post("rewrite/delete", rewriteJson(r, withEnabled = false)) } }
     plan.rewritesEnabled?.let { on -> step(SyncPart.REWRITES, "") { api.put("rewrite/settings/update", buildJsonObject { put("enabled", on) }) } }
 
     plan.services?.let { s -> step(SyncPart.SERVICES, "") { api.put("blocked_services/update", AghJson.encodeToJsonElement(BlockedServicesConfig.serializer(), s)) } }
@@ -130,9 +138,26 @@ suspend fun applySync(plan: SyncPlan, api: AghClient, version: AghVersion, onPro
     plan.parental?.let { on -> step(SyncPart.PROTECTION, "") { api.post(if (on) "parental/enable" else "parental/disable") } }
     plan.safeSearch?.let { s -> step(SyncPart.PROTECTION, "") { api.put("safesearch/settings", AghJson.encodeToJsonElement(SafeSearch.serializer(), s)) } }
 
-    plan.clientsRemove.forEach { name -> step(SyncPart.CLIENTS, name) { api.post("clients/delete", buildJsonObject { put("name", name) }) } }
-    plan.clientsAdd.forEach { c -> step(SyncPart.CLIENTS, c.name) { api.post("clients/add", c.data) } }
+    val clientAddFailures = mutableListOf<Pair<SyncClient, SyncFailure>>()
+    plan.clientsAdd.forEach { c ->
+        val before = failures.size
+        step(SyncPart.CLIENTS, c.name) { api.post("clients/add", c.data) }
+        if (failures.size > before) clientAddFailures += c to failures.last()
+    }
     plan.clientsUpdate.forEach { c -> step(SyncPart.CLIENTS, c.name) { api.post("clients/update", buildJsonObject { put("name", c.name); put("data", c.data) }) } }
+    plan.clientsRemove.forEach { name -> step(SyncPart.CLIENTS, name) { api.post("clients/delete", buildJsonObject { put("name", name) }) } }
+    // A new client can be refused because a client that is removed above still used its address: try those once more.
+    for ((c, failure) in clientAddFailures) {
+        val ok = try {
+            api.post("clients/add", c.data)
+            true
+        } catch (e: AghError.Server) {
+            false
+        } catch (e: AghError.Forbidden) {
+            false
+        }
+        if (ok) failures.remove(failure)
+    }
 
     return failures
 }
