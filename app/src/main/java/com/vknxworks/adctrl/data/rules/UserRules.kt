@@ -148,16 +148,31 @@ class UserRules(private val sessions: Sessions) {
      * (what AdGuard Home's check reports, plus exact opposites of [newRule] in the list): shown in
      * the dialog as the lines that can be removed.
      */
-    suspend fun opposing(block: Boolean, host: String, client: String?, newRule: String?): List<String> {
+    suspend fun opposing(block: Boolean, host: String, client: String?, newRule: String?, qtype: String? = null): List<String> {
         val active = sessions.active.value ?: return emptyList()
-        return opposingOn(active.client, active.server, block, host, client, newRule, check(active.client, active.server, host, client))
+        return opposingOn(active.client, active.server, block, host, client, newRule, check(active.client, active.server, host, client, qtype))
     }
 
     /**
      * Blocks ([block]) or allows [host] on the active server, or on every writable server with
      * [allServers]. With [removeOpposing], your opposing custom rules are removed first.
+     *
+     * [qtype] is the query type to check with (the logged query's type; A when null). [loggedBlocked]
+     * is whether the query-log entry this comes from was blocked: when the log contradicts AdGuard
+     * Home's check (the entry was blocked but the check says it isn't, or the reverse), the rule is
+     * still added. The check can't see why a logged query was blocked: a blocked CNAME target in the
+     * answer, a rule for another query type, or a blocked-services schedule that isn't active now.
      */
-    suspend fun apply(block: Boolean, host: String, client: String?, newRule: String, allServers: Boolean, removeOpposing: Boolean = true): RuleResult {
+    suspend fun apply(
+        block: Boolean,
+        host: String,
+        client: String?,
+        newRule: String,
+        allServers: Boolean,
+        removeOpposing: Boolean = true,
+        qtype: String? = null,
+        loggedBlocked: Boolean? = null,
+    ): RuleResult {
         val active = sessions.active.value ?: return RuleResult(emptyList(), emptyList())
         val targets = if (allServers) sessions.servers.value.filter { !it.readOnly } else listOf(active.server)
         val done = mutableListOf<Pair<Server, RuleOutcome>>()
@@ -166,7 +181,7 @@ class UserRules(private val sessions: Sessions) {
         targets.forEach { server ->
             val api = if (server.id == active.server.id) active.client else sessions.clientFor(server)
             try {
-                val (outcome, change) = applyOn(api, server, block, host, client, newRule, removeOpposing)
+                val (outcome, change) = applyOn(api, server, block, host, client, newRule, removeOpposing, qtype, loggedBlocked)
                 done += server to outcome
                 changes[server.id] = change
             } catch (e: AghError) {
@@ -202,11 +217,16 @@ class UserRules(private val sessions: Sessions) {
         client: String?,
         newRule: String,
         removeOpposing: Boolean,
+        qtype: String?,
+        loggedBlocked: Boolean?,
     ): Pair<RuleOutcome, RuleChange> {
-        val before = check(api, server, host, client)
+        val before = check(api, server, host, client, qtype)
         val remove = if (removeOpposing) opposingOn(api, server, block, host, client, newRule, before) else emptyList()
+        // The query log saw the opposite of what's asked (unblocking a query it shows blocked, or
+        // blocking one it shows let through): trust it over the check, which can't see every reason.
+        val logContradictsCheck = loggedBlocked == !block
         if (remove.isEmpty()) {
-            if (removeOpposing && isAsWanted(block, before)) return RuleOutcome.ALREADY to RuleChange()
+            if (removeOpposing && isAsWanted(block, before) && !logContradictsCheck) return RuleOutcome.ALREADY to RuleChange()
             return addRule(api, newRule)?.let { RuleOutcome.ADDED to it } ?: (RuleOutcome.ALREADY to RuleChange())
         }
 
@@ -218,7 +238,7 @@ class UserRules(private val sessions: Sessions) {
         // AdGuard Home reloads the rules in the background: wait until the removed rules no longer match.
         repeat(RELOAD_CHECKS) {
             delay(RELOAD_WAIT_MS)
-            val after = check(api, server, host, client)
+            val after = check(api, server, host, client, qtype)
             if (after.rules.none { it.filterListId == 0L && it.text.trim() in drop }) {
                 return if (isAsWanted(block, after)) {
                     RuleOutcome.REMOVED to RuleChange(removed = removed)
@@ -252,12 +272,16 @@ class UserRules(private val sessions: Sessions) {
 
     private fun isAsWanted(block: Boolean, r: CheckHostResult): Boolean = if (block) r.kind.isBlocked else !r.kind.isBlocked
 
-    private suspend fun check(api: AghClient, server: Server, host: String, client: String?): CheckHostResult {
+    private suspend fun check(api: AghClient, server: Server, host: String, client: String?, qtype: String? = null): CheckHostResult {
         val version = AghVersion.parse(server.version)
         val name = RuleBuilder.normalizeHost(host) ?: host.trim().trimEnd('.')
         val query = buildMap {
             put("name", name)
-            if (version.checkHostClient) client?.takeIf { it.isNotBlank() }?.let { put("client", it.trim()) }
+            if (version.checkHostClient) {
+                client?.takeIf { it.isNotBlank() }?.let { put("client", it.trim()) }
+                // Check with the logged query's type, so rules for AAAA or HTTPS only are seen too.
+                qtype?.trim()?.takeIf { it.isNotEmpty() && it.all { ch -> ch.isLetterOrDigit() } }?.let { put("qtype", it) }
+            }
         }
         return api.get("filtering/check_host", CheckHostResult.serializer(), query)
     }

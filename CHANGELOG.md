@@ -4,6 +4,16 @@ What changed in each AdCtrl release. Every release on the [Releases page](https:
 
 To publish a new version: bump `versionCode` and `versionName` in `app/build.gradle.kts`, add a section here, and push to `main`. Pushes without a version bump only build; they don't make a release.
 
+## v0.18.3 (2026-11-25)
+
+Built and checked by CI only: nothing in this release had been run on a phone when it was published.
+
+### Fixed
+
+- **Unblocking a blocked query now always adds the allow rule to your custom rules.** Before adding anything, AdCtrl asks AdGuard Home's "check host" whether the domain is blocked, and when the check said it wasn't, AdCtrl answered "… already isn't blocked" and changed nothing. But that check can't see every reason a query in the log was blocked: a tracker hidden behind a CNAME (the name itself is fine, the address it points to is on a blocklist), a rule only for AAAA or HTTPS queries, or a blocked-services schedule that isn't active right now. Unblocking a query that the query log shows as blocked now adds the `@@…$important` allow rule even when the check disagrees. If one of your own custom rules blocks it, that line is still removed first, as before
+- **Block works the same way the other way round.** Blocking a query the log shows as let through now adds the block rule even if the check says the domain is already blocked
+- **The check uses the query's own type.** Block and Unblock from the query log now check the domain with the type of the query you tapped (A, AAAA, HTTPS, …) instead of always A, so rules for one query type are taken into account
+
 ## v0.18.2 (2026-11-22)
 
 Built and checked by CI only: nothing in this release had been run on a phone when it was published.

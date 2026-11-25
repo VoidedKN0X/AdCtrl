@@ -319,12 +319,16 @@ fun QueriesScreen() {
             client = ruleClient,
             clientLabel = item.clientLabel,
             writableServers = servers.count { !it.readOnly },
-            loadOpposing = { rule -> c.userRules.opposing(target.block, item.asciiDomain, ruleClient, rule) },
+            loadOpposing = { rule -> c.userRules.opposing(target.block, item.asciiDomain, ruleClient, rule, item.question.type) },
             onDismiss = { ruleTarget = null },
             onSave = { rule, all, removeOpposing ->
                 ruleTarget = null
                 scope.launch {
-                    val result = c.userRules.apply(target.block, item.asciiDomain, ruleClient, rule, all, removeOpposing)
+                    val result = c.userRules.apply(
+                        target.block, item.asciiDomain, ruleClient, rule, all, removeOpposing,
+                        qtype = item.question.type,
+                        loggedBlocked = item.kind.isBlocked,
+                    )
                     showRuleResult(context, snackbar, c.userRules, result, target.block, item.domain)
                 }
             },
